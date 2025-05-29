@@ -5,7 +5,8 @@ description = "BillBoard"
 authors = [{name = "Arkhan Lewis", email = "arkhan.lewis@uwaterloo.com"}]
 # add ur email if u care it doesnt affect anything
 dependencies = [
-    "fastapi",
+    "fastapi[standard]",
+    "uvicorn"
 ]
 requires-python = ">=3.8"
 
