@@ -6,7 +6,10 @@ authors = [{name = "Arkhan Lewis", email = "arkhan.lewis@uwaterloo.com"}]
 # add ur email if u care it doesnt affect anything
 dependencies = [
     "fastapi[standard]",
-    "uvicorn"
+    "uvicorn",
+    "psycopg2",
+    "boto3"
+
 ]
 requires-python = ">=3.8"
 
