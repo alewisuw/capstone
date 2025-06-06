@@ -4,6 +4,7 @@ import psycopg2
 import requests
 from google.oauth2 import service_account
 import google.auth.transport.requests
+from sentence_transformers import SentenceTransformer
 
 #CURRENTLY SET TO FLASH 2.0, CAN CHANGE AS NEEDED
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
@@ -58,7 +59,6 @@ def get_token():
 
     service_account_info = json.loads(SERVICE_ACCOUNT_JSON)
 
-
     # Load the service account credentials with the Gemini scope
     creds = service_account.Credentials.from_service_account_info(
         service_account_info,
@@ -106,9 +106,6 @@ def summarize(text, token, length='full'):
 
     
     response = requests.post(GEMINI_URL, json=payload, headers=headers)
-    # Debugging
-    # print(response.status_code)
-    # print(response.json())
 
     response.raise_for_status()
     result = response.json()
@@ -178,6 +175,12 @@ def main():
     conn.close()
 
     return {"status": "tested", "summarized_count": len(results)}
+
+
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+def get_embedding(text):
+    return model.encode(text).tolist()
 
 if __name__ == "__main__":
     response = main()
