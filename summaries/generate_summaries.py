@@ -141,7 +141,7 @@ def main():
     # select bills
     cursor.execute("""
         SELECT bill_id, text_en FROM bills_billtext
-        LIMIT 2
+        ORDER BY created DESC LIMIT 1 
     """)
     bills = cursor.fetchall()
 
