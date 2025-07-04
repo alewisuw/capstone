@@ -5,3 +5,4 @@ venv/
 venv
 env
 **.egg-info
+.DS_Store

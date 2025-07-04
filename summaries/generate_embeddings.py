@@ -5,9 +5,9 @@ from sentence_transformers import SentenceTransformer
 
 # --- Local Config --- change as needed this works for my local db
 PG_CONFIG = {
-    "dbname": "billsdb",
+    "dbname": "postgres",
     "user": "postgres",
-    "password": "postgres",
+    "password": "test",
     "host": "localhost",
     "port": 5432,
 }
@@ -36,8 +36,6 @@ qdrant.create_collection(
     collection_name=COLLECTION_NAME,
     vectors_config=VectorParams(size=384, distance=Distance.COSINE),
 )
-
-
 
 # --- Load embedding model ---
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")  # ~384D vectors
@@ -69,7 +67,7 @@ points = []
 
 for idx, (bill_id, text) in enumerate(rows):
     if text:
-        embedding = model.encode(text).tolist()
+        embedding = model.encode(text).tolist()  # type: ignore
         point = PointStruct(
             id=int(bill_id),  # Must be unique
             vector=embedding,
@@ -91,5 +89,3 @@ print("✅ Done: Embeddings stored in Qdrant.")
 # --- Cleanup ---
 cur.close()
 conn.close()
-
-#TO-DO: Change payload to include summaries

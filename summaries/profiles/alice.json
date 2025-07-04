@@ -4,5 +4,12 @@
     "data privacy",
     "climate change",
     "reproductive rights"
-  ]
+  ],
+  "demographics": {
+    "age": 28,
+    "income": "middle",
+    "location": "urban",
+    "education": "bachelor",
+    "occupation": "tech"
+  }
 }

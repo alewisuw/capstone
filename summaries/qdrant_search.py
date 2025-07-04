@@ -9,9 +9,9 @@ COLLECTION_NAME = "bill_text_embeddings"
 TAGS_FILE = "summaries/tags.json"
 #change as needed this works for my local db
 PG_CONFIG = {
-    "dbname": "billsdb",
+    "dbname": "postgres",
     "user": "postgres",
-    "password": "postgres",
+    "password": "test",
     "host": "localhost",
     "port": 5432,
 }
@@ -35,7 +35,7 @@ if user_input not in valid_terms:
     sys.exit(1)
 
 # --- Embed the query ---
-query_vector = model.encode(user_input).tolist()
+query_vector = model.encode(user_input).tolist()  # type: ignore
 
 # --- Connect to Qdrant ---
 qdrant = QdrantClient("localhost", port=6333)

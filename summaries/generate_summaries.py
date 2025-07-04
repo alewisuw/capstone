@@ -180,7 +180,7 @@ def main():
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 def get_embedding(text):
-    return model.encode(text).tolist()
+    return model.encode(text).tolist() #type: ignore
 
 if __name__ == "__main__":
     response = main()
