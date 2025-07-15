@@ -26,12 +26,12 @@ with open(TAGS_FILE, "r") as f:
 valid_terms = [term.lower() for sublist in tag_data.values() for term in sublist]
 
 # --- Ask user for input ---
-print("\n🔍 Available search topics (example):")
+print("Available search topics (example):")
 print(", ".join(valid_terms[:10]) + ", ...")
 user_input = input("\nEnter your search term (must match a listed topic): ").strip().lower()
 
 if user_input not in valid_terms:
-    print(f"❌ Invalid topic. Please choose from one of the listed subtopics in '{TAGS_FILE}'")
+    print(f"Invalid topic. Please choose from one of the listed subtopics in '{TAGS_FILE}'")
     sys.exit(1)
 
 # --- Embed the query ---
