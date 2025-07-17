@@ -2,8 +2,10 @@ import json
 import sys
 import os
 import psycopg2
+import numpy as np
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
+from embedding_fusion import EmbeddingFusion
 
 # --- Config ---
 COLLECTION_NAME = "bill_text_embeddings"
@@ -19,7 +21,7 @@ PG_CONFIG = {
 
 # --- Get user from CLI ---
 if len(sys.argv) < 2:
-    print("Usage: python profile_recommend.py <username>")
+    print("Usage: python summaries/profile_recommendations.py <username>")
     sys.exit(1)
 
 username = sys.argv[1].lower()
@@ -34,18 +36,24 @@ with open(profile_path, "r") as f:
     profile = json.load(f)
 
 interests = profile.get("interests", [])
+demographics = profile.get("demographics", {})
 if not interests:
     print("No interests found in profile.")
     sys.exit(1)
 
 print(f"\nFinding bills for {profile['name']}'s interests: {', '.join(interests)}")
+if demographics:
+    print(f"Demographics: Age {demographics.get('age', 'N/A')}, Income: {demographics.get('income', 'N/A')}, Location: {demographics.get('location', 'N/A')}")
 
-# --- Load model and Qdrant client ---
+
+# --- Initialize models and clients ---
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 qdrant = QdrantClient("localhost", port=6333)
+fusion = EmbeddingFusion()
 
-# --- Connect to PostgreSQL ---
+# --- Database helper function ---
 def get_summary(bill_id):
+    """Fetch bill summary from PostgreSQL database"""
     try:
         conn = psycopg2.connect(**PG_CONFIG)
         cur = conn.cursor()
@@ -57,7 +65,22 @@ def get_summary(bill_id):
     except Exception as e:
         return f"[DB error: {e}]"
 
-# --- Method 1: Average vector of interests ---
+# --- Method 1: Fused embedding search (combines interests + demographics) ---
+print("Creating fused embedding...")
+fused_vector = fusion.create_fused_embedding(
+    interests=interests,
+    demographics=demographics
+)
+
+fused_results = qdrant.search(
+    collection_name=COLLECTION_NAME,
+    query_vector=fused_vector.tolist(),
+    limit=3,
+    with_payload=True,
+    with_vectors=False,
+)
+
+# --- Method 2: Average vector of interests ---
 avg_vector = model.encode(interests).mean(axis=0).tolist() #type: ignore
 
 avg_results = qdrant.search(
@@ -68,7 +91,7 @@ avg_results = qdrant.search(
     with_vectors=False,
 )
 
-# --- Method 2: Individual tag queries (collect top scores) ---
+# --- Method 3: Individual tag queries (collect top scores) ---
 individual_results = []
 
 for tag in interests:
@@ -96,7 +119,7 @@ for hit in sorted(individual_results, key=lambda x: -x.score):
 
 # --- Method 3: Blended Results ---
 avg_score_map = {hit.payload.get("bill_id"): hit.score for hit in avg_results} #type: ignore
-tag_score_map = {hit.payload.get("bill_id"): hit.score for hit in unique_results}
+tag_score_map = {hit.payload.get("bill_id"): hit.score for hit in unique_results} #type: ignore
 
 all_ids = set(avg_score_map) | set(tag_score_map)
 blended_results = []
@@ -135,7 +158,7 @@ def display_results(results, method_name):
         print("-" * 50)
 
 def display_blended(results, method_name):
-    print(f"\nTop 3 results ({method_name})\n" + "=" * 50)
+    print(f"\n🔷 Top 3 results ({method_name})\n" + "=" * 50)
     for i, (bill_id, score) in enumerate(results, 1):
         payload = get_payload_by_id(bill_id)
         summary = get_summary(bill_id)
@@ -147,7 +170,7 @@ def display_blended(results, method_name):
         print("-" * 50)
 
 # --- Output all results ---
-display_results(avg_results, "Average Vector Search")
-display_results(unique_results, "Top Individual Tag Matches")
-display_blended(top_blended, "Blended Method (Average + Tag Score)")
-#TO-DO: Take summary from payload
+display_results(fused_results, "Fused Embedding Search (Interests + Demographics)")
+display_results(interest_results, "Interest-Only Search")
+display_results(unique_individual_results, "Individual Interest Search")
+display_blended(top_blended, "Blended Method (Fused + Individual Scores)")

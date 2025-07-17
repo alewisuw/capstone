@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from typing import List, Dict, Optional
+from typing import List, Dict
 from sentence_transformers import SentenceTransformer
 from demographic_enums import DemographicContextGenerator
 
