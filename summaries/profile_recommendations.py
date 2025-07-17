@@ -5,7 +5,6 @@ import psycopg2
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
-from demographic_enums import validate_demographics
 from embedding_fusion import EmbeddingFusion
 
 # --- Config ---
@@ -46,13 +45,6 @@ print(f"\n🔍 Finding bills for {profile['name']}'s interests: {', '.join(inter
 if demographics:
     print(f"📊 Demographics: Age {demographics.get('age', 'N/A')}, Income: {demographics.get('income', 'N/A')}, Location: {demographics.get('location', 'N/A')}")
 
-# Validate demographics
-validation_errors = validate_demographics(demographics)
-if validation_errors:
-    print("⚠️  Warning: Invalid demographic values found:")
-    for field, errors in validation_errors.items():
-        for error in errors:
-            print(f"   - {error}")
 
 # --- Initialize models and clients ---
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
@@ -74,12 +66,10 @@ def get_summary(bill_id):
         return f"[DB error: {e}]"
 
 # --- Method 1: Fused embedding search (combines interests + demographics) ---
-print("\n🔬 Creating fused embedding...")
+print("Creating fused embedding...")
 fused_vector = fusion.create_fused_embedding(
     interests=interests,
-    demographics=demographics,
-    strategy="weighted_average",
-    weights={"interest": 0.8, "demographic": 0.2}
+    demographics=demographics
 )
 
 fused_results = qdrant.search(
