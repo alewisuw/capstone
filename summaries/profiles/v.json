@@ -1,0 +1,15 @@
+{
+  "name": "V",
+  "interests": [
+    "infrastructure resilience"
+  ],
+  "demographics": {
+    "age": "18_24",
+    "gender_identity": "man",
+    "ethnicity_racial_identity": "east_asian",
+    "indigenous_status": "not_indigenous",
+    "sexual_orientation": "heterosexual_straight",
+    "income_range": "60000_79999",
+    "disability_status": "no_disability"
+  }
+}

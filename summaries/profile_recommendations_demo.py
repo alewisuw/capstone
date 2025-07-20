@@ -21,7 +21,7 @@ PG_CONFIG = {
 
 # --- Get user from CLI ---
 if len(sys.argv) < 2:
-    print("Usage: python summaries/profile_recommendations.py <username>")
+    print("Usage: python summaries/profile_recommendations_demo.py <username>")
     sys.exit(1)
 
 username = sys.argv[1].lower()
@@ -43,7 +43,10 @@ if not interests:
 
 print(f"\nFinding bills for {profile['name']}'s interests: {', '.join(interests)}")
 if demographics:
-    print(f"Demographics: Age {demographics.get('age', 'N/A')}, Income: {demographics.get('income', 'N/A')}, Location: {demographics.get('location', 'N/A')}")
+    print(f"Demographics collected: {len(demographics)} categories")
+    for key, value in demographics.items():
+        if value and value != "prefer_not_to_say":
+            print(f"  - {key.replace('_', ' ').title()}: {value.replace('_', ' ').title()}")
 
 
 # --- Initialize models and clients ---
@@ -171,6 +174,6 @@ def display_blended(results, method_name):
 
 # --- Output all results ---
 display_results(fused_results, "Fused Embedding Search (Interests + Demographics)")
-display_results(interest_results, "Interest-Only Search")
-display_results(unique_individual_results, "Individual Interest Search")
-display_blended(top_blended, "Blended Method (Fused + Individual Scores)")
+display_results(avg_results, "Average Vector Search")
+display_results(unique_results, "Top Individual Tag Matches")
+display_blended(top_blended, "Blended Method (Average + Tag Score)")

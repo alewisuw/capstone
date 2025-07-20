@@ -22,6 +22,7 @@ class EmbeddingFusion:
     
     def create_demographic_embedding(self, demographics: Dict) -> np.ndarray:
         terms = DemographicContextGenerator.generate_demographic_context(demographics) if demographics else []
+        print(f'terms: {terms}')
         return self._encode_or_zero(terms)
     
     def create_interest_embedding(self, interests: List[str]) -> np.ndarray:

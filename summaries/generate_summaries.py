@@ -46,8 +46,6 @@ PG_CONFIG = {
 }
 
 
-
-
 def get_token():
     service_account_info = json.loads(SERVICE_ACCOUNT_JSON)
     creds = service_account.Credentials.from_service_account_info(
