@@ -89,8 +89,8 @@ qdrant = QdrantClient("localhost", port=6333)
 fusion = EmbeddingFusion()
 
 # --- Database helper function ---
-def get_summary(bill_id):
-    """Fetch bill summary from PostgreSQL database"""
+def get_bill_info(bill_id):
+    """Fetch bill title and summary from PostgreSQL database"""
     try:
         conn = psycopg2.connect(
             host=DB_HOST,
@@ -100,13 +100,30 @@ def get_summary(bill_id):
             password=DB_PASS
         )
         cur = conn.cursor()
-        cur.execute("SELECT llm_summary FROM bills_billtext WHERE bill_id = %s;", (bill_id,))
+        cur.execute("""
+            SELECT bt.llm_summary, b.name_en
+            FROM bills_billtext bt
+            JOIN bills_bill b ON bt.bill_id = b.id
+            WHERE bt.bill_id = %s;
+        """, (bill_id,))
         row = cur.fetchone()
         cur.close()
         conn.close()
-        return row[0] if row else "[No summary found]"
+        if row:
+            return {
+                "summary": row[0] or "[No summary found]",
+                "title": row[1] or "[No title found]"
+            }
+        else:
+            return {
+                "summary": "[No summary found]",
+                "title": "[No title found]"
+            }
     except Exception as e:
-        return f"[DB error: {e}]"
+        return {
+            "summary": f"[DB error: {e}]",
+            "title": f"[DB error: {e}]"
+        }
 
 # --- Method 1: Fused embedding search (combines interests + demographics) ---
 print("Creating fused embedding...")
@@ -192,24 +209,27 @@ def display_results(results, method_name):
     print(f"\nTop 5 results ({method_name})\n" + "=" * 50)
     for i, hit in enumerate(results, 1):
         bill_id = hit.payload.get("bill_id", "N/A")
-        summary = get_summary(bill_id)
+        bill_info = get_bill_info(bill_id)
         print(f"\nResult #{i}")
         print(f"Bill ID: {bill_id}")
         # print(f"Score: {hit.score:.4f}")
+        print(f"Title: {bill_info['title']}")
         print("Summary:")
-        print(summary)
+        print(bill_info['summary'])
         print("-" * 50)
+
 
 def display_blended(results, method_name):
     print(f"\nTop 5 results ({method_name})\n" + "=" * 50)
     for i, (bill_id, score) in enumerate(results, 1):
         payload = get_payload_by_id(bill_id)
-        summary = get_summary(bill_id)
+        bill_info = get_bill_info(bill_id)
         print(f"\nResult #{i}")
         print(f"Bill ID: {bill_id}")
-        # print(f"Blended Score: {score:.4f}")
+        # print(f"Score: {hit.score:.4f}")
+        print(f"Title: {bill_info['title']}")
         print("Summary:")
-        print(summary)
+        print(bill_info['summary'])
         print("-" * 50)
 
 # --- Output all results ---

@@ -76,9 +76,7 @@ while True:
         with_vectors=False,
     )
 
-
-    # --- Connect to PostgreSQL ---
-    def get_summary(bill_id):
+    def get_bill_info(bill_id):
         try:
             conn = psycopg2.connect(
                 host=DB_HOST,
@@ -88,13 +86,31 @@ while True:
                 password=DB_PASS
             )
             cur = conn.cursor()
-            cur.execute("SELECT llm_summary FROM bills_billtext WHERE bill_id = %s;", (bill_id,))
+            cur.execute("""
+                SELECT bt.llm_summary, b.name_en
+                FROM bills_billtext bt
+                JOIN bills_bill b ON bt.bill_id = b.id
+                WHERE bt.bill_id = %s;
+            """, (bill_id,))
             row = cur.fetchone()
             cur.close()
             conn.close()
-            return row[0] if row else "[No summary found]"
+            if row:
+                return {
+                    "summary": row[0] or "[No summary found]",
+                    "title": row[1] or "[No title found]"
+                }
+            else:
+                return {
+                    "summary": "[No summary found]",
+                    "title": "[No title found]"
+                }
         except Exception as e:
-            return f"[DB error: {e}]"
+            return {
+                "summary": f"[DB error: {e}]",
+                "title": f"[DB error: {e}]"
+            }
+
 
     # --- Display results ---
     print(f"\nTop 3 results for: '{user_input}'\n" + "=" * 50)
@@ -105,10 +121,10 @@ while True:
         if bill_id is None:
             continue
 
-        summary = get_summary(bill_id)
+        bill_info = get_bill_info(bill_id)
         print(f"\nResult #{i}")
         print(f"Bill ID: {bill_id}")
-        # print(f"Score: {hit.score:.4f}")
+        print(f"Title: {bill_info['title']}")
         print("Summary:")
-        print(summary)
+        print(bill_info['summary'])
         print("-" * 50)
