@@ -56,12 +56,6 @@ def get_token():
     return creds.token
 
 def summarize(text, token):
-    """
-    Generate a single digestible summary of the bill with:
-    - Introduction/purpose
-    - Bullet points for key changes/impacts/takeaways
-    Designed for ~1 minute reading time.
-    """
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json"
@@ -69,7 +63,7 @@ def summarize(text, token):
 
     prompt_text = (
     "You are an AI tasked with summarizing Canadian legal bills. "
-    "Do not include any introductory phrases or conversational responses. "
+    "Do not include any introductory phrases or conversational responses and do not format it in markdown. "
     "Just output the summary based on provided text only.\n\n"
     "The summary should:\n"
     "- Begin with a short, clear introduction explaining what the bill is and its purpose.\n"
@@ -97,22 +91,37 @@ def summarize(text, token):
 def main():
     token = get_token()
 
-    # conn = psycopg2.connect(
-    #     host=DB_HOST,
-    #     port=DB_PORT,
-    #     dbname=DB_NAME,
-    #     user=DB_USER,
-    #     password=DB_PASS
-    # )
-    # cursor = conn.cursor()
-
-    # --- Connect to PostgreSQL ---
-    conn = psycopg2.connect(**PG_CONFIG)
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        dbname=DB_NAME,
+        user=DB_USER,
+        password=DB_PASS
+    )
     cursor = conn.cursor()
 
+    # --- Connect to PostgreSQL ---
+    # conn = psycopg2.connect(**PG_CONFIG)
+    # cursor = conn.cursor()
+
     cursor.execute("""
-        SELECT bill_id, text_en FROM bills_billtext WHERE bill_id = 8526
-        ORDER BY created DESC LIMIT 1
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='bills_billtext' AND column_name='llm_summary'
+            ) THEN
+                ALTER TABLE bills_billtext ADD COLUMN llm_summary TEXT;
+            END IF;
+        END
+        $$;
+    """)
+    conn.commit()
+
+    cursor.execute("""
+        SELECT bill_id, text_en FROM bills_billtext
+        WHERE llm_summary IS NULL
+        ORDER BY created DESC
     """)
     bills = cursor.fetchall()
 
@@ -129,12 +138,13 @@ def main():
                 "summary": summary
             })
 
-            # Optional: Insert summary back into DB
-            # cursor.execute("""
-            #     INSERT INTO bill_summaries (bill_id, summary)
-            #     VALUES (%s, %s)
-            # """, (bill_id, summary))
-            # conn.commit()
+            cursor.execute("""
+                UPDATE bills_billtext
+                SET llm_summary = %s
+                WHERE bill_id = %s
+            """, (summary, bill_id))
+            conn.commit()
+
         except Exception as e:
             print(f"Error summarizing bill {bill_id}: {e}")
             conn.rollback()
@@ -143,11 +153,6 @@ def main():
     conn.close()
 
     return {"status": "tested", "summarized_count": len(results)}
-
-model = SentenceTransformer('all-MiniLM-L6-v2')
-
-def get_embedding(text):
-    return model.encode(text).tolist()  # type: ignore
 
 if __name__ == "__main__":
     response = main()

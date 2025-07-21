@@ -1,6 +1,7 @@
 import json
 import sys
 import os
+import boto3
 import psycopg2
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -9,19 +10,52 @@ from embedding_fusion import EmbeddingFusion
 
 # --- Config ---
 COLLECTION_NAME = "bill_text_embeddings"
-PROFILE_DIR = "summaries/profiles"
+PROFILE_DIR = "retrieval/profiles"
+
+
+ssm = boto3.client('ssm', region_name='ca-central-1')
+
+PARAMETER_NAMES = [
+    '/billBoard/GEMINI_API_KEY',
+    '/billBoard/DB_HOST',
+    '/billBoard/DB_PASSWORD',
+    '/billBoard/SERVICE_ACCOUNT_JSON'
+]
+
+def get_parameters(names, with_decryption=True):
+    response = ssm.get_parameters(
+        Names=names,
+        WithDecryption=with_decryption
+    )
+    parameters = {param['Name']: param['Value'] for param in response['Parameters']}
+    if response['InvalidParameters']:
+        print(f"Missing parameters: {response['InvalidParameters']}")
+    return parameters
+
+creds = get_parameters(PARAMETER_NAMES)
+
+GEMINI_API_KEY = creds['/billBoard/GEMINI_API_KEY']
+DB_HOST = creds['/billBoard/DB_HOST']
+DB_PORT = 5432
+DB_NAME = 'postgres'
+DB_USER = 'postgres'
+DB_PASS = creds['/billBoard/DB_PASSWORD']
+SERVICE_ACCOUNT_JSON = creds['/billBoard/SERVICE_ACCOUNT_JSON']
+
+
+#LOCAL 
 #change as needed this works for my local db
 PG_CONFIG = {
-    "dbname": "postgres",
+    "dbname": "billsdb",
     "user": "postgres",
-    "password": "nae8t02krp9",
+    "password": "postgres",
     "host": "localhost",
     "port": 5432,
 }
 
 # --- Get user from CLI ---
 if len(sys.argv) < 2:
-    print("Usage: python summaries/profile_recommendations_demo.py <username>")
+    print("Usage: python retrieval/profile_recommendations_demo.py <username>")
     sys.exit(1)
 
 username = sys.argv[1].lower()
@@ -58,9 +92,15 @@ fusion = EmbeddingFusion()
 def get_summary(bill_id):
     """Fetch bill summary from PostgreSQL database"""
     try:
-        conn = psycopg2.connect(**PG_CONFIG)
+        conn = psycopg2.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASS
+        )
         cur = conn.cursor()
-        cur.execute("SELECT summary_en FROM bills_billtext WHERE bill_id = %s;", (bill_id,))
+        cur.execute("SELECT llm_summary FROM bills_billtext WHERE bill_id = %s;", (bill_id,))
         row = cur.fetchone()
         cur.close()
         conn.close()
@@ -78,7 +118,7 @@ fused_vector = fusion.create_fused_embedding(
 fused_results = qdrant.search(
     collection_name=COLLECTION_NAME,
     query_vector=fused_vector.tolist(),
-    limit=3,
+    limit=6,
     with_payload=True,
     with_vectors=False,
 )
@@ -89,7 +129,7 @@ avg_vector = model.encode(interests).mean(axis=0).tolist() #type: ignore
 avg_results = qdrant.search(
     collection_name=COLLECTION_NAME,
     query_vector=avg_vector,
-    limit=3,
+    limit=5,
     with_payload=True,
     with_vectors=False,
 )
@@ -117,7 +157,7 @@ for hit in sorted(individual_results, key=lambda x: -x.score):
     if bill_id not in seen_ids:
         seen_ids.add(bill_id)
         unique_results.append(hit)
-    if len(unique_results) == 3:
+    if len(unique_results) == 6:
         break
 
 # --- Method 3: Blended Results ---
@@ -134,7 +174,7 @@ for bill_id in all_ids:
     blended_results.append((bill_id, final_score))
 
 # Sort and get top 3 blended results
-top_blended = sorted(blended_results, key=lambda x: -x[1])[:3]
+top_blended = sorted(blended_results, key=lambda x: -x[1])[:5]
 
 # Helper to fetch payload for bill_id
 def get_payload_by_id(bill_id):
@@ -149,31 +189,31 @@ def get_payload_by_id(bill_id):
 
 # --- Display functions ---
 def display_results(results, method_name):
-    print(f"\n🔹 Top 3 results ({method_name})\n" + "=" * 50)
+    print(f"\nTop 5 results ({method_name})\n" + "=" * 50)
     for i, hit in enumerate(results, 1):
         bill_id = hit.payload.get("bill_id", "N/A")
         summary = get_summary(bill_id)
         print(f"\nResult #{i}")
         print(f"Bill ID: {bill_id}")
-        print(f"Score: {hit.score:.4f}")
+        # print(f"Score: {hit.score:.4f}")
         print("Summary:")
-        print(summary[:400].replace("\n", " ") + "...")
+        print(summary)
         print("-" * 50)
 
 def display_blended(results, method_name):
-    print(f"\n🔷 Top 3 results ({method_name})\n" + "=" * 50)
+    print(f"\nTop 5 results ({method_name})\n" + "=" * 50)
     for i, (bill_id, score) in enumerate(results, 1):
         payload = get_payload_by_id(bill_id)
         summary = get_summary(bill_id)
         print(f"\nResult #{i}")
         print(f"Bill ID: {bill_id}")
-        print(f"Blended Score: {score:.4f}")
+        # print(f"Blended Score: {score:.4f}")
         print("Summary:")
-        print(summary[:400].replace("\n", " ") + "...")
+        print(summary)
         print("-" * 50)
 
 # --- Output all results ---
 display_results(fused_results, "Fused Embedding Search (Interests + Demographics)")
-display_results(avg_results, "Average Vector Search")
+# display_results(avg_results, "Average Vector Search")
 display_results(unique_results, "Top Individual Tag Matches")
-display_blended(top_blended, "Blended Method (Average + Tag Score)")
+# display_blended(top_blended, "Blended Method (Average + Tag Score)")

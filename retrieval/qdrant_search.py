@@ -6,7 +6,7 @@ from qdrant_client import QdrantClient
 
 # --- Config ---
 COLLECTION_NAME = "bill_text_embeddings"
-TAGS_FILE = "summaries/tags.json"
+TAGS_FILE = "tagging/tags.json"
 #change as needed this works for my local db
 PG_CONFIG = {
     "dbname": "postgres",
@@ -64,7 +64,7 @@ def get_summary(bill_id):
         return f"[DB error: {e}]"
 
 # --- Display results ---
-print(f"\n✅ Top 3 results for: '{user_input}'\n" + "=" * 50)
+print(f"\nTop 3 results for: '{user_input}'\n" + "=" * 50)
 
 for i, hit in enumerate(results, 1):
     payload = hit.payload or {}

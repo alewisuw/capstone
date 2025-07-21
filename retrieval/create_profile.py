@@ -4,7 +4,7 @@ import sys
 from typing import List, Dict
 
 # Configuration
-PROFILE_DIR = "summaries/profiles"
+PROFILE_DIR = "retrieval/profiles"
 
 def get_user_input(prompt: str, required: bool = True) -> str:
     while True:

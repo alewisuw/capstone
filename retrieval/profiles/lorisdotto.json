@@ -1,0 +1,27 @@
+{
+  "name": "lorisdotto",
+  "interests": [
+    "electric vehicles",
+    "labor rights",
+    "data privacy",
+    "trade agreements",
+    "climate change",
+    "pharmaceutical regulation",
+    "election security",
+    "emergency preparedness",
+    "indigenous truth & reconciliation",
+    "green building & retrofitting",
+    "higher education funding and affordability",
+    "individual tax policy",
+    "telecom regulation"
+  ],
+  "demographics": {
+    "age": "prefer_not_to_say",
+    "gender_identity": "prefer_not_to_say",
+    "ethnicity_racial_identity": "prefer_not_to_say",
+    "indigenous_status": "not_indigenous",
+    "sexual_orientation": "prefer_not_to_say",
+    "income_range_(annual,_before_tax)": "prefer_not_to_say",
+    "disability_status_functional_ability": "prefer_not_to_say"
+  }
+}

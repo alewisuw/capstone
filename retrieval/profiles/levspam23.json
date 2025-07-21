@@ -1,0 +1,26 @@
+{
+  "name": "levspam23",
+  "interests": [
+    "student debt",
+    "inflation response",
+    "affordable housing",
+    "public infrastructure",
+    "trade agreements",
+    "nan",
+    "green building & retrofitting",
+    "foreign interference",
+    "higher education funding and affordability",
+    "military spending",
+    "public transit",
+    "interventionism"
+  ],
+  "demographics": {
+    "age": "18_24",
+    "gender_identity": "man",
+    "ethnicity_racial_identity": "white_caucasian",
+    "indigenous_status": "not_indigenous",
+    "sexual_orientation": "heterosexual_straight",
+    "income_range_(annual,_before_tax)": "under_20000",
+    "disability_status_functional_ability": "no_disability"
+  }
+}

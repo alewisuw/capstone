@@ -2,7 +2,7 @@ from transformers import pipeline
 import json
 
 # Put tags/topics into list
-with open('summaries/tags.json', 'r') as f:
+with open('tagging/tags.json', 'r') as f:
     tags_json = json.load(f)
 tags = []
 for tag in tags_json.values():

@@ -1,0 +1,33 @@
+{
+  "name": "parth_desai",
+  "interests": [
+    "freedom of speech",
+    "federal budget",
+    "voting rights",
+    "curriculum reform",
+    "immigration policy",
+    "electric vehicles",
+    "affordable housing",
+    "military spending",
+    "counter-terrorism",
+    "homelessness",
+    "trade agreements",
+    "economic stimulus",
+    "individual tax policy",
+    "interventionism",
+    "reproductive rights",
+    "gender equality",
+    "arms export control",
+    "nan",
+    "ai regulation",
+    "anti-money laundering"
+  ],
+  "demographics": {
+    "age": "18_24",
+    "gender_identity": "man",
+    "ethnicity_racial_identity": "south_asian",
+    "indigenous_status": "not_indigenous",
+    "sexual_orientation": "heterosexual_straight",
+    "disability_status_functional_ability": "no_disability"
+  }
+}
