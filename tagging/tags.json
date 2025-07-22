@@ -1,0 +1,119 @@
+{
+  "Social & Civil Rights": [
+    "Racial justice and equity",
+    "Gender equality",
+    "LGBTQ+ rights",
+    "Immigration policy",
+    "Refugee support",
+    "Criminal justice reform",
+    "Freedom of speech",
+    "Charter of Rights and Freedoms",
+    "Labor rights"
+  ],
+  "Economic Issues": [
+    "Minimum wage",
+    "Corporate Tax Policy",
+    "Individual Tax Policy",
+    "Support for small businesses",
+    "Corporate regulation",
+    "Federal budget",
+    "Economic stimulus",
+    "Inflation response",
+    "Gig & platform work",
+    "Employment Insurance",
+    "Anti-money laundering"
+  ],
+  "Environmental Policy": [
+    "Climate change",
+    "Sustainability",
+    "Renewable energy investment",
+    "Conservation",
+    "Environmental justice",
+    "Carbon pricing",
+    "Resource extraction regulation",
+    "Recycling",
+    "Water protection"
+  ],
+  "Healthcare": [
+    "Mental health funding",
+    "Reproductive rights",
+    "Pharmaceutical regulation",
+    "Healthcare system reform",
+    "Drug policy & controlled substances",
+    "Indigenous health",
+    "MAiD (Medical Assistance in Dying)",
+    "Health data & privacy",
+    "Vaccination policy"
+  ],
+  "Education": [
+    "Student debt",
+    "Access to education",
+    "Curriculum reform",
+    "Higher education funding and affordability",
+    "Indigenous education",
+    "Early childhood education",
+    "Digital literacy"
+  ],
+  "Technology & Innovation": [
+    "AI regulation",
+    "Data privacy",
+    "Cybersecurity",
+    "Access to internet",
+    "Content moderation",
+    "Telecom regulation",
+    "Intellectual property"
+  ],
+  "Foreign Policy": [
+    "Military spending",
+    "Interventionism",
+    "International aid and development",
+    "Trade agreements",
+    "International organizations (UN, NATO, etc.)",
+    "Arms export control",
+    "Peacekeeping",
+    "Sanctions",
+    "Foreign interference"
+  ],
+  "Democracy & Governance": [
+    "Voting rights",
+    "Election security",
+    "Gerrymandering and redistricting",
+    "Campaign finance reform",
+    "National security oversight"
+  ],
+  "Housing & Infrastructure": [
+    "Affordable housing",
+    "Homelessness",
+    "Indigenous housing",
+    "Public Infrastructure",
+    "Urban planning",
+    "Green building & retrofitting"
+  ],
+  "Indigenous Affairs": [
+    "Indigenous Truth & Reconciliation",
+    "UNDRIP (United Nations Declaration on the Rights of Indigenous Peoples)",
+    "Land rights & treaties",
+    "Indigenous self-government",
+    "Indigenous languages",
+    "MMIWG (Missing and Murdered Indigenous Women and Girls)",
+    "Child welfare reform"
+  ],
+  "Public Safety & Emergency Response": [
+    "National security",
+    "Emergency preparedness",
+    "Disaster response",
+    "Border security",
+    "Counter-terrorism",
+    "Human trafficking"
+  ],
+  "Transportation & Mobility": [
+    "Public transit",
+    "Aviation safety",
+    "Rail regulation",
+    "Vehicle emissions",
+    "Autonomous vehicles",
+    "Supply chain",
+    "Transportation Accessibility",
+    "Electric Vehicles"
+  ]
+}
