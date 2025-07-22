@@ -12,7 +12,8 @@ dependencies = [
     "requests",
     "google-auth",
     "google-auth-oauthlib",
-    "torch"
+    "torch",
+    "transformers"
 
 ]
 requires-python = ">=3.8"
