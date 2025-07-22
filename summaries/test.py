@@ -1,8 +1,8 @@
 import boto3
 import psycopg2
-from qdrant_client import QdrantClient
-from qdrant_client.models import VectorParams, Distance, PointStruct
-from sentence_transformers import SentenceTransformer
+# from qdrant_client import QdrantClient
+# from qdrant_client.models import VectorParams, Distance, PointStruct
+# from sentence_transformers import SentenceTransformer
 
 # --- Local Config --- change as needed this works for my local db
 PG_CONFIG = {
@@ -56,14 +56,29 @@ cur = conn.cursor()
 
 
 cur.execute("""
-    SELECT bill_id, text_en, llm_summary
-    FROM bills_billtext WHERE bill_id = 1800
-    ORDER BY created DESC
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE table bills_duplicate_bills AS (
+SELECT 
+    b1.id as bill1_id,
+    b2.id as bill2_id,
+    similarity(bt1.text_en, bt2.text_en) as text_similarity_score,
+    b1.name_en as bill_name
+FROM public.bills_bill b1
+JOIN public.bills_bill b2
+ON 1=1
+  -- ON b1.sponsor_member_id = b2.sponsor_member_id
+  AND b1.introduced <> b2.introduced
+  AND b1.id < b2.id  -- Avoid duplicate pairs for better performance
+  AND b1.name_en = b2.name_en  -- EXACT name match required
+JOIN public.bills_billtext bt1 ON bt1.bill_id = b1.id
+JOIN public.bills_billtext bt2 ON bt2.bill_id = b2.id
+WHERE similarity(bt1.text_en, bt2.text_en) > 0.6
+ORDER BY text_similarity_score DESC)
 """)
 
 rows = cur.fetchall()
 
-
+print(rows)
 for idx, (bill_id, text, llm_summary) in enumerate(rows):
         print(text)
         print(llm_summary)

@@ -55,7 +55,13 @@ def main():
     conn = psycopg2.connect(**PG_CONFIG)
     cursor = conn.cursor()
     print("connected to DB")
-    cursor.execute("SELECT bill_id, llm_summary FROM bills_billtext WHERE llm_summary IS NOT NULL")
+
+    #add column if it isn't already there
+    cursor.execute("""
+    ALTER TABLE bills_billtext
+    ADD COLUMN IF NOT EXISTS llm_tags JSON
+    """)
+    cursor.execute("SELECT bill_id, llm_summary FROM bills_billtext WHERE llm_summary IS NOT NULL AND llm_tags IS NULL")
     bills = cursor.fetchall()
 
     for bill_id, llm_summary in bills:

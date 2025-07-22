@@ -1,5 +1,5 @@
 {
-  "Social & Civil Rights": [
+  "Civil Rights": [
     "Racial justice and equity",
     "Gender equality",
     "LGBTQ+ rights",
@@ -10,7 +10,7 @@
     "Charter of Rights and Freedoms",
     "Labor rights"
   ],
-  "Economic Issues": [
+  "Economics": [
     "Minimum wage",
     "Corporate Tax Policy",
     "Individual Tax Policy",
@@ -54,7 +54,7 @@
     "Early childhood education",
     "Digital literacy"
   ],
-  "Technology & Innovation": [
+  "Technology, Science, and Innovation": [
     "AI regulation",
     "Data privacy",
     "Cybersecurity",
@@ -115,5 +115,7 @@
     "Supply chain",
     "Transportation Accessibility",
     "Electric Vehicles"
-  ]
+  ],
+  "Crime, Justice and Public Safety": [],
+  "Culture, Heritage, and Holidays": []
 }
