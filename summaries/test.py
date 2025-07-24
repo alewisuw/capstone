@@ -44,7 +44,6 @@ SERVICE_ACCOUNT_JSON = creds['/billBoard/SERVICE_ACCOUNT_JSON']
 
 
 
-# --- Connect to PostgreSQL ---
 conn = psycopg2.connect(
     host=DB_HOST,
     port=DB_PORT,
@@ -53,35 +52,20 @@ conn = psycopg2.connect(
     password=DB_PASS
 )
 cur = conn.cursor()
-
-
 cur.execute("""
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-CREATE table bills_duplicate_bills AS (
-SELECT 
-    b1.id as bill1_id,
-    b2.id as bill2_id,
-    similarity(bt1.text_en, bt2.text_en) as text_similarity_score,
-    b1.name_en as bill_name
-FROM public.bills_bill b1
-JOIN public.bills_bill b2
-ON 1=1
-  -- ON b1.sponsor_member_id = b2.sponsor_member_id
-  AND b1.introduced <> b2.introduced
-  AND b1.id < b2.id  -- Avoid duplicate pairs for better performance
-  AND b1.name_en = b2.name_en  -- EXACT name match required
-JOIN public.bills_billtext bt1 ON bt1.bill_id = b1.id
-JOIN public.bills_billtext bt2 ON bt2.bill_id = b2.id
-WHERE similarity(bt1.text_en, bt2.text_en) > 0.6
-ORDER BY text_similarity_score DESC)
+SELECT bill_id, llm_tags from bills_billtext where llm_tags is not null
 """)
+
+# Get column names from cursor description
+columns = [desc[0] for desc in cur.description]
 
 rows = cur.fetchall()
 
 print(rows)
-for idx, (bill_id, text, llm_summary) in enumerate(rows):
-        print(text)
-        print(llm_summary)
+for idx, row in enumerate(rows):
+    print(f"\nRow {idx + 1}:")
+    for col_name, value in zip(columns, row):
+        print(f"  {col_name}: {value}")
 
 # --- Cleanup ---
 cur.close()
