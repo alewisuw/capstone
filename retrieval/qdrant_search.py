@@ -49,8 +49,14 @@ with open(TAGS_FILE, "r") as f:
 valid_terms = [term.lower() for sublist in tag_data.values() for term in sublist]
 
 # --- Ask user for input ---
-print("Search topics examples:")
-print(", ".join(valid_terms))
+print("Search topic examples by category:\n")
+
+for category, terms in tag_data.items():
+    print(f"{category}:")
+    for term in terms:
+        print(f"  - {term}")
+    print()
+
 while True:
     user_input = input("Enter your search term or 'q' to quit: ").strip().lower()
     if user_input == "q":

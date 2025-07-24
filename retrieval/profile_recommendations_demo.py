@@ -112,29 +112,29 @@ def get_bill_info(bill_id):
         if row:
             summary = row[0] or "[No summary found]"
             title = row[1] or "[No title found]"
-            tags_raw = row[2]
+            # tags_raw = row[2]
 
             # Extract first 3 keys from llm_tags
-            tag_keys = []
-            if tags_raw:
-                try:
-                    tags_dict = json.loads(tags_raw)
-                    tag_keys = list(tags_dict.keys())[:1]
-                except json.JSONDecodeError:
-                    tag_keys = ["[Invalid JSON in tags]"]
-            else:
-                tag_keys = ["[No tags found]"]
+            # tag_keys = []
+            # if tags_raw:
+            #     try:
+            #         tags_dict = json.loads(tags_raw)
+            #         tag_keys = list(tags_dict.keys())[:1]
+            #     except json.JSONDecodeError:
+            #         tag_keys = ["[Invalid JSON in tags]"]
+            # else:
+            #     tag_keys = ["[No tags found]"]
 
             return {
                 "summary": summary,
                 "title": title,
-                "tags": tag_keys
+                # "tags": tag_keys
             }
         else:
             return {
                 "summary": "[No summary found]",
                 "title": "[No title found]",
-                "tags": ["[No tags found]"]
+                # "tags": ["[No tags found]"]
             }
     except Exception as e:
         return {
@@ -232,7 +232,7 @@ def display_results(results, method_name):
         print(f"Bill ID: {bill_id}")
         # print(f"Score: {hit.score:.4f}")
         print(f"Title: {bill_info['title']}")
-        print("Tag:", ", ".join(bill_info['tags']))
+        # print("Tag:", ", ".join(bill_info['tags']))
         print("Summary:")
         print(bill_info['summary'])
         print("-" * 50)

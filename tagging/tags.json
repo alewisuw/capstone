@@ -116,6 +116,16 @@
     "Transportation Accessibility",
     "Electric Vehicles"
   ],
-  "Crime, Justice and Public Safety": [],
-  "Culture, Heritage, and Holidays": []
+  "Crime, Justice and Public Safety": [
+    "policing",
+    "prison reform",
+    "public safety",
+    "gun control"
+  ],
+  "Culture, Heritage, and Holidays": [
+    "public holidays",
+    "indigenous heritage",
+    "arts and culture"
+  ]
+
 }
