@@ -101,7 +101,7 @@ def get_bill_info(bill_id):
         )
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.llm_summary, b.name_en
+            SELECT bt.llm_summary, b.name_en, bt.llm_tags
             FROM bills_billtext bt
             JOIN bills_bill b ON bt.bill_id = b.id
             WHERE bt.bill_id = %s;
@@ -110,19 +110,37 @@ def get_bill_info(bill_id):
         cur.close()
         conn.close()
         if row:
+            summary = row[0] or "[No summary found]"
+            title = row[1] or "[No title found]"
+            tags_raw = row[2]
+
+            # Extract first 3 keys from llm_tags
+            tag_keys = []
+            if tags_raw:
+                try:
+                    tags_dict = json.loads(tags_raw)
+                    tag_keys = list(tags_dict.keys())[:1]
+                except json.JSONDecodeError:
+                    tag_keys = ["[Invalid JSON in tags]"]
+            else:
+                tag_keys = ["[No tags found]"]
+
             return {
-                "summary": row[0] or "[No summary found]",
-                "title": row[1] or "[No title found]"
+                "summary": summary,
+                "title": title,
+                "tags": tag_keys
             }
         else:
             return {
                 "summary": "[No summary found]",
-                "title": "[No title found]"
+                "title": "[No title found]",
+                "tags": ["[No tags found]"]
             }
     except Exception as e:
         return {
             "summary": f"[DB error: {e}]",
-            "title": f"[DB error: {e}]"
+            "title": f"[DB error: {e}]",
+            "tags": [f"[DB error: {e}]"]
         }
 
 # --- Method 1: Fused embedding search (combines interests + demographics) ---
@@ -135,7 +153,7 @@ fused_vector = fusion.create_fused_embedding(
 fused_results = qdrant.search(
     collection_name=COLLECTION_NAME,
     query_vector=fused_vector.tolist(),
-    limit=6,
+    limit=5,
     with_payload=True,
     with_vectors=False,
 )
@@ -174,7 +192,7 @@ for hit in sorted(individual_results, key=lambda x: -x.score):
     if bill_id not in seen_ids:
         seen_ids.add(bill_id)
         unique_results.append(hit)
-    if len(unique_results) == 6:
+    if len(unique_results) == 5:
         break
 
 # --- Method 3: Blended Results ---
@@ -214,6 +232,7 @@ def display_results(results, method_name):
         print(f"Bill ID: {bill_id}")
         # print(f"Score: {hit.score:.4f}")
         print(f"Title: {bill_info['title']}")
+        print("Tag:", ", ".join(bill_info['tags']))
         print("Summary:")
         print(bill_info['summary'])
         print("-" * 50)
@@ -235,5 +254,5 @@ def display_blended(results, method_name):
 # --- Output all results ---
 display_results(fused_results, "Fused Embedding Search (Interests + Demographics)")
 # display_results(avg_results, "Average Vector Search")
-display_results(unique_results, "Top Individual Tag Matches")
+# display_results(unique_results, "Top Individual Tag Matches")
 # display_blended(top_blended, "Blended Method (Average + Tag Score)")
