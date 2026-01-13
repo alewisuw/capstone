@@ -1,11 +1,20 @@
+print("Starting imports...")
 import json
+print("json imported")
 import psycopg2
+print("psycopg2 imported")
 import os
-from transformers import pipeline
+print("os imported")
 import torch
+print("torch imported")
 import collections.abc
+print("collections.abc imported")
 import boto3
+print("boto3 imported")
+from transformers import pipeline
+print("Transformers loaded successfully!")
 
+print("All basic imports complete!")
 # Load tags from tags.json
 TAGS_PATH = os.path.join(os.path.dirname(__file__), 'tags.json')
 with open(TAGS_PATH, 'r', encoding='utf-8') as f:
@@ -45,6 +54,9 @@ PG_CONFIG = {
 }
 
 def main():
+    print("Loading transformers pipeline (this may take a moment)...")
+
+    
     classifier = pipeline(
         "zero-shot-classification",
         model = "facebook/bart-large-mnli",
