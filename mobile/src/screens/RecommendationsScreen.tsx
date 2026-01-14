@@ -19,6 +19,7 @@ import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import type { BillRecommendation, RecommendationMethod } from '../types';
+import { theme } from '../theme';
 
 type RecommendationsScreenProps = StackScreenProps<RootStackParamList, 'RecommendationsMain'>;
 
@@ -96,7 +97,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.header}>
+        <LinearGradient colors={theme.gradients.header} style={styles.header}>
           <Text style={styles.headerTitle}>Recommendations</Text>
         </LinearGradient>
         <LoadingSpinner />
@@ -106,7 +107,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.header}>
+      <LinearGradient colors={theme.gradients.header} style={styles.header}>
         <Text style={styles.headerTitle}>Recommendations</Text>
         <Text style={styles.headerSubtitle}>
           Personalized bills for {username}
@@ -117,7 +118,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             style={styles.searchButton}
             onPress={() => setShowUsernameInput(true)}
           >
-            <Ionicons name="person" size={20} color="#6366f1" />
+            <Ionicons name="person" size={20} color={theme.colors.accent} />
             <Text style={styles.searchButtonText}>{username}</Text>
           </TouchableOpacity>
         ) : (
@@ -125,14 +126,14 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             <TextInput
               style={styles.searchInput}
               placeholder="Enter username"
-              placeholderTextColor="rgba(255, 255, 255, 0.7)"
+              placeholderTextColor="#6b6b6b"
               value={username}
               onChangeText={setUsername}
               autoCapitalize="none"
               autoCorrect={false}
             />
             <TouchableOpacity style={styles.searchIconButton} onPress={handleLoad}>
-              <Ionicons name="checkmark" size={24} color="#fff" />
+              <Ionicons name="checkmark" size={24} color={theme.colors.accent} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.cancelButton}
@@ -253,7 +254,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: theme.colors.background,
   },
   header: {
     padding: 20,
@@ -273,14 +274,16 @@ const styles = StyleSheet.create({
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
     gap: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   searchButtonText: {
     fontSize: 16,
-    color: '#6366f1',
+    color: theme.colors.accent,
     fontWeight: '600',
   },
   searchContainer: {
@@ -290,11 +293,13 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
-    color: '#fff',
+    color: theme.colors.textDark,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   searchIconButton: {
     padding: 12,
@@ -309,13 +314,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   methodChip: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   methodChipActive: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.accent,
   },
   methodChipText: {
     color: '#fff',
@@ -324,7 +332,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   methodChipTextActive: {
-    color: '#6366f1',
+    color: theme.colors.accent,
   },
   limitRow: {
     marginTop: 12,
@@ -346,7 +354,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -368,11 +376,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textDark,
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     marginTop: 4,
   },
   profileChips: {
@@ -382,7 +390,7 @@ const styles = StyleSheet.create({
   profileChipsLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#374151',
+    color: theme.colors.textMuted,
     marginBottom: 8,
   },
   profileChipRow: {
@@ -391,13 +399,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   profileChip: {
-    backgroundColor: '#e0e7ff',
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   profileChipText: {
-    color: '#6366f1',
+    color: theme.colors.accent,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -410,7 +420,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     textAlign: 'center',
   },
 });

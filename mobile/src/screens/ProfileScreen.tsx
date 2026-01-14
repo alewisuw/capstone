@@ -17,6 +17,8 @@ import { getProfile, getProfiles } from '../services/apiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import type { UserProfile } from '../types';
+import { theme } from '../theme';
+import { categoryColors, normalizeTag, tagCategoryLookup } from '../data/tagCategories';
 
 type ProfileScreenProps = BottomTabScreenProps<RootTabParamList, 'Profile'>;
 
@@ -93,10 +95,18 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     return String(value);
   };
 
+  const getInterestChipStyle = (interest: string) => {
+    const normalized = normalizeTag(interest);
+    const category = tagCategoryLookup[normalized];
+    const backgroundColor = category ? categoryColors[category] : theme.colors.surfaceMuted;
+    const textColor = category ? '#ffffff' : theme.colors.textDark;
+    return { backgroundColor, textColor };
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={['#6366f1', '#8b5cf6']}
+        colors={theme.gradients.header}
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Profile</Text>
@@ -106,7 +116,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             style={styles.searchButton}
             onPress={() => setShowUsernameInput(true)}
           >
-            <Ionicons name="person" size={20} color="#6366f1" />
+            <Ionicons name="person" size={20} color={theme.colors.accent} />
             <Text style={styles.searchButtonText}>
               {username || 'Enter username'}
             </Text>
@@ -116,7 +126,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             <TextInput
               style={styles.searchInput}
               placeholder="Enter username"
-              placeholderTextColor="rgba(255, 255, 255, 0.7)"
+              placeholderTextColor="#6b6b6b"
               value={username}
               onChangeText={handleUsernameChange}
               autoCapitalize="none"
@@ -126,7 +136,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               style={styles.searchIconButton}
               onPress={handleLoadProfile}
             >
-              <Ionicons name="checkmark" size={24} color="#fff" />
+              <Ionicons name="checkmark" size={24} color={theme.colors.accent} />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.cancelButton}
@@ -152,7 +162,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         >
           <View style={styles.profileCard}>
             <View style={styles.profileNameContainer}>
-              <Ionicons name="person-circle" size={64} color="#6366f1" />
+              <Ionicons name="person-circle" size={64} color={theme.colors.accent} />
               <Text style={styles.profileName}>{profile.name}</Text>
             </View>
 
@@ -160,13 +170,28 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Interests</Text>
                 <View style={styles.interestsContainer}>
-                  {profile.interests.map((interest, index) => (
-                    interest !== 'nan' && (
-                      <View key={index} style={styles.interestChip}>
-                        <Text style={styles.interestText}>{formatValue(interest)}</Text>
+                  {profile.interests.map((interest, index) => {
+                    if (interest === 'nan') return null;
+                    const chipStyle = getInterestChipStyle(interest);
+                    return (
+                      <View
+                        key={index}
+                        style={[
+                          styles.interestChip,
+                          { backgroundColor: chipStyle.backgroundColor },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.interestText,
+                            { color: chipStyle.textColor },
+                          ]}
+                        >
+                          {formatValue(interest)}
+                        </Text>
                       </View>
-                    )
-                  ))}
+                    );
+                  })}
                 </View>
               </View>
             )}
@@ -190,7 +215,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               onPress={handleViewRecommendations}
             >
               <LinearGradient
-                colors={['#6366f1', '#8b5cf6']}
+                colors={theme.gradients.header}
                 style={styles.recommendationsButtonGradient}
               >
                 <Ionicons name="document-text" size={20} color="#fff" />
@@ -238,7 +263,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: theme.colors.background,
   },
   header: {
     padding: 20,
@@ -254,14 +279,16 @@ const styles = StyleSheet.create({
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
     gap: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   searchButtonText: {
     fontSize: 16,
-    color: '#6366f1',
+    color: theme.colors.accent,
     fontWeight: '600',
   },
   searchContainer: {
@@ -271,11 +298,13 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
-    color: '#fff',
+    color: theme.colors.textDark,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   searchIconButton: {
     padding: 12,
@@ -290,7 +319,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   profileCard: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -307,7 +336,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textDark,
     marginTop: 12,
   },
   section: {
@@ -316,7 +345,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textDark,
     marginBottom: 12,
   },
   interestsContainer: {
@@ -325,13 +354,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   interestChip: {
-    backgroundColor: '#e0e7ff',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    borderWidth: 0,
   },
   interestText: {
-    color: '#6366f1',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -340,17 +368,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: theme.colors.borderLight,
   },
   demographicLabel: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     fontWeight: '500',
     flex: 1,
   },
   demographicValue: {
     fontSize: 14,
-    color: '#111827',
+    color: theme.colors.textDark,
     fontWeight: '600',
     flex: 1,
     textAlign: 'right',
@@ -373,7 +401,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   profilesListSection: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     borderRadius: 16,
     padding: 20,
     shadowColor: '#000',
@@ -385,7 +413,7 @@ const styles = StyleSheet.create({
   profilesListTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textDark,
     marginBottom: 12,
   },
   profileListItem: {
@@ -394,11 +422,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: theme.colors.borderLight,
   },
   profileListItemText: {
     fontSize: 16,
-    color: '#374151',
+    color: theme.colors.textDark,
     fontWeight: '500',
   },
   emptyState: {
@@ -409,11 +437,10 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     textAlign: 'center',
     marginTop: 16,
   },
 });
 
 export default ProfileScreen;
-

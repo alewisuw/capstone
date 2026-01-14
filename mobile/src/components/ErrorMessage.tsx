@@ -2,11 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { ErrorMessageProps } from '../types';
+import { theme } from '../theme';
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, onRetry }) => {
   return (
     <View style={styles.container}>
-      <Ionicons name="alert-circle-outline" size={48} color="#ef4444" />
+      <Ionicons name="alert-circle-outline" size={48} color={theme.colors.accent} />
       <Text style={styles.message}>{message || 'Something went wrong'}</Text>
       {onRetry && (
         <TouchableOpacity onPress={onRetry}>
@@ -26,18 +27,17 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 16,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 8,
   },
   retryText: {
     fontSize: 14,
-    color: '#6366f1',
+    color: theme.colors.accent,
     fontWeight: '600',
     marginTop: 8,
   },
 });
 
 export default ErrorMessage;
-

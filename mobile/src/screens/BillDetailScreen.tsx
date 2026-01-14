@@ -10,6 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
+import { theme } from '../theme';
 
 type BillDetailScreenProps = StackScreenProps<RootStackParamList, 'BillDetail'>;
 
@@ -23,7 +24,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
         contentContainerStyle={styles.contentContainer}
       >
         <LinearGradient
-          colors={['#6366f1', '#8b5cf6']}
+          colors={theme.gradients.header}
           style={styles.header}
         >
           <View style={styles.billIdContainer}>
@@ -31,7 +32,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
           </View>
           {bill.score !== null && bill.score !== undefined && (
             <View style={styles.scoreContainer}>
-              <Ionicons name="star" size={16} color="#fbbf24" />
+              <Ionicons name="star" size={16} color="#fff" />
               <Text style={styles.scoreText}>
                 Match: {(bill.score * 100).toFixed(0)}%
               </Text>
@@ -41,7 +42,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
 
         <View style={styles.card}>
           <View style={styles.titleSection}>
-            <Ionicons name="document-text" size={24} color="#6366f1" />
+            <Ionicons name="document-text" size={24} color={theme.colors.accent} />
             <Text style={styles.title}>{bill.title}</Text>
           </View>
 
@@ -52,7 +53,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
 
           <View style={styles.infoSection}>
             <View style={styles.infoRow}>
-              <Ionicons name="information-circle" size={20} color="#6b7280" />
+              <Ionicons name="information-circle" size={20} color={theme.colors.accentDark} />
               <Text style={styles.infoText}>
                 This summary is retrieved from the database and ranked for relevance
               </Text>
@@ -67,7 +68,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: theme.colors.background,
   },
   content: {
     flex: 1,
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   billIdContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   scoreContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
@@ -107,15 +108,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.surface,
     margin: 16,
     borderRadius: 16,
     padding: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
   },
   titleSection: {
     flexDirection: 'row',
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textDark,
     lineHeight: 32,
   },
   summarySection: {
@@ -136,16 +139,16 @@ const styles = StyleSheet.create({
   summaryLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#374151',
+    color: theme.colors.textDark,
     marginBottom: 12,
   },
   summary: {
     fontSize: 16,
-    color: '#4b5563',
+    color: theme.colors.textMuted,
     lineHeight: 24,
   },
   infoSection: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.colors.surfaceMuted,
     borderRadius: 12,
     padding: 16,
   },
@@ -157,7 +160,7 @@ const styles = StyleSheet.create({
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     lineHeight: 20,
   },
 });

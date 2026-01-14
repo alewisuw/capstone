@@ -18,6 +18,7 @@ import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import type { BillRecommendation } from '../types';
+import { theme } from '../theme';
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
@@ -70,7 +71,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <LinearGradient
-        colors={['#6366f1', '#8b5cf6']}
+        colors={theme.gradients.header}
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Search Bills</Text>
@@ -92,11 +93,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </View>
 
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#fff" />
+          <Ionicons name="search" size={20} color={theme.colors.accent} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by topic, issue, or phrase"
-            placeholderTextColor="rgba(255, 255, 255, 0.7)"
+            placeholderTextColor="#6b6b6b"
             value={query}
             onChangeText={setQuery}
             onSubmitEditing={() => handleSearch()}
@@ -108,7 +109,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             style={styles.searchIconButton}
             onPress={() => handleSearch()}
           >
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
+            <Ionicons name="arrow-forward" size={20} color={theme.colors.accent} />
           </TouchableOpacity>
         </View>
 
@@ -190,7 +191,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: theme.colors.background,
   },
   header: {
     padding: 20,
@@ -220,10 +221,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   statusOk: {
-    backgroundColor: '#34d399',
+    backgroundColor: '#2ecc71',
   },
   statusDown: {
-    backgroundColor: '#f87171',
+    backgroundColor: theme.colors.accent,
   },
   statusText: {
     color: '#fff',
@@ -238,14 +239,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   searchInput: {
     flex: 1,
-    color: '#fff',
+    color: theme.colors.textDark,
     fontSize: 16,
   },
   searchIconButton: {
@@ -271,7 +274,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -293,12 +296,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.colors.textDark,
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
   },
   emptyState: {
     flex: 1,
@@ -309,7 +312,7 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: '#6b7280',
+    color: theme.colors.textMuted,
     textAlign: 'center',
     marginTop: 16,
   },
@@ -320,19 +323,21 @@ const styles = StyleSheet.create({
   suggestionsTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: theme.colors.textMuted,
     marginBottom: 12,
   },
   suggestionChip: {
-    backgroundColor: '#e0e7ff',
+    backgroundColor: theme.colors.surface,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 8,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
   },
   suggestionChipText: {
-    color: '#6366f1',
+    color: theme.colors.accent,
     fontWeight: '600',
   },
 });

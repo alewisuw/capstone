@@ -13,6 +13,7 @@ import RecommendationsScreen from './src/screens/RecommendationsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import BillDetailScreen from './src/screens/BillDetailScreen';
 import type { RootStackParamList, RootTabParamList } from './src/types';
+import { theme } from './src/theme';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
@@ -33,7 +34,7 @@ function HomeStack() {
         component={BillDetailScreen}
         options={{ 
           title: 'Bill Details',
-          headerStyle: { backgroundColor: '#6366f1' },
+          headerStyle: { backgroundColor: theme.colors.accentDark },
           headerTintColor: '#fff',
         }}
       />
@@ -54,7 +55,7 @@ function RecommendationsStack() {
         component={BillDetailScreen}
         options={{ 
           title: 'Bill Details',
-          headerStyle: { backgroundColor: '#6366f1' },
+          headerStyle: { backgroundColor: theme.colors.accentDark },
           headerTintColor: '#fff',
         }}
       />
@@ -84,13 +85,13 @@ export default function App(): JSX.Element {
 
               return <Ionicons name={iconName} size={size} color={color} />;
             },
-            tabBarActiveTintColor: '#6366f1',
-            tabBarInactiveTintColor: 'gray',
+            tabBarActiveTintColor: theme.colors.accent,
+            tabBarInactiveTintColor: '#9a9a9a',
             headerShown: false,
             tabBarStyle: {
               backgroundColor: '#ffffff',
               borderTopWidth: 1,
-              borderTopColor: '#e5e7eb',
+              borderTopColor: theme.colors.borderLight,
               paddingBottom: 5,
               paddingTop: 5,
               height: 60,
