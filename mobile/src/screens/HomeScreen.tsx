@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
-import { getProfiles, getRecommendations } from '../services/apiService';
+import { getHealth, searchBills } from '../services/apiService';
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -22,30 +22,30 @@ import type { BillRecommendation } from '../types';
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [username, setUsername] = useState<string>('su_victor21');
-  const [profiles, setProfiles] = useState<string[]>([]);
-  const [recommendations, setRecommendations] = useState<BillRecommendation[]>([]);
+  const [query, setQuery] = useState<string>('climate');
+  const [results, setResults] = useState<BillRecommendation[]>([]);
+  const [limit, setLimit] = useState<number>(3);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
+  const [healthStatus, setHealthStatus] = useState<'loading' | 'ok' | 'down'>('loading');
 
   useEffect(() => {
-    loadProfiles();
+    loadHealth();
   }, []);
 
-  const loadProfiles = async (): Promise<void> => {
+  const loadHealth = async (): Promise<void> => {
     try {
-      const data = await getProfiles();
-      setProfiles(data);
+      const data = await getHealth();
+      setHealthStatus(data.status === 'ok' ? 'ok' : 'down');
     } catch (err) {
-      console.error('Failed to load profiles:', err);
+      setHealthStatus('down');
     }
   };
 
-  const handleSearch = async (searchUsername?: string | null): Promise<void> => {
-    const userToSearch = searchUsername || username;
-    if (!userToSearch || !userToSearch.trim()) {
-      Alert.alert('Error', 'Please enter a username');
+  const handleSearch = async (term?: string | null): Promise<void> => {
+    const searchTerm = term || query;
+    if (!searchTerm || !searchTerm.trim()) {
+      Alert.alert('Error', 'Please enter a search query');
       return;
     }
 
@@ -53,12 +53,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setError(null);
     
     try {
-      const data = await getRecommendations(userToSearch.trim().toLowerCase());
-      setRecommendations(data.recommendations || []);
-      setShowUsernameInput(false);
+      const data = await searchBills(searchTerm.trim(), limit);
+      setResults(data || []);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load recommendations');
-      setRecommendations([]);
+      setError(err.response?.data?.detail || 'Failed to search bills');
+      setResults([]);
     } finally {
       setLoading(false);
     }
@@ -74,47 +73,63 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         colors={['#6366f1', '#8b5cf6']}
         style={styles.header}
       >
-        <Text style={styles.headerTitle}>BillBoard</Text>
-        <Text style={styles.headerSubtitle}>Discover bills that matter to you</Text>
-        
-        {!showUsernameInput ? (
-          <TouchableOpacity
-            style={styles.searchButton}
-            onPress={() => setShowUsernameInput(true)}
-          >
-            <Ionicons name="search" size={20} color="#6366f1" />
-            <Text style={styles.searchButtonText}>
-              {username || 'Enter username'}
-            </Text>
+        <Text style={styles.headerTitle}>Search Bills</Text>
+        <Text style={styles.headerSubtitle}>Semantic search across bill summaries</Text>
+
+        <View style={styles.statusRow}>
+          <View
+            style={[
+              styles.statusDot,
+              healthStatus === 'ok' ? styles.statusOk : styles.statusDown,
+            ]}
+          />
+          <Text style={styles.statusText}>
+            API {healthStatus === 'loading' ? 'checking' : healthStatus}
+          </Text>
+          <TouchableOpacity style={styles.statusRefresh} onPress={loadHealth}>
+            <Ionicons name="refresh" size={16} color="#fff" />
           </TouchableOpacity>
-        ) : (
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Enter username"
-              placeholderTextColor="rgba(255, 255, 255, 0.7)"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+        </View>
+
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#fff" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by topic, issue, or phrase"
+            placeholderTextColor="rgba(255, 255, 255, 0.7)"
+            value={query}
+            onChangeText={setQuery}
+            onSubmitEditing={() => handleSearch()}
+            returnKeyType="search"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TouchableOpacity
+            style={styles.searchIconButton}
+            onPress={() => handleSearch()}
+          >
+            <Ionicons name="arrow-forward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.limitRow}>
+          <Text style={styles.limitLabel}>Results</Text>
+          <View style={styles.limitControls}>
             <TouchableOpacity
-              style={styles.searchIconButton}
-              onPress={() => handleSearch()}
+              style={styles.limitButton}
+              onPress={() => setLimit((prev) => Math.max(1, prev - 1))}
             >
-              <Ionicons name="checkmark" size={24} color="#fff" />
+              <Ionicons name="remove" size={16} color="#fff" />
             </TouchableOpacity>
+            <Text style={styles.limitValue}>{limit}</Text>
             <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setShowUsernameInput(false);
-                setError(null);
-              }}
+              style={styles.limitButton}
+              onPress={() => setLimit((prev) => Math.min(10, prev + 1))}
             >
-              <Ionicons name="close" size={24} color="#fff" />
+              <Ionicons name="add" size={16} color="#fff" />
             </TouchableOpacity>
           </View>
-        )}
+        </View>
       </LinearGradient>
 
       <ScrollView 
@@ -128,15 +143,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             message={error} 
             onRetry={() => handleSearch()}
           />
-        ) : recommendations.length > 0 ? (
+        ) : results.length > 0 ? (
           <>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recommended Bills</Text>
+              <Text style={styles.sectionTitle}>Search Results</Text>
               <Text style={styles.sectionSubtitle}>
-                {recommendations.length} bills found
+                {results.length} bills found
               </Text>
             </View>
-            {recommendations.map((bill) => (
+            {results.map((bill) => (
               <BillCard
                 key={bill.bill_id}
                 bill={bill}
@@ -148,26 +163,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={styles.emptyState}>
             <Ionicons name="document-text-outline" size={64} color="#d1d5db" />
             <Text style={styles.emptyStateText}>
-              Enter a username to see bill recommendations
+              Search for a topic to see related bills
             </Text>
-            {profiles.length > 0 && (
-              <View style={styles.profilesContainer}>
-                <Text style={styles.profilesTitle}>Available profiles:</Text>
-                {profiles.slice(0, 5).map((profile) => (
-                  <TouchableOpacity
-                    key={profile}
-                    style={styles.profileChip}
-                    onPress={() => {
-                      setUsername(profile);
-                      setShowUsernameInput(false);
-                      handleSearch(profile);
-                    }}
-                  >
-                    <Text style={styles.profileChipText}>{profile}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
+            <View style={styles.suggestionsContainer}>
+              <Text style={styles.suggestionsTitle}>Try a quick search:</Text>
+              {['climate', 'healthcare', 'housing', 'education', 'tax'].map((term) => (
+                <TouchableOpacity
+                  key={term}
+                  style={styles.suggestionChip}
+                  onPress={() => {
+                    setQuery(term);
+                    handleSearch(term);
+                  }}
+                >
+                  <Text style={styles.suggestionChipText}>{term}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         )}
       </ScrollView>
@@ -196,37 +208,77 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: 16,
   },
-  searchButton: {
+  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 12,
     gap: 8,
+    marginBottom: 16,
   },
-  searchButtonText: {
-    fontSize: 16,
-    color: '#6366f1',
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  statusOk: {
+    backgroundColor: '#34d399',
+  },
+  statusDown: {
+    backgroundColor: '#f87171',
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 14,
     fontWeight: '600',
+  },
+  statusRefresh: {
+    marginLeft: 'auto',
+    padding: 6,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
   },
   searchInput: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    padding: 12,
-    borderRadius: 12,
     color: '#fff',
     fontSize: 16,
   },
   searchIconButton: {
-    padding: 12,
+    padding: 6,
   },
-  cancelButton: {
-    padding: 12,
+  limitRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  limitLabel: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  limitControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  limitButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  limitValue: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
   content: {
     flex: 1,
@@ -261,17 +313,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
   },
-  profilesContainer: {
+  suggestionsContainer: {
     marginTop: 24,
     width: '100%',
   },
-  profilesTitle: {
+  suggestionsTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#374151',
     marginBottom: 12,
   },
-  profileChip: {
+  suggestionChip: {
     backgroundColor: '#e0e7ff',
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -279,11 +331,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     alignSelf: 'flex-start',
   },
-  profileChipText: {
+  suggestionChipText: {
     color: '#6366f1',
     fontWeight: '600',
   },
 });
 
 export default HomeScreen;
-

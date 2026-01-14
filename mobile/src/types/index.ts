@@ -15,6 +15,8 @@ export interface UserProfile {
     ethnicity_racial_identity?: string;
     indigenous_status?: string;
     sexual_orientation?: string;
+    income_range?: string;
+    disability_status?: string;
     "income_range_(annual,_before_tax)"?: string;
     disability_status_functional_ability?: string;
     [key: string]: string | undefined;
@@ -25,6 +27,12 @@ export interface RecommendationResponse {
   recommendations: BillRecommendation[];
   user_profile: UserProfile;
 }
+
+export interface HealthStatus {
+  status: string;
+}
+
+export type RecommendationMethod = 'fused' | 'average' | 'individual' | 'blended';
 
 // Navigation Types
 export type RootStackParamList = {
@@ -54,4 +62,3 @@ export interface ErrorMessageProps {
   message?: string;
   onRetry?: () => void;
 }
-

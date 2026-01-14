@@ -52,6 +52,28 @@ npm start
    - Press `a` for Android emulator
    - Scan the QR code with Expo Go app on your physical device
 
+## Render on Android (Emulator)
+
+1. Make sure the Android SDK is installed and `ANDROID_HOME` is set (Android Studio → SDK Manager).
+2. Start an Android emulator from Android Studio (Device Manager).
+3. From `mobile/`, run:
+```bash
+npm run android
+```
+
+If you see API connection errors in the app, set `EXPO_PUBLIC_API_BASE_URL` before launching:
+```bash
+EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:8000 npm run android
+```
+
+## Render on Android (Native Build)
+
+Use this path if you need a full native build (custom permissions/plugins):
+
+```bash
+npx expo run:android
+```
+
 ## Project Structure
 
 ```
@@ -121,4 +143,3 @@ npm run type-check
 ## License
 
 See the main project LICENSE file.
-

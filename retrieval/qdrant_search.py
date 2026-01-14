@@ -39,16 +39,13 @@ DB_PASS = creds['/billBoard/DB_PASSWORD']
 SERVICE_ACCOUNT_JSON = creds['/billBoard/SERVICE_ACCOUNT_JSON']
 
 
-# --- Load embedding model ---
 model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
-# --- Load valid topics from tags.json ---
 with open(TAGS_FILE, "r") as f:
     tag_data = json.load(f)
 
 valid_terms = [term.lower() for sublist in tag_data.values() for term in sublist]
 
-# --- Ask user for input ---
 print("Search topic examples by category:\n")
 
 for category, terms in tag_data.items():
@@ -67,13 +64,10 @@ while True:
         print("Please enter a search term or 'q' to quit.")
         continue
 
-    # --- Embed the query ---
     query_vector = model.encode(user_input).tolist()  # type: ignore
 
-    # --- Connect to Qdrant ---
     qdrant = QdrantClient("localhost", port=6333)
 
-    # --- Search Qdrant ---
     results = qdrant.search(
         collection_name=COLLECTION_NAME,
         query_vector=query_vector,
@@ -118,7 +112,6 @@ while True:
             }
 
 
-    # --- Display results ---
     print(f"\nTop 3 results for: '{user_input}'\n" + "=" * 50)
 
     for i, hit in enumerate(results, 1):

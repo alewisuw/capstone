@@ -1,5 +1,21 @@
 import api from '../config/api';
-import type { UserProfile, RecommendationResponse } from '../types';
+import type {
+  UserProfile,
+  RecommendationResponse,
+  HealthStatus,
+  BillRecommendation,
+  RecommendationMethod,
+} from '../types';
+
+export const getHealth = async (): Promise<HealthStatus> => {
+  try {
+    const response = await api.get<HealthStatus>('/health');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching health:', error);
+    throw error;
+  }
+};
 
 export const getProfiles = async (): Promise<string[]> => {
   try {
@@ -23,13 +39,14 @@ export const getProfile = async (username: string): Promise<UserProfile> => {
 
 export const getRecommendations = async (
   username: string, 
-  limit: number = 5
+  limit: number = 5,
+  method: RecommendationMethod = 'fused'
 ): Promise<RecommendationResponse> => {
   try {
     const response = await api.get<RecommendationResponse>(
       `/api/recommendations/${username}`, 
       {
-        params: { limit },
+        params: { limit, method },
       }
     );
     return response.data;
@@ -39,3 +56,17 @@ export const getRecommendations = async (
   }
 };
 
+export const searchBills = async (
+  query: string,
+  limit: number = 3
+): Promise<BillRecommendation[]> => {
+  try {
+    const response = await api.get<BillRecommendation[]>('/api/search', {
+      params: { q: query, limit },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error searching bills:', error);
+    throw error;
+  }
+};

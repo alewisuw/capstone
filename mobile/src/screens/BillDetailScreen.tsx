@@ -54,7 +54,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
             <View style={styles.infoRow}>
               <Ionicons name="information-circle" size={20} color="#6b7280" />
               <Text style={styles.infoText}>
-                This bill has been personalized based on your interests and demographics
+                This summary is retrieved from the database and ranked for relevance
               </Text>
             </View>
           </View>
@@ -163,4 +163,3 @@ const styles = StyleSheet.create({
 });
 
 export default BillDetailScreen;
-

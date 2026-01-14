@@ -73,7 +73,7 @@ export default function App(): JSX.Element {
               let iconName: keyof typeof Ionicons.glyphMap;
 
               if (route.name === 'Home') {
-                iconName = focused ? 'home' : 'home-outline';
+                iconName = focused ? 'search' : 'search-outline';
               } else if (route.name === 'Recommendations') {
                 iconName = focused ? 'document-text' : 'document-text-outline';
               } else if (route.name === 'Profile') {
@@ -97,7 +97,7 @@ export default function App(): JSX.Element {
             },
           })}
         >
-          <Tab.Screen name="Home" component={HomeStack} />
+          <Tab.Screen name="Home" component={HomeStack} options={{ title: 'Search' }} />
           <Tab.Screen name="Recommendations" component={RecommendationsStack} />
           <Tab.Screen name="Profile" component={ProfileScreen} />
         </Tab.Navigator>
@@ -105,4 +105,3 @@ export default function App(): JSX.Element {
     </SafeAreaProvider>
   );
 }
-
