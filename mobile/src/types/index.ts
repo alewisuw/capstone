@@ -47,6 +47,14 @@ export type RootTabParamList = {
   Profile: undefined;
 };
 
+export type AuthStackParamList = {
+  AuthLanding: undefined;
+  Login: undefined;
+  SignUp: undefined;
+  Instructions: undefined;
+  BasicInfo: undefined;
+};
+
 // Component Props Types
 export interface BillCardProps {
   bill: BillRecommendation;

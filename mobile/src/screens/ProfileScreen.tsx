@@ -19,10 +19,12 @@ import ErrorMessage from '../components/ErrorMessage';
 import type { UserProfile } from '../types';
 import { theme } from '../theme';
 import { categoryColors, normalizeTag, tagCategoryLookup } from '../data/tagCategories';
+import { useAuth } from '../context/AuthContext';
 
 type ProfileScreenProps = BottomTabScreenProps<RootTabParamList, 'Profile'>;
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+  const { user, signOut } = useAuth();
   const [username, setUsername] = useState<string>('su_victor21');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
@@ -32,8 +34,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   useEffect(() => {
     loadProfiles();
-    loadProfile(username);
   }, []);
+
+  useEffect(() => {
+    const effective = user?.username || username;
+    if (effective) {
+      setUsername(effective);
+      loadProfile(effective);
+    }
+  }, [user]);
 
   const loadProfiles = async (): Promise<void> => {
     try {
@@ -111,7 +120,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.headerTitle}>Profile</Text>
         
-        {!showUsernameInput ? (
+        {!showUsernameInput && !user ? (
           <TouchableOpacity
             style={styles.searchButton}
             onPress={() => setShowUsernameInput(true)}
@@ -121,7 +130,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               {username || 'Enter username'}
             </Text>
           </TouchableOpacity>
-        ) : (
+        ) : !user ? (
           <View style={styles.searchContainer}>
             <TextInput
               style={styles.searchInput}
@@ -146,6 +155,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               }}
             >
               <Ionicons name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.lockedRow}>
+            <View style={styles.lockedChip}>
+              <Ionicons name="lock-closed" size={16} color={theme.colors.accent} />
+              <Text style={styles.lockedText}>{user.username}</Text>
+            </View>
+            <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
+              <Text style={styles.signOutText}>Sign Out</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -226,7 +245,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {availableProfiles.length > 0 && (
+          {availableProfiles.length > 0 && !user && (
             <View style={styles.profilesListSection}>
               <Text style={styles.profilesListTitle}>Other Profiles</Text>
               {availableProfiles
@@ -311,6 +330,34 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     padding: 12,
+  },
+  lockedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  lockedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  lockedText: {
+    color: theme.colors.accent,
+    fontWeight: '600',
+  },
+  signOutButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  signOutText: {
+    color: theme.colors.textLight,
+    fontWeight: '600',
   },
   content: {
     flex: 1,

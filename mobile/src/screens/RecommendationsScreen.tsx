@@ -20,6 +20,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import type { BillRecommendation, RecommendationMethod } from '../types';
 import { theme } from '../theme';
+import { useAuth } from '../context/AuthContext';
 
 type RecommendationsScreenProps = StackScreenProps<RootStackParamList, 'RecommendationsMain'>;
 
@@ -38,6 +39,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (route.params?.username) {
@@ -46,9 +48,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   }, [route.params?.username]);
 
   useEffect(() => {
-    loadProfiles();
+    if (!user) {
+      loadProfiles();
+    }
     loadRecommendations();
-  }, [username, method, limit]);
+  }, [username, method, limit, user]);
 
   const loadProfiles = async (): Promise<void> => {
     try {
@@ -65,7 +69,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       if (!refreshing) {
         setLoading(true);
       }
-      const normalized = username.trim().toLowerCase();
+      const normalized = (user?.username || username).trim().toLowerCase();
       const data = await getRecommendations(normalized, limit, method);
       setRecommendations(data.recommendations || []);
     } catch (err: any) {
@@ -110,10 +114,10 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       <LinearGradient colors={theme.gradients.header} style={styles.header}>
         <Text style={styles.headerTitle}>Recommendations</Text>
         <Text style={styles.headerSubtitle}>
-          Personalized bills for {username}
+          Personalized bills for {user?.username || username}
         </Text>
 
-        {!showUsernameInput ? (
+        {!showUsernameInput && !user ? (
           <TouchableOpacity
             style={styles.searchButton}
             onPress={() => setShowUsernameInput(true)}
@@ -121,7 +125,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             <Ionicons name="person" size={20} color={theme.colors.accent} />
             <Text style={styles.searchButtonText}>{username}</Text>
           </TouchableOpacity>
-        ) : (
+        ) : !user ? (
           <View style={styles.searchContainer}>
             <TextInput
               style={styles.searchInput}
@@ -144,6 +148,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             >
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.lockedChip}>
+            <Ionicons name="lock-closed" size={16} color={theme.colors.accent} />
+            <Text style={styles.lockedText}>{user.username}</Text>
           </View>
         )}
 
@@ -201,7 +210,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {availableProfiles.length > 0 && (
+          {availableProfiles.length > 0 && !user && (
             <View style={styles.profileChips}>
               <Text style={styles.profileChipsLabel}>Try another profile:</Text>
               <View style={styles.profileChipRow}>
@@ -306,6 +315,21 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     padding: 12,
+  },
+  lockedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  lockedText: {
+    color: theme.colors.accent,
+    fontWeight: '600',
   },
   methodRow: {
     flexDirection: 'row',
