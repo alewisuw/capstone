@@ -103,30 +103,5 @@ def _blended_results(avg_results, individual_results, limit: int):
         blended.append((bill_id, 0.5 * avg_score + 0.5 * tag_score))
     return sorted(blended, key=lambda x: -x[1])[:limit]
 
-def recommend_bills(interests, demographics, limit, method: str = "fused"):
-    method = method.lower()
-    if method == "fused":
-        return _build_recommendations(_fused_search(interests, demographics, limit))
-    if method == "average":
-        return _build_recommendations(_average_search(interests, limit))
-    if method == "individual":
-        return _build_recommendations(_individual_search(interests, limit))
-    if method == "blended":
-        avg_results = _average_search(interests, limit)
-        individual_results = _individual_search(interests, limit)
-        blended = _blended_results(avg_results, individual_results, limit)
-        output = []
-        for bill_id, score in blended:
-            if not bill_id:
-                continue
-            info = get_bill_info(bill_id)
-            output.append(
-                BillRecommendation(
-                    bill_id=bill_id,
-                    title=info["title"],
-                    summary=info["summary"],
-                    score=float(score),
-                )
-            )
-        return output
-    raise ValueError(f"Unsupported method: {method}")
+def recommend_bills(interests, demographics, limit):
+    return _build_recommendations(_fused_search(interests, demographics, limit))

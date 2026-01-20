@@ -91,6 +91,7 @@ function AppShell() {
 
   return (
     <Tab.Navigator
+      initialRouteName="Recommendations"
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
@@ -120,8 +121,8 @@ function AppShell() {
         },
       })}
     >
+      <Tab.Screen name="Recommendations" component={RecommendationsStack} options={{ title: 'Home' }} />
       <Tab.Screen name="Home" component={HomeStack} options={{ title: 'Search' }} />
-      <Tab.Screen name="Recommendations" component={RecommendationsStack} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

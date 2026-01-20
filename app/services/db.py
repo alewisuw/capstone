@@ -6,7 +6,7 @@ def get_bill_info(bill_id: int):
         conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.llm_summary, b.name_en
+            SELECT bt.llm_summary, bt.summary_en, b.name_en
             FROM bills_billtext bt
             JOIN bills_bill b ON bt.bill_id = b.id
             WHERE bt.bill_id = %s;
@@ -21,7 +21,9 @@ def get_bill_info(bill_id: int):
     if not row:
         return {"summary": "[No summary found]", "title": "[No title found]"}
 
+    summary = row[0] or row[1] or "[No summary found]"
+    title = row[2] or "[No title found]"
     return {
-        "summary": row[0] or "[No summary found]",
-        "title": row[1] or "[No title found]",
+        "summary": summary,
+        "title": title,
     }

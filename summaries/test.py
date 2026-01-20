@@ -53,7 +53,7 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 cur.execute("""
-SELECT count(*) from bills_billtext where llm_tags is not null
+SELECT count(*) from bills_billtext where llm_tags is null
 """)
 
 # Get column names from cursor description

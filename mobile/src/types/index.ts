@@ -32,7 +32,6 @@ export interface HealthStatus {
   status: string;
 }
 
-export type RecommendationMethod = 'fused' | 'average' | 'individual' | 'blended';
 
 // Navigation Types
 export type RootStackParamList = {

@@ -18,7 +18,7 @@ import { getRecommendations, getProfiles } from '../services/apiService';
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
-import type { BillRecommendation, RecommendationMethod } from '../types';
+import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useAuth } from '../context/AuthContext';
 
@@ -33,7 +33,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   );
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<BillRecommendation[]>([]);
-  const [method, setMethod] = useState<RecommendationMethod>('fused');
   const [limit, setLimit] = useState<number>(5);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +51,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       loadProfiles();
     }
     loadRecommendations();
-  }, [username, method, limit, user]);
+  }, [username, limit, user]);
 
   const loadProfiles = async (): Promise<void> => {
     try {
@@ -70,7 +69,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         setLoading(true);
       }
       const normalized = (user?.username || username).trim().toLowerCase();
-      const data = await getRecommendations(normalized, limit, method);
+      const data = await getRecommendations(normalized, limit);
       setRecommendations(data.recommendations || []);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load recommendations');
@@ -156,30 +155,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
           </View>
         )}
 
-        <View style={styles.methodRow}>
-          {(['fused', 'average', 'individual', 'blended'] as RecommendationMethod[]).map(
-            (option) => (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.methodChip,
-                  method === option && styles.methodChipActive,
-                ]}
-                onPress={() => setMethod(option)}
-              >
-                <Text
-                  style={[
-                    styles.methodChipText,
-                    method === option && styles.methodChipTextActive,
-                  ]}
-                >
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            )
-          )}
-        </View>
-
         <View style={styles.limitRow}>
           <Text style={styles.limitLabel}>Results</Text>
           <View style={styles.limitControls}>
@@ -234,9 +209,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>
                   {recommendations.length} Bills Recommended
-                </Text>
-                <Text style={styles.sectionSubtitle}>
-                  Method: {method}
                 </Text>
               </View>
               {recommendations.map((bill) => (
@@ -331,33 +303,6 @@ const styles = StyleSheet.create({
     color: theme.colors.accent,
     fontWeight: '600',
   },
-  methodRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 16,
-  },
-  methodChip: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.4)',
-  },
-  methodChipActive: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.accent,
-  },
-  methodChipText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'capitalize',
-  },
-  methodChipTextActive: {
-    color: theme.colors.accent,
-  },
   limitRow: {
     marginTop: 12,
     flexDirection: 'row',
@@ -401,11 +346,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: theme.colors.textDark,
-  },
-  sectionSubtitle: {
-    fontSize: 12,
-    color: theme.colors.textMuted,
-    marginTop: 4,
   },
   profileChips: {
     paddingHorizontal: 16,

@@ -35,7 +35,7 @@ def get_settings():
         "db": {
             "host": ssm_params.get("/billBoard/DB_HOST", "localhost"),
             "port": int(os.getenv("DB_PORT", 5432)),
-            "name": os.getenv("DB_NAME", "postgres"),
+            "name": os.getenv("DB_NAME", "billsdb"),
             "user": os.getenv("DB_USER", "postgres"),
             "password": ssm_params.get("/billBoard/DB_PASSWORD", "postgres"),
         },

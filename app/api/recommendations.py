@@ -17,7 +17,6 @@ PROFILE_DIR = settings["paths"]["profiles"]
 def get_recommendations(
     username: str,
     limit: int = Query(5, ge=1, le=20),
-    method: str = Query("fused", pattern="^(fused|average|individual|blended)$"),
 ):
     profile_path = os.path.join(PROFILE_DIR, f"{username.lower()}.json")
     if not os.path.exists(profile_path):
@@ -34,7 +33,6 @@ def get_recommendations(
         interests=interests,
         demographics=profile.get("demographics", {}),
         limit=limit,
-        method=method,
     )
 
     return RecommendationResponse(

@@ -4,7 +4,6 @@ import type {
   RecommendationResponse,
   HealthStatus,
   BillRecommendation,
-  RecommendationMethod,
 } from '../types';
 
 export const getHealth = async (): Promise<HealthStatus> => {
@@ -39,14 +38,13 @@ export const getProfile = async (username: string): Promise<UserProfile> => {
 
 export const getRecommendations = async (
   username: string, 
-  limit: number = 5,
-  method: RecommendationMethod = 'fused'
+  limit: number = 5
 ): Promise<RecommendationResponse> => {
   try {
     const response = await api.get<RecommendationResponse>(
       `/api/recommendations/${username}`, 
       {
-        params: { limit, method },
+        params: { limit },
       }
     );
     return response.data;
