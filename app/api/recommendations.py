@@ -2,10 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 import json
 import os
 
-from app.models.schemas import (
-    RecommendationResponse,
-    UserProfile,
-)
+from app.models.schemas import RecommendationResponse
 from app.config.settings import settings
 from app.services.recommendations import recommend_bills
 
@@ -35,7 +32,4 @@ def get_recommendations(
         limit=limit,
     )
 
-    return RecommendationResponse(
-        recommendations=recommendations,
-        user_profile=UserProfile(**profile),
-    )
+    return RecommendationResponse(recommendations=recommendations)

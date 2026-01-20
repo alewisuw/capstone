@@ -25,7 +25,6 @@ export interface UserProfile {
 
 export interface RecommendationResponse {
   recommendations: BillRecommendation[];
-  user_profile: UserProfile;
 }
 
 export interface HealthStatus {

@@ -14,4 +14,3 @@ class UserProfile(BaseModel):
 
 class RecommendationResponse(BaseModel):
     recommendations: List[BillRecommendation]
-    user_profile: UserProfile
