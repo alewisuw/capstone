@@ -7,10 +7,12 @@ AWS_REGION = os.getenv("AWS_REGION", "ca-central-1")
 PARAMETER_NAMES = [
     "/billBoard/DB_HOST",
     "/billBoard/DB_PASSWORD",
+    "/billBoard/COGNITO_USER_POOL_ID",
+    "/billBoard/COGNITO_APP_CLIENT_ID",
 ]
 
 def _ssm_enabled() -> bool:
-    return os.getenv("AWS_SSM_ENABLED", "").lower() in {"1", "true", "yes"}
+    return os.getenv("AWS_SSM_ENABLED", "true").lower() in {"1", "true", "yes"}
 
 def _load_ssm_parameters():
     if not _ssm_enabled():
@@ -34,17 +36,25 @@ def get_settings():
     return {
         "db": {
             "host": ssm_params.get("/billBoard/DB_HOST", "localhost"),
-            "port": int(os.getenv("DB_PORT", 5432)),
-            "name": os.getenv("DB_NAME", "billsdb"),
-            "user": os.getenv("DB_USER", "postgres"),
+            "port": 5432,
+            "name": "postgres",
+            "user": "postgres",
             "password": ssm_params.get("/billBoard/DB_PASSWORD", "postgres"),
         },
         "qdrant": {
             "host": os.getenv("QDRANT_HOST", "localhost"),
-            "port": int(os.getenv("QDRANT_PORT", 6333)),
+            "port": 6333
         },
         "collections": {
             "bill_embeddings": "bill_text_embeddings",
+        },
+        "auth": {
+            "cognito_region": AWS_REGION,
+            "user_pool_id": ssm_params.get("/billBoard/COGNITO_USER_POOL_ID", ""),
+            "app_client_id":  ssm_params.get("/billBoard/COGNITO_APP_CLIENT_ID", ""),
+        },
+        "dynamodb": {
+            "table": "user_data",
         },
         "paths": {
             "profiles": os.path.join(

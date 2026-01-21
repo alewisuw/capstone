@@ -23,6 +23,17 @@ export interface UserProfile {
   };
 }
 
+export interface MyProfileRecord {
+  user_id: string;
+  username: string;
+  email: string;
+  interests: string[];
+  demographics: Record<string, string>;
+  onboarded: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface RecommendationResponse {
   recommendations: BillRecommendation[];
 }
@@ -49,8 +60,10 @@ export type AuthStackParamList = {
   AuthLanding: undefined;
   Login: undefined;
   SignUp: undefined;
+  VerifyEmail: undefined;
   Instructions: undefined;
   BasicInfo: undefined;
+  Interests: { demographics: Record<string, string> };
 };
 
 // Component Props Types

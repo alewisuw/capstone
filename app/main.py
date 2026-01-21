@@ -6,6 +6,7 @@ from app.api import (
     search,
     recommendations,
     profiles,
+    me,
 )
 
 app = FastAPI(title="BillBoard API")
@@ -22,3 +23,4 @@ app.include_router(health.router)
 app.include_router(search.router, prefix="/api/search", tags=["search"])
 app.include_router(recommendations.router, prefix="/api/recommendations", tags=["recommendations"])
 app.include_router(profiles.router, prefix="/api/profiles", tags=["profiles"])
+app.include_router(me.router, prefix="/api", tags=["me"])

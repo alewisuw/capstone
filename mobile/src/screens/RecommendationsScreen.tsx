@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
-import { getRecommendations, getProfiles } from '../services/apiService';
+import { getRecommendations, getMyRecommendations, getProfiles } from '../services/apiService';
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -38,7 +38,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
-  const { user } = useAuth();
+  const { user, authToken } = useAuth();
 
   useEffect(() => {
     if (route.params?.username) {
@@ -67,6 +67,15 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       setError(null);
       if (!refreshing) {
         setLoading(true);
+      }
+      if (user && authToken) {
+        const data = await getMyRecommendations(authToken, limit);
+        setRecommendations(data.recommendations || []);
+        return;
+      }
+      if (user && !authToken) {
+        setError('Missing session. Please sign in again.');
+        return;
       }
       const normalized = (user?.username || username).trim().toLowerCase();
       const data = await getRecommendations(normalized, limit);

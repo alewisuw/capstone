@@ -47,6 +47,8 @@ class EmbeddingFusion:
         demographic_emb = self.create_demographic_embedding(demographics)
 
         return interest_emb * 0.8 + demographic_emb * 0.2
+    
+    # fuse rankings after retrieving 2 lists
 
 
 @lru_cache

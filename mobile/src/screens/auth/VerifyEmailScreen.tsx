@@ -1,76 +1,71 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
 
-type LoginProps = StackScreenProps<AuthStackParamList, 'Login'>;
+type VerifyEmailProps = StackScreenProps<AuthStackParamList, 'VerifyEmail'>;
 
-const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
-  const { signIn } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ navigation }) => {
+  const { confirmSignUp, pendingEmail } = useAuth();
+  const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
+  const handleVerify = async () => {
     setError(null);
-    const result = await signIn(username, password);
-    if (!result.ok) {
-      setError(result.error || 'Sign in failed. Please try again.');
+    if (!code.trim()) {
+      setError('Enter the verification code.');
       return;
     }
-    if (result.needsOnboarding) {
-      navigation.navigate('Instructions');
+    const result = await confirmSignUp(code.trim());
+    if (!result.ok) {
+      setError(result.error || 'Verification failed. Please try again.');
+      return;
     }
+    if (result.needsOnboarding === true) {
+      navigation.navigate('Instructions');
+      return;
+    }
+    if (result.needsOnboarding === false) {
+      return;
+    }
+    navigation.navigate('Login');
   };
 
   return (
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={20} color="#fff" />
+        </TouchableOpacity>
         <AppLogo width={90} height={90} />
       </LinearGradient>
 
       <View style={styles.card}>
-        <Text style={styles.title}>Log in to your account</Text>
+        <Text style={styles.title}>Verify your email</Text>
+        <Text style={styles.subtitle}>
+          Enter the code sent to {pendingEmail || 'your email'}.
+        </Text>
 
-        <Text style={styles.label}>Username</Text>
+        <Text style={styles.label}>Verification Code</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your username"
+          placeholder="Enter code"
           placeholderTextColor="#9b9b9b"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
+          value={code}
+          onChangeText={setCode}
+          keyboardType="number-pad"
         />
-
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          placeholderTextColor="#9b9b9b"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={handleLogin}
-        >
-          <Text style={styles.primaryButtonText}>Log In</Text>
-        </TouchableOpacity>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <Text style={styles.footer}>
-          Don't have an account?{' '}
-          <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
-            Sign Up
-          </Text>
-        </Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={handleVerify}>
+          <Text style={styles.primaryButtonText}>Verify Email</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -86,6 +81,17 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     alignItems: 'center',
   },
+  backButton: {
+    position: 'absolute',
+    left: 16,
+    top: 56,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+  },
   card: {
     flex: 1,
     backgroundColor: theme.colors.surface,
@@ -98,6 +104,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: theme.colors.textDark,
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: theme.colors.textMuted,
     marginBottom: 16,
   },
   label: {
@@ -117,6 +128,12 @@ const styles = StyleSheet.create({
     color: theme.colors.textDark,
     backgroundColor: theme.colors.surface,
   },
+  errorText: {
+    marginTop: 12,
+    color: theme.colors.accent,
+    fontSize: 13,
+    fontWeight: '600',
+  },
   primaryButton: {
     marginTop: 24,
     backgroundColor: theme.colors.black,
@@ -129,23 +146,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  errorText: {
-    marginTop: 12,
-    color: theme.colors.accent,
-    fontSize: 13,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  footer: {
-    marginTop: 16,
-    fontSize: 13,
-    color: theme.colors.textMuted,
-    textAlign: 'center',
-  },
-  link: {
-    color: theme.colors.accent,
-    fontWeight: '700',
-  },
 });
 
-export default LoginScreen;
+export default VerifyEmailScreen;

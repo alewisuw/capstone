@@ -20,7 +20,7 @@ def get_recommendations(
         raise HTTPException(404, "Profile not found")
 
     with open(profile_path) as f:
-        profile = json.load(f)
+        profile = json.load(f) # to be changed to cognito
 
     interests = profile.get("interests", [])
     if not interests:

@@ -15,8 +15,10 @@ import BillDetailScreen from './src/screens/BillDetailScreen';
 import AuthLandingScreen from './src/screens/auth/AuthLandingScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignUpScreen from './src/screens/auth/SignUpScreen';
+import VerifyEmailScreen from './src/screens/auth/VerifyEmailScreen';
 import InstructionsScreen from './src/screens/auth/InstructionsScreen';
 import BasicInfoScreen from './src/screens/auth/BasicInfoScreen';
+import InterestsScreen from './src/screens/auth/InterestsScreen';
 import type { AuthStackParamList, RootStackParamList, RootTabParamList } from './src/types';
 import { theme } from './src/theme';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
@@ -76,8 +78,10 @@ function AuthFlow() {
       <AuthStack.Screen name="AuthLanding" component={AuthLandingScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+      <AuthStack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
       <AuthStack.Screen name="Instructions" component={InstructionsScreen} />
       <AuthStack.Screen name="BasicInfo" component={BasicInfoScreen} />
+      <AuthStack.Screen name="Interests" component={InterestsScreen} />
     </AuthStack.Navigator>
   );
 }

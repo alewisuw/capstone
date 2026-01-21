@@ -12,5 +12,17 @@ class UserProfile(BaseModel):
     interests: List[str]
     demographics: Dict
 
+
+class UserProfileInput(BaseModel):
+    username: str
+    email: str
+    interests: List[str] = []
+    demographics: Dict = {}
+    onboarded: bool = False
+
+
+class UserProfileResponse(UserProfileInput):
+    user_id: str
+
 class RecommendationResponse(BaseModel):
     recommendations: List[BillRecommendation]

@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
+import AppLogo from '../../components/AppLogo';
 
 type AuthLandingProps = StackScreenProps<AuthStackParamList, 'AuthLanding'>;
 
@@ -12,10 +12,7 @@ const AuthLandingScreen: React.FC<AuthLandingProps> = ({ navigation }) => {
   return (
     <LinearGradient colors={theme.gradients.auth} style={styles.container}>
       <View style={styles.hero}>
-        <View style={styles.logoCircle}>
-          <Ionicons name="business" size={40} color="#fff" />
-        </View>
-        <Text style={styles.logoText}>Bill Board</Text>
+        <AppLogo width={140} height={140} />
         <Text style={styles.logoSub}>Personalized bills, focused on you.</Text>
       </View>
 
@@ -48,20 +45,6 @@ const styles = StyleSheet.create({
   hero: {
     alignItems: 'center',
     gap: 12,
-  },
-  logoCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 0.4,
   },
   logoSub: {
     color: 'rgba(255, 255, 255, 0.8)',

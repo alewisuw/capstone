@@ -6,6 +6,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
+import AppLogo from '../../components/AppLogo';
 
 type SignUpProps = StackScreenProps<AuthStackParamList, 'SignUp'>;
 
@@ -42,7 +43,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
       setError(result.error || 'Sign up failed. Please try again.');
       return;
     }
-    navigation.navigate('Instructions');
+    navigation.navigate('VerifyEmail');
   };
 
   return (
@@ -51,7 +52,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Bill Board</Text>
+        <AppLogo width={90} height={90} />
       </LinearGradient>
 
       <View style={styles.card}>
@@ -159,11 +160,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
-  },
-  headerText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '700',
   },
   card: {
     flex: 1,

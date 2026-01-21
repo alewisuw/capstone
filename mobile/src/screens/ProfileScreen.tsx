@@ -13,10 +13,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RootTabParamList } from '../types';
-import { getProfile, getProfiles } from '../services/apiService';
+import { getMyProfile, getProfile, getProfiles } from '../services/apiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
-import type { UserProfile } from '../types';
+import type { UserProfile, MyProfileRecord } from '../types';
 import { theme } from '../theme';
 import { categoryColors, normalizeTag, tagCategoryLookup } from '../data/tagCategories';
 import { useAuth } from '../context/AuthContext';
@@ -24,9 +24,9 @@ import { useAuth } from '../context/AuthContext';
 type ProfileScreenProps = BottomTabScreenProps<RootTabParamList, 'Profile'>;
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
-  const { user, signOut } = useAuth();
+  const { user, authToken, signOut } = useAuth();
   const [username, setUsername] = useState<string>('su_victor21');
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<UserProfile | MyProfileRecord | null>(null);
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +45,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   }, [user]);
 
   const loadProfiles = async (): Promise<void> => {
+    if (user) {
+      return;
+    }
     try {
       const data = await getProfiles();
       setAvailableProfiles(data);
@@ -60,6 +63,17 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     setError(null);
     
     try {
+      if (user) {
+        if (!authToken) {
+          setError('Missing session. Please sign in again.');
+          setProfile(null);
+          return;
+        }
+        const data = await getMyProfile(authToken);
+        setProfile(data);
+        setShowUsernameInput(false);
+        return;
+      }
       const data = await getProfile(user.toLowerCase());
       setProfile(data);
       setShowUsernameInput(false);
@@ -84,9 +98,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   };
 
   const handleViewRecommendations = (): void => {
-    if (profile) {
-      navigation.navigate('Recommendations', { username: profile.name });
+    if (!profile) {
+      return;
     }
+    const targetName = 'username' in profile ? profile.username : profile.name;
+    navigation.navigate('Recommendations', { username: targetName });
   };
 
   const formatLabel = (key: string): string => {
@@ -182,7 +198,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           <View style={styles.profileCard}>
             <View style={styles.profileNameContainer}>
               <Ionicons name="person-circle" size={64} color={theme.colors.accent} />
-              <Text style={styles.profileName}>{profile.name}</Text>
+              <Text style={styles.profileName}>
+                {'username' in profile ? profile.username : profile.name}
+              </Text>
             </View>
 
             {profile.interests && profile.interests.length > 0 && (
@@ -249,7 +267,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             <View style={styles.profilesListSection}>
               <Text style={styles.profilesListTitle}>Other Profiles</Text>
               {availableProfiles
-                .filter((p) => p !== profile.name)
+                .filter((p) => p !== ('username' in profile ? profile.username : profile.name))
                 .slice(0, 10)
                 .map((profileName) => (
                   <TouchableOpacity

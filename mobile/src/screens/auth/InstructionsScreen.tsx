@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
+import AppLogo from '../../components/AppLogo';
 
 type InstructionsProps = StackScreenProps<AuthStackParamList, 'Instructions'>;
 
@@ -11,7 +12,7 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
-        <Text style={styles.headerText}>Bill Board</Text>
+        <AppLogo width={90} height={90} />
       </LinearGradient>
 
       <View style={styles.card}>
@@ -67,11 +68,6 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: 24,
     alignItems: 'center',
-  },
-  headerText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '700',
   },
   card: {
     flex: 1,
