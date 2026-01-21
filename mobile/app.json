@@ -19,9 +19,7 @@
       "bundleIdentifier": "com.billboard.app"
     },
     "android": {
-      "permissions": [
-        "DETECT_SCREEN_CAPTURE"
-      ],
+      "permissions": [],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

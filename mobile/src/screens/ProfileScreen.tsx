@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '../components/Icon';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RootTabParamList } from '../types';
 import { getMyProfile, getProfile, getProfiles } from '../services/apiService';

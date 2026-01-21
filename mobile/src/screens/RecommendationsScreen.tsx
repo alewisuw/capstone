@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { getRecommendations, getMyRecommendations, getProfiles } from '../services/apiService';

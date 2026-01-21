@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';

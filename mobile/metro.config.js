@@ -7,6 +7,7 @@ const config = getDefaultConfig(__dirname);
 // Reduce the number of files Metro watches to prevent EMFILE errors
 config.watchFolders = [__dirname];
 config.resolver.sourceExts.push('tsx', 'ts');
+config.resolver.assetExts.push('ttf', 'otf');
 
 // Exclude node_modules from watching in parent directories
 config.watchFolders = config.watchFolders.filter(folder => {
@@ -14,4 +15,3 @@ config.watchFolders = config.watchFolders.filter(folder => {
 });
 
 module.exports = config;
-
