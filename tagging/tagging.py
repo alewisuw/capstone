@@ -1,18 +1,10 @@
-print("Starting imports...")
 import json
-print("json imported")
 import psycopg2
-print("psycopg2 imported")
 import os
-print("os imported")
 import torch
-print("torch imported")
 import collections.abc
-print("collections.abc imported")
 import boto3
-print("boto3 imported")
 from transformers import pipeline
-print("Transformers loaded successfully!")
 
 print("All basic imports complete!")
 # Load tags from tags.json
