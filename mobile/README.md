@@ -12,19 +12,19 @@ A React Native cross-platform mobile application (built with TypeScript) for dis
 ## Prerequisites
 
 - Node.js (v16 or higher)
-- npm or yarn
-- Expo CLI (`npm install -g expo-cli`)
+- npm
 - For iOS: Xcode (macOS only)
-- For Android: Android Studio
+- For Android: Android Studio + Android SDK
+- Java 17 (set `JAVA_HOME`, e.g., `/usr/lib/jvm/java-17-openjdk-amd64`)
 
-## Installation
+## Installation (SDK 50)
 
 1. Navigate to the mobile directory:
 ```bash
 cd mobile
 ```
 
-2. Install dependencies:
+2. Install dependencies (Expo SDK 50):
 ```bash
 npm install
 ```
@@ -40,25 +40,23 @@ Before running the app, update the API base URL in `src/config/api.ts`:
 
 Make sure your FastAPI backend is running and accessible at the configured URL.
 
-## Running the App
+## Running the App (Android Emulator)
 
-1. Start the Expo development server:
+### Option A: Expo Go (QR code)
+1. Start the dev server:
 ```bash
 npm start
 ```
+2. Press `a` to open the Android emulator or scan the QR code with Expo Go on a device.
 
-2. Choose how to run:
-   - Press `i` for iOS simulator
-   - Press `a` for Android emulator
-   - Scan the QR code with Expo Go app on your physical device
-
-## Render on Android (Emulator)
-
-1. Make sure the Android SDK is installed and `ANDROID_HOME` is set (Android Studio → SDK Manager).
-2. Start an Android emulator from Android Studio (Device Manager).
-3. From `mobile/`, run:
+### Option B: Dev Client (native build)
+Use this if you need native modules/plugins:
 ```bash
-npm run android
+npx expo run:android
+```
+Then in another terminal:
+```bash
+npx expo start --dev-client
 ```
 
 If you see API connection errors in the app, set `EXPO_PUBLIC_API_BASE_URL` before launching:
@@ -66,13 +64,10 @@ If you see API connection errors in the app, set `EXPO_PUBLIC_API_BASE_URL` befo
 EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:8000 npm run android
 ```
 
-## Render on Android (Native Build)
+## Notes
 
-Use this path if you need a full native build (custom permissions/plugins):
-
-```bash
-npx expo run:android
-```
+- This project is pinned to **Expo SDK 50** (`expo@~50.0.0`).
+- If you are prompted to upgrade to SDK 54, do not accept unless you plan to migrate dependencies.
 
 ## Project Structure
 
@@ -123,6 +118,7 @@ If you encounter build errors:
 1. Clear cache: `expo start -c`
 2. Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
 3. Reset Metro bundler cache
+4. Ensure `JAVA_HOME` points to Java 17 and the Android SDK is installed
 
 ## Development
 

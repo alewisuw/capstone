@@ -3,6 +3,7 @@ import psycopg2
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 from sentence_transformers import SentenceTransformer
+from tqdm import tqdm
 
 ssm = boto3.client('ssm', region_name='ca-central-1')
 
@@ -91,7 +92,7 @@ if not qdrant.collection_exists(COLLECTION_NAME):
 # --- Embed and Upload ---
 points = []
 
-for idx, (bill_id, text) in enumerate(rows):
+for idx, (bill_id, text) in enumerate(tqdm(rows, total=len(rows), desc="Embedding bills")):
     if text:
         embedding = model.encode(text).tolist()  # type: ignore
         point = PointStruct(

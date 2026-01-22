@@ -44,6 +44,7 @@ s3transfer==0.13.0
 sentence-transformers==2.5.1
 six==1.17.0
 stack-data==0.6.3
+tqdm==4.67.1
 tornado==6.5.1
 traitlets==5.14.3
 typing_extensions==4.13.2
