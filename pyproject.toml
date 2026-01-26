@@ -4,18 +4,7 @@ version = "0.1.0"
 description = "BillBoard"
 authors = [{name = "Arkhan Lewis", email = "arkhan.lewis@uwaterloo.com"}]
 # add ur email if u care it doesnt affect anything
-dependencies = [
-    "fastapi[standard]",
-    "uvicorn",
-    "boto3",
-    "psycopg2-binary",
-    "requests",
-    "google-auth",
-    "google-auth-oauthlib",
-    "torch",
-    "transformers"
-
-]
+dynamic = ["dependencies"]
 requires-python = ">=3.8"
 
 [build-system]
@@ -24,3 +13,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["app", "tagging", "retrieval", "summaries"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
