@@ -1,4 +1,4 @@
-v# BillBoard
+# BillBoard
 
 ## Setup
 
@@ -7,12 +7,11 @@ v# BillBoard
 ## Run
 
 1. ```source venv/bin/activate```
-2. ```fastapi dev app/main.py```
+2. ```docker pull qdrant/qdrant```
+3. ```docker run -p 6333:6333 -v qdrant_storage:/qdrant/storage qdrant/qdrant```
+4. ```fastapi dev app/main.py```
 
 
-docker pull qdrant/qdrant
-
-docker run -p 6333:6333 -v qdrant_storage:/qdrant/storage qdrant/qdrant
 
 
 go to:
