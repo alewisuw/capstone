@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Input</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .interests-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .interests-container input {
+            flex: 1;
+        }
+
+        .add-interest-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .add-interest-btn:hover {
+            background: #5568d3;
+        }
+
+        .interest-tag {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 8px 16px;
+            margin: 5px 5px 5px 0;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .interest-tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            color: #999;
+            font-weight: bold;
+        }
+
+        .interest-tag .remove:hover {
+            color: #333;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .demographics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Bill Recommendation Study</h1>
+        <p class="subtitle">Help us improve bill recommendations by sharing your interests and demographics</p>
+
+        <form id="profileForm">
+            <!-- Interests Section -->
+            <div class="section-title">Your Interests</div>
+            <div class="form-group">
+                <label>Select topics you're interested in:</label>
+                <div id="tagsContainer"></div>
+                <div class="error" id="interestError"></div>
+            </div>
+
+            <!-- Demographics Section -->
+            <div class="section-title">Demographics (Optional)</div>
+            <div class="demographics-grid">
+                <div class="form-group">
+                    <label for="age_group">Age Group:</label>
+                    <select id="age_group" name="age_group">
+                        <option value="">Select...</option>
+                        <option value="under_18">Under 18</option>
+                        <option value="18_24">18-24</option>
+                        <option value="25_34">25-34</option>
+                        <option value="35_44">35-44</option>
+                        <option value="45_54">45-54</option>
+                        <option value="55_64">55-64</option>
+                        <option value="65_plus">65+</option>
+                        <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender_identity">Gender Identity:</label>
+                    <select id="gender_identity" name="gender_identity">
+                        <option value="">Select...</option>
+                        <option value="woman">Woman</option>
+                        <option value="man">Man</option>
+                        <option value="non_binary">Non-binary</option>
+                        <option value="two_spirit">Two-spirit</option>
+                        <option value="prefer_to_self_describe">Prefer to self-describe</option>
+                        <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="income_range">Income Range:</label>
+                    <select id="income_range" name="income_range">
+                        <option value="">Select...</option>
+                        <option value="under_20000">Under $20,000</option>
+                        <option value="20000_39999">$20,000 - $39,999</option>
+                        <option value="40000_59999">$40,000 - $59,999</option>
+                        <option value="60000_79999">$60,000 - $79,999</option>
+                        <option value="80000_99999">$80,000 - $99,999</option>
+                        <option value="100000_149999">$100,000 - $149,999</option>
+                        <option value="150000_200000">$150,000 - $200,000</option>
+                        <option value="200000_250000">$200,000+</option>
+                        <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="disability_status">Disability Status:</label>
+                    <select id="disability_status" name="disability_status">
+                        <option value="">Select...</option>
+                        <option value="no_disability">No disability</option>
+                        <option value="physical_disability">Physical disability</option>
+                        <option value="sensory_disability">Sensory disability</option>
+                        <option value="cognitive_learning_disability">Cognitive/learning disability</option>
+                        <option value="mental_health_disability">Mental health disability</option>
+                        <option value="chronic_illness">Chronic illness</option>
+                        <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Get Bill Recommendations</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px;">Loading recommendations...</p>
+        </div>
+    </div>
+
+    <script>
+        let interests = [];
+
+        // Fetch tags from API and render checkboxes
+        async function loadTags() {
+            const res = await fetch('/api/tags');
+            const tags = await res.json();
+            const container = document.getElementById('tagsContainer');
+            container.innerHTML = '';
+            Object.entries(tags).forEach(([category, tagList]) => {
+                const catDiv = document.createElement('div');
+                catDiv.style.marginBottom = '10px';
+                catDiv.innerHTML = `<strong>${category}</strong>`;
+                tagList.forEach(tag => {
+                    const id = `tag_${category.replace(/\W/g, '')}_${tag.replace(/\W/g, '')}`;
+                    const label = document.createElement('label');
+                    label.style.display = 'block';
+                    label.style.marginLeft = '16px';
+                    label.innerHTML = `<input type="checkbox" value="${tag}" onchange="onTagChange(this)"> ${tag}`;
+                    catDiv.appendChild(label);
+                });
+                container.appendChild(catDiv);
+            });
+        }
+
+        function onTagChange(checkbox) {
+            const value = checkbox.value;
+            if (checkbox.checked) {
+                if (!interests.includes(value)) interests.push(value);
+            } else {
+                interests = interests.filter(i => i !== value);
+            }
+        }
+
+        window.onload = loadTags;
+
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const errorDiv = document.getElementById('interestError');
+
+            if (interests.length === 0) {
+                errorDiv.textContent = 'Please add at least one interest';
+                return;
+            }
+
+            // Collect demographics
+            const demographics = {
+                age_group: document.getElementById('age_group').value,
+                gender_identity: document.getElementById('gender_identity').value,
+                income_range: document.getElementById('income_range').value,
+                disability_status: document.getElementById('disability_status').value
+            };
+
+            // Show loading
+            document.getElementById('profileForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+
+            try {
+                const response = await fetch('/api/recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        interests: interests,
+                        demographics: demographics
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store data in sessionStorage and navigate to compare page
+                    sessionStorage.setItem('recommendations', JSON.stringify(data));
+                    sessionStorage.setItem('userProfile', JSON.stringify({
+                        interests: interests,
+                        demographics: demographics
+                    }));
+                    window.location.href = '/compare';
+                } else {
+                    alert('Error: ' + data.error);
+                    document.getElementById('profileForm').style.display = 'block';
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+                document.getElementById('profileForm').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

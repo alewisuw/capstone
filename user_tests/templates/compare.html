@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare Recommendations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .method-column {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .method-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            text-align: center;
+        }
+
+        .method-column.fused .method-title {
+            border-bottom-color: #667eea;
+        }
+
+        .method-column.tag .method-title {
+            border-bottom-color: #764ba2;
+        }
+
+        .bill-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .bill-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .bill-id {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .bill-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .bill-summary {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .relevance-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .relevance-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .relevance-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .relevance-btn.selected.relevant {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .relevance-btn.selected.non-relevant {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-indicator {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 968px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Compare Recommendation Methods</h1>
+        <p class="subtitle">Rate each bill as relevant or non-relevant to your interests</p>
+
+        <div class="progress-indicator">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="progressText">0 of 10 bills rated</span>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <div class="comparison-grid">
+            <!-- Fused Embedding Column -->
+            <div class="method-column fused">
+                <div class="method-title">Method 1<br></div>
+                <div id="fusedBills"></div>
+            </div>
+
+            <!-- Tag Query Column -->
+            <div class="method-column tag">
+                <div class="method-title">Method 2<br></div>
+                <div id="tagBills"></div>
+            </div>
+        </div>
+
+        <div class="submit-section">
+            <button class="submit-btn" id="submitBtn" onclick="submitResults()" disabled>
+                Submit Ratings & Start New Test
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let recommendations = {};
+        let userProfile = {};
+        let fusedResponses = {};
+        let tagResponses = {};
+        let totalBills = 10;
+
+        function loadData() {
+            const recsData = sessionStorage.getItem('recommendations');
+            const profileData = sessionStorage.getItem('userProfile');
+
+            if (!recsData || !profileData) {
+                document.getElementById('errorMessage').textContent = 
+                    'No recommendation data found. Please start from the beginning.';
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+                return false;
+            }
+
+            recommendations = JSON.parse(recsData);
+            userProfile = JSON.parse(profileData);
+            return true;
+        }
+
+        function renderBills() {
+            const fusedContainer = document.getElementById('fusedBills');
+            const tagContainer = document.getElementById('tagBills');
+
+            // Render fused embedding bills
+            fusedContainer.innerHTML = recommendations.fused.map((bill, index) => `
+                <div class="bill-card">
+                    <div class="bill-id">Bill #${index + 1}: ${bill.bill_id}</div>
+                    <div class="bill-title">${bill.title}</div>
+                    <div class="bill-summary">${bill.summary}</div>
+                    <div class="relevance-buttons">
+                        <button class="relevance-btn" onclick="selectRelevance('fused', '${bill.bill_id}', 'relevant', '${bill.title.replace(/'/g, "\\'")}')">
+                            ✓ Relevant
+                        </button>
+                        <button class="relevance-btn" onclick="selectRelevance('fused', '${bill.bill_id}', 'non-relevant', '${bill.title.replace(/'/g, "\\'")}')">
+                            ✗ Non-Relevant
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Render tag query bills
+            tagContainer.innerHTML = recommendations.tag_query.map((bill, index) => `
+                <div class="bill-card">
+                    <div class="bill-id">Bill #${index + 1}: ${bill.bill_id}</div>
+                    <div class="bill-title">${bill.title}</div>
+                    <div class="bill-summary">${bill.summary}</div>
+                    <div class="relevance-buttons">
+                        <button class="relevance-btn" onclick="selectRelevance('tag', '${bill.bill_id}', 'relevant', '${bill.title.replace(/'/g, "\\'")}')">
+                            ✓ Relevant
+                        </button>
+                        <button class="relevance-btn" onclick="selectRelevance('tag', '${bill.bill_id}', 'non-relevant', '${bill.title.replace(/'/g, "\\'")}')">
+                            ✗ Non-Relevant
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectRelevance(method, billId, relevance, title) {
+            const responses = method === 'fused' ? fusedResponses : tagResponses;
+            
+            // Store response
+            responses[billId] = {
+                relevance: relevance,
+                title: title
+            };
+
+            // Update button styling
+            const card = event.target.closest('.bill-card');
+            const buttons = card.querySelectorAll('.relevance-btn');
+            buttons.forEach(btn => btn.classList.remove('selected', 'relevant', 'non-relevant'));
+            event.target.classList.add('selected', relevance);
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalResponses = Object.keys(fusedResponses).length + Object.keys(tagResponses).length;
+            const percentage = (totalResponses / totalBills) * 100;
+
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = 
+                `${totalResponses} of ${totalBills} bills rated`;
+
+            // Enable submit button when all bills are rated
+            document.getElementById('submitBtn').disabled = totalResponses < totalBills;
+        }
+
+        async function submitResults() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        interests: userProfile.interests,
+                        demographics: userProfile.demographics,
+                        fused_responses: fusedResponses,
+                        tag_responses: tagResponses
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Clear session storage
+                    sessionStorage.removeItem('recommendations');
+                    sessionStorage.removeItem('userProfile');
+                    
+                    alert('✅ Results saved successfully! Starting a new test...');
+                    window.location.href = '/';
+                } else {
+                    alert('Error saving results: ' + data.error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Ratings & Start New Test';
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Ratings & Start New Test';
+            }
+        }
+
+        // Initialize page
+        if (loadData()) {
+            renderBills();
+            updateProgress();
+        }
+    </script>
+</body>
+</html>

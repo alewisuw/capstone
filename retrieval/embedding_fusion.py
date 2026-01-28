@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from typing import List, Dict
 from sentence_transformers import SentenceTransformer
-from demographic_enums import DemographicContextGenerator
+from .demographic_enums import DemographicContextGenerator
 
 class EmbeddingFusion:
     def __init__(self, model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):

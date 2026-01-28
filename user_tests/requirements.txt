@@ -1,0 +1,7 @@
+flask
+sentence-transformers
+qdrant-client
+psycopg2-binary
+boto3
+numpy
+torch

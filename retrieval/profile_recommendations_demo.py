@@ -195,7 +195,7 @@ for hit in sorted(individual_results, key=lambda x: -x.score):
     if len(unique_results) == 5:
         break
 
-# --- Method 3: Blended Results ---
+# --- Method 4: Blended Results ---
 avg_score_map = {hit.payload.get("bill_id"): hit.score for hit in avg_results} #type: ignore
 tag_score_map = {hit.payload.get("bill_id"): hit.score for hit in unique_results} #type: ignore
 
