@@ -16,6 +16,7 @@ import type { RootTabParamList } from '../types';
 import { getMyProfile, getProfile, getProfiles } from '../services/apiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import AppLogo from '../components/AppLogo';
 import type { UserProfile, MyProfileRecord } from '../types';
 import { theme } from '../theme';
 import { categoryColors, normalizeTag, tagCategoryLookup } from '../data/tagCategories';
@@ -135,6 +136,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Profile</Text>
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
         
         {!showUsernameInput && !user ? (
           <TouchableOpacity
@@ -174,15 +178,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.lockedRow}>
-            <View style={styles.lockedChip}>
-              <Ionicons name="lock-closed" size={16} color={theme.colors.accent} />
-              <Text style={styles.lockedText}>{user.username}</Text>
-            </View>
-            <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
-              <Text style={styles.signOutText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
         )}
       </LinearGradient>
 
@@ -307,6 +305,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 24,
   },
+  topRightLogo: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
+  },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
@@ -349,27 +352,8 @@ const styles = StyleSheet.create({
   cancelButton: {
     padding: 12,
   },
-  lockedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  lockedChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-  },
-  lockedText: {
-    color: theme.colors.accent,
-    fontWeight: '600',
-  },
   signOutButton: {
+    alignSelf: 'flex-start',
     paddingHorizontal: 12,
     paddingVertical: 8,
   },

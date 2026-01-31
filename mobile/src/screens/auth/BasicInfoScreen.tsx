@@ -298,6 +298,9 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
         <AppLogo width={90} height={90} />
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
       </LinearGradient>
 
       <Pressable style={styles.card} onPress={() => setOpenKey(null)}>
@@ -332,7 +335,11 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
                         key={option}
                         style={styles.optionRow}
                         onPress={() => {
-                          field.setter(option);
+                          if (option === field.value) {
+                            field.setter('');
+                          } else {
+                            field.setter(option);
+                          }
                           setOpenKey(null);
                         }}
                       >
@@ -393,6 +400,11 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: 24,
     alignItems: 'center',
+  },
+  topRightLogo: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
   },
   card: {
     flex: 1,

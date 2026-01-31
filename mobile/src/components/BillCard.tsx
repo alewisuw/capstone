@@ -35,7 +35,7 @@ const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
         <Text style={styles.summary} numberOfLines={3}>
           {truncateText(bill.summary, 150)}
         </Text>
-        
+
         <View style={styles.footer}>
           <View style={styles.readMoreContainer}>
             <Text style={styles.readMoreText}>Read More</Text>

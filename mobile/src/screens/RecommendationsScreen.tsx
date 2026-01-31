@@ -18,6 +18,7 @@ import { getRecommendations, getMyRecommendations, getProfiles } from '../servic
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import AppLogo from '../components/AppLogo';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useAuth } from '../context/AuthContext';
@@ -124,6 +125,9 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         <Text style={styles.headerSubtitle}>
           Personalized bills for {user?.username || username}
         </Text>
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
 
         {!showUsernameInput && !user ? (
           <TouchableOpacity
@@ -157,12 +161,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
-        ) : (
-          <View style={styles.lockedChip}>
-            <Ionicons name="lock-closed" size={16} color={theme.colors.accent} />
-            <Text style={styles.lockedText}>{user.username}</Text>
-          </View>
-        )}
+        ) : null}
 
         <View style={styles.limitRow}>
           <Text style={styles.limitLabel}>Results</Text>
@@ -250,6 +249,11 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 16,
   },
+  topRightLogo: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
+  },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -296,21 +300,6 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     padding: 12,
-  },
-  lockedChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-  },
-  lockedText: {
-    color: theme.colors.accent,
-    fontWeight: '600',
   },
   limitRow: {
     marginTop: 12,

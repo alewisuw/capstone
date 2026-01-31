@@ -8,6 +8,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
+import AppLogo from '../components/AppLogo';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { theme } from '../theme';
@@ -18,7 +19,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
   const { bill } = route.params;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
@@ -29,6 +30,9 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
         >
           <View style={styles.billIdContainer}>
             <Text style={styles.billIdText}>Bill #{bill.bill_id}</Text>
+          </View>
+          <View style={styles.topRightLogo}>
+            <AppLogo width={44} height={44} />
           </View>
           {bill.score !== null && bill.score !== undefined && (
             <View style={styles.scoreContainer}>
@@ -55,7 +59,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
             <View style={styles.infoRow}>
               <Ionicons name="information-circle" size={20} color={theme.colors.accentDark} />
               <Text style={styles.infoText}>
-                This summary is retrieved from the database and ranked for relevance
+                bill uses AI generated summaries, make sure to refer to full bill for most accurate information
               </Text>
             </View>
           </View>
@@ -81,6 +85,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  topRightLogo: {
+    position: 'absolute',
+    top: 0,
+    right: 16,
   },
   billIdContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -109,7 +118,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: theme.colors.surface,
-    margin: 16,
+    marginHorizontal: 16,
+    marginTop: -12,
+    marginBottom: 16,
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,

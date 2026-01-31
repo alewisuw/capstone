@@ -13,6 +13,9 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
         <AppLogo width={90} height={90} />
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
       </LinearGradient>
 
       <View style={styles.card}>
@@ -68,6 +71,11 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: 24,
     alignItems: 'center',
+  },
+  topRightLogo: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
   },
   card: {
     flex: 1,

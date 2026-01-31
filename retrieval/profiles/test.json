@@ -1,0 +1,13 @@
+{
+  "name": "marc_test777",
+  "interests": [
+    "Racial Justice and Equity",
+    "Gender Equality",
+    "Refugee Support",
+    "Immigration Policy"
+  ],
+  "demographics": {
+    "age": "under_18",
+    "gender_identity": "man"
+  }
+}

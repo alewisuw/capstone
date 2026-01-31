@@ -53,6 +53,9 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
       </LinearGradient>
 
       <View style={styles.card}>
@@ -89,6 +92,16 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
           secureTextEntry
         />
 
+        <Text style={styles.label}>Re-enter Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Re-enter your password"
+          placeholderTextColor="#9b9b9b"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
+
         {password.length > 0 ? (
           <View style={styles.passwordChecks}>
             <Text style={styles.passwordChecksTitle}>Password must include:</Text>
@@ -112,16 +125,6 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
             ))}
           </View>
         ) : null}
-
-        <Text style={styles.label}>Re-enter Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Re-enter your password"
-          placeholderTextColor="#9b9b9b"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -149,6 +152,11 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: 24,
     alignItems: 'center',
+  },
+  topRightLogo: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
   },
   backButton: {
     position: 'absolute',

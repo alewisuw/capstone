@@ -17,6 +17,7 @@ import { getHealth, searchBills } from '../services/apiService';
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
+import AppLogo from '../components/AppLogo';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 
@@ -76,6 +77,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.headerTitle}>Search Bills</Text>
         <Text style={styles.headerSubtitle}>Semantic search across bill summaries</Text>
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
 
         <View style={styles.statusRow}>
           <View
@@ -148,9 +152,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Search Results</Text>
-              <Text style={styles.sectionSubtitle}>
-                {results.length} bills found
-              </Text>
             </View>
             {results.map((bill) => (
               <BillCard
@@ -197,6 +198,11 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 10,
     paddingBottom: 24,
+  },
+  topRightLogo: {
+    position: 'absolute',
+    top: 12,
+    right: 16,
   },
   headerTitle: {
     fontSize: 32,
@@ -298,10 +304,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textDark,
     marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: theme.colors.textMuted,
   },
   emptyState: {
     flex: 1,

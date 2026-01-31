@@ -4,7 +4,20 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8d19efea-4018-4fec-a464-375ee69afb79" name="Changes" comment="" />
+    <list default="true" id="8d19efea-4018-4fec-a464-375ee69afb79" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/components/BillCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/BillCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/BillDetailScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/BillDetailScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/HomeScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/HomeScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/RecommendationsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/RecommendationsScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/AuthLandingScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/AuthLandingScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/InstructionsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/InstructionsScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/InterestsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/InterestsScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/LoginScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/LoginScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/SignUpScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/SignUpScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/VerifyEmailScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/VerifyEmailScreen.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -20,7 +33,7 @@
     </projectState>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
