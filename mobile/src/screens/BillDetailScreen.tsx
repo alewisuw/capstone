@@ -196,7 +196,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
             <View style={styles.infoRow}>
               <Ionicons name="information-circle" size={20} color={theme.colors.accentDark} />
               <Text style={styles.infoText}>
-                bill uses AI generated summaries, make sure to refer to full bill for most accurate information
+                Bill uses AI generated summaries, make sure to refer to full bill below for most accurate information.
               </Text>
             </View>
           </View>

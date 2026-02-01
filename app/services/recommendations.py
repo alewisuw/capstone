@@ -9,6 +9,7 @@ from app.models.schemas import BillRecommendation
 
 def _build_recommendations(hits) -> List[BillRecommendation]:
     output = []
+    debug_ids = []
     for hit in hits:
         payload = hit.payload or {}
         bill_id = payload.get("bill_id")
@@ -25,8 +26,12 @@ def _build_recommendations(hits) -> List[BillRecommendation]:
                 score=float(hit.score),
                 parliament_session=info.get("parliament_session"),
                 last_updated=info.get("last_updated"),
+                tags=info.get("tags"),
             )
         )
+        debug_ids.append(bill_id)
+    if debug_ids:
+        print(f"[recommendations] bill_ids={debug_ids}")
     return output
 
 def _fused_search(interests: List[str], demographics: Dict, limit: int):

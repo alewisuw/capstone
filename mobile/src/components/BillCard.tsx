@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Ionicons from './Icon';
 import type { BillCardProps } from '../types';
 import { theme } from '../theme';
+import { getTagColor } from '../data/tagCategories';
 
 const BillCard: React.FC<BillCardProps> = ({
   bill,
@@ -89,6 +90,21 @@ const BillCard: React.FC<BillCardProps> = ({
         <Text style={styles.title}>
           {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
         </Text>
+
+        {bill.tags && bill.tags.length > 0 ? (
+          <View style={styles.tagsRow}>
+            {bill.tags.map((tag) => {
+              const tagColor = getTagColor(tag);
+              const backgroundColor = tagColor || theme.colors.surfaceMuted;
+              const textColor = tagColor ? '#fff' : theme.colors.textDark;
+              return (
+                <View key={tag} style={[styles.tagChip, { backgroundColor }]}>
+                  <Text style={[styles.tagText, { color: textColor }]}>{tag}</Text>
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
         
         {renderSummary(bill.summary, 150)}
 
@@ -142,6 +158,21 @@ const styles = StyleSheet.create({
   },
   summaryContainer: {
     marginBottom: 12,
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 10,
+  },
+  tagChip: {
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   summary: {
     fontSize: 14,

@@ -1,3 +1,5 @@
+import { interestGroups } from './interestGroups';
+
 export const categoryColors: Record<string, string> = {
   "Civil Rights": "#b91c1c",
   "Economics": "#1d4ed8",
@@ -15,7 +17,22 @@ export const categoryColors: Record<string, string> = {
   "Culture, Heritage, and Holidays": "#c2410c",
 };
 
-export const tagCategoryLookup: Record<string, string> = {
+const groupTitleToCategory: Record<string, string> = {
+  'social & civil rights': 'Civil Rights',
+  'economic issues': 'Economics',
+  'technology & innovation': 'Technology, Science, and Innovation',
+  'public safety & emergency response': 'Public Safety & Emergency Response',
+  'transportation & mobility': 'Transportation & Mobility',
+  'housing & infrastructure': 'Housing & Infrastructure',
+  'environmental policy': 'Environmental Policy',
+  'democracy & governance': 'Democracy & Governance',
+  'foreign policy': 'Foreign Policy',
+  'indigenous affairs': 'Indigenous Affairs',
+  'education': 'Education',
+  'healthcare': 'Healthcare',
+};
+
+const staticTagCategoryLookup: Record<string, string> = {
   "racial justice and equity": "Civil Rights",
   "gender equality": "Civil Rights",
   "lgbtq+ rights": "Civil Rights",
@@ -119,3 +136,42 @@ export const tagCategoryLookup: Record<string, string> = {
 };
 
 export const normalizeTag = (tag: string): string => tag.trim().toLowerCase();
+
+const dynamicTagCategoryLookup: Record<string, string> = {};
+interestGroups.forEach((group) => {
+  const normalizedTitle = normalizeTag(group.title);
+  const category =
+    groupTitleToCategory[normalizedTitle] ||
+    (categoryColors[group.title] ? group.title : null);
+  if (!category) {
+    return;
+  }
+  group.tags.forEach((tag) => {
+    dynamicTagCategoryLookup[normalizeTag(tag)] = category;
+  });
+});
+
+export const tagCategoryLookup: Record<string, string> = {
+  ...dynamicTagCategoryLookup,
+  ...staticTagCategoryLookup,
+};
+
+export const getTagCategory = (tag: string): string | null => {
+  const normalized = normalizeTag(tag);
+  const directCategory = categoryColors[tag] ? tag : null;
+  if (directCategory) {
+    return directCategory;
+  }
+  const categoryByName = Object.keys(categoryColors).find(
+    (category) => normalizeTag(category) === normalized
+  );
+  if (categoryByName) {
+    return categoryByName;
+  }
+  return tagCategoryLookup[normalized] || null;
+};
+
+export const getTagColor = (tag: string): string | null => {
+  const category = getTagCategory(tag);
+  return category ? categoryColors[category] : null;
+};

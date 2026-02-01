@@ -6,6 +6,7 @@ export interface BillRecommendation {
   summary: string;
   score?: number | null;
   url?: string | null;
+  tags?: string[] | null;
   parliament_session?: string | null;
   last_updated?: string | null;
 }

@@ -2,7 +2,7 @@ import os
 import boto3
 from functools import lru_cache
 
-AWS_REGION = os.getenv("AWS_REGION", "ca-central-1")
+AWS_REGION = "ca-central-1"
 
 PARAMETER_NAMES = [
     "/billBoard/DB_HOST",

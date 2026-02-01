@@ -15,22 +15,7 @@ import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
 import { interestGroups } from '../../data/interestGroups';
-
-// Color mapping for each interest group
-const groupColors: Record<string, string> = {
-  'Social & Civil Rights': '#b91c1c', // Red
-  'Economic Issues': '#1d4ed8', // Blue
-  'Environmental Policy': '#0f766e', // Teal
-  'Healthcare': '#9d174d', // Pink
-  'Education': '#6d28d9', // Purple
-  'Technology & Innovation': '#0f172a', // Dark gray/black
-  'Foreign Policy': '#a16207', // Amber
-  'Democracy & Governance': '#374151', // Gray
-  'Housing & Infrastructure': '#7c2d12', // Brown
-  'Indigenous Affairs': '#7f1d1d', // Dark red
-  'Public Safety & Emergency Response': '#0b1324', // Very dark blue
-  'Transportation & Mobility': '#047857', // Green
-};
+import { getTagColor } from '../../data/tagCategories';
 
 type InterestsProps = StackScreenProps<AuthStackParamList, 'Interests'>;
 
@@ -129,7 +114,7 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
                   <View style={styles.tagWrap}>
                     {group.tags.map((tag) => {
                       const isSelected = !!selected[tag];
-                      const groupColor = groupColors[group.title] || theme.colors.accent;
+                      const groupColor = getTagColor(tag) || theme.colors.accent;
                       return (
                         <TouchableOpacity
                           key={tag}

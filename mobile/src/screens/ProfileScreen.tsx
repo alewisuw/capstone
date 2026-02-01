@@ -19,7 +19,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
 import type { UserProfile, MyProfileRecord } from '../types';
 import { theme } from '../theme';
-import { categoryColors, normalizeTag, tagCategoryLookup } from '../data/tagCategories';
+import { categoryColors, getTagCategory } from '../data/tagCategories';
 import { useAuth } from '../context/AuthContext';
 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileMain'>;
@@ -160,8 +160,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   };
 
   const getInterestChipStyle = (interest: string) => {
-    const normalized = normalizeTag(interest);
-    const category = tagCategoryLookup[normalized];
+    const category = getTagCategory(interest);
     const backgroundColor = category ? categoryColors[category] : theme.colors.surfaceMuted;
     const textColor = category ? '#ffffff' : theme.colors.textDark;
     return { backgroundColor, textColor };

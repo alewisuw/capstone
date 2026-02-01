@@ -23,6 +23,7 @@ def semantic_search(query: str, limit: int = 3):
             "score": float(hit.score),
             "parliament_session": info.get("parliament_session"),
             "last_updated": info.get("last_updated"),
+            "tags": info.get("tags"),
         })
 
     return output
