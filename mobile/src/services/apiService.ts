@@ -113,6 +113,76 @@ export const getMyRecommendations = async (
   }
 };
 
+export const getMySaved = async (
+  token: string
+): Promise<BillRecommendation[]> => {
+  try {
+    const response = await api.get<BillRecommendation[]>('/api/me/saved', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching saved bills:', error);
+    throw error;
+  }
+};
+
+export const saveBill = async (
+  token: string,
+  bill_id: number
+): Promise<number[]> => {
+  try {
+    const response = await api.post<number[]>(
+      '/api/me/saved',
+      { bill_id },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error saving bill:', error);
+    throw error;
+  }
+};
+
+export const unsaveBill = async (
+  token: string,
+  bill_id: number
+): Promise<number[]> => {
+  try {
+    const response = await api.delete<number[]>(
+      `/api/me/saved/${bill_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error unsaving bill:', error);
+    throw error;
+  }
+};
+
+export const deleteMyAccount = async (token: string): Promise<void> => {
+  try {
+    await api.delete('/api/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    throw error;
+  }
+};
+
 export const searchBills = async (
   query: string,
   limit: number = 3

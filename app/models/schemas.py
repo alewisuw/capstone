@@ -8,6 +8,15 @@ class BillRecommendation(BaseModel):
     summary: str
     score: Optional[float] = None
 
+class SavedBill(BaseModel):
+    bill_id: int
+    bill_number: Optional[str] = None
+    title: str
+    summary: str
+
+class SaveBillRequest(BaseModel):
+    bill_id: int
+
 class UserProfile(BaseModel):
     name: str
     interests: List[str]
@@ -24,6 +33,7 @@ class UserProfileInput(BaseModel):
 
 class UserProfileResponse(UserProfileInput):
     user_id: str
+    saved_bill_ids: Optional[List[int]] = None
 
 class RecommendationResponse(BaseModel):
     recommendations: List[BillRecommendation]

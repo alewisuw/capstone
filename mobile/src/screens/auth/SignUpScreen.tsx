@@ -49,7 +49,10 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('AuthLanding')}
+        >
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />

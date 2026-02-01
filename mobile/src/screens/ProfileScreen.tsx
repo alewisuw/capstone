@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { RootTabParamList } from '../types';
-import { getMyProfile, getProfile, getProfiles } from '../services/apiService';
+import { deleteMyAccount, getMyProfile, getProfile, getProfiles } from '../services/apiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
@@ -105,6 +105,32 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
     const targetName = 'username' in profile ? profile.username : profile.name;
     navigation.navigate('Recommendations', { username: targetName });
+  };
+
+  const handleDeleteAccount = (): void => {
+    if (!authToken) {
+      Alert.alert('Missing session', 'Please sign in again to delete your account.');
+      return;
+    }
+    Alert.alert(
+      'Delete account?',
+      'This is permanent. Your account and all saved data will be removed.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMyAccount(authToken);
+              signOut();
+            } catch (err) {
+              Alert.alert('Delete failed', 'Unable to delete your account. Please try again.');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const formatLabel = (key: string): string => {
@@ -260,6 +286,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
                 </Text>
               </LinearGradient>
             </TouchableOpacity>
+
+            {user ? (
+              <TouchableOpacity
+                style={styles.deleteAccountButton}
+                onPress={handleDeleteAccount}
+              >
+                <Text style={styles.deleteAccountText}>Delete Account</Text>
+              </TouchableOpacity>
+            ) : null}
           </View>
 
           {availableProfiles.length > 0 && !user && (
@@ -448,6 +483,15 @@ const styles = StyleSheet.create({
   recommendationsButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  deleteAccountButton: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  deleteAccountText: {
+    color: theme.colors.accent,
+    fontSize: 14,
     fontWeight: '600',
   },
   profilesListSection: {

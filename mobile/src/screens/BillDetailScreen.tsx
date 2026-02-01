@@ -13,12 +13,15 @@ import AppLogo from '../components/AppLogo';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { theme } from '../theme';
+import { useSaved } from '../context/SavedContext';
 
 type BillDetailScreenProps = StackScreenProps<RootStackParamList, 'BillDetail'>;
 
 const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }) => {
   const insets = useSafeAreaInsets();
   const { bill } = route.params;
+  const { isSaved, toggleSave } = useSaved();
+  const saved = isSaved(bill.bill_id);
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
@@ -41,7 +44,18 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
             <AppLogo width={44} height={44} />
           </View>
 
-          <View style={styles.headerRow} />
+          <View style={styles.headerRow}>
+            <TouchableOpacity
+              style={styles.bookmarkButton}
+              onPress={() => toggleSave(bill)}
+            >
+              <Ionicons
+                name={saved ? 'bookmark' : 'bookmark-outline'}
+                size={18}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </View>
         </LinearGradient>
 
         <View style={styles.card}>
@@ -103,20 +117,18 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     width: '100%',
-  },
-  scoreContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    gap: 6,
+    justifyContent: 'flex-end',
   },
-  scoreText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
+  bookmarkButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   card: {
     backgroundColor: theme.colors.surface,

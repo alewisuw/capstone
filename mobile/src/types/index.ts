@@ -31,6 +31,7 @@ export interface MyProfileRecord {
   interests: string[];
   demographics: Record<string, string>;
   onboarded: boolean;
+  saved_bill_ids?: number[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -48,12 +49,14 @@ export interface HealthStatus {
 export type RootStackParamList = {
   HomeMain: undefined;
   RecommendationsMain: { username?: string };
+  SavedMain: undefined;
   BillDetail: { bill: BillRecommendation };
 };
 
 export type RootTabParamList = {
   Home: undefined;
   Recommendations: { username?: string };
+  Saved: undefined;
   Profile: undefined;
 };
 
@@ -71,6 +74,8 @@ export type AuthStackParamList = {
 export interface BillCardProps {
   bill: BillRecommendation;
   onPress: () => void;
+  isSaved?: boolean;
+  onToggleSave?: (bill: BillRecommendation) => void;
 }
 
 export interface LoadingSpinnerProps {

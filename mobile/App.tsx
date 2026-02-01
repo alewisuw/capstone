@@ -12,6 +12,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import RecommendationsScreen from './src/screens/RecommendationsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import BillDetailScreen from './src/screens/BillDetailScreen';
+import SavedScreen from './src/screens/SavedScreen';
 import AuthLandingScreen from './src/screens/auth/AuthLandingScreen';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import SignUpScreen from './src/screens/auth/SignUpScreen';
@@ -22,6 +23,7 @@ import InterestsScreen from './src/screens/auth/InterestsScreen';
 import type { AuthStackParamList, RootStackParamList, RootTabParamList } from './src/types';
 import { theme } from './src/theme';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { SavedProvider } from './src/context/SavedContext';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
@@ -53,6 +55,23 @@ function RecommendationsStack() {
       <Stack.Screen 
         name="RecommendationsMain" 
         component={RecommendationsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="BillDetail" 
+        component={BillDetailScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function SavedStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="SavedMain" 
+        component={SavedScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen 
@@ -96,6 +115,8 @@ function AppShell() {
             iconName = focused ? 'search' : 'search-outline';
           } else if (route.name === 'Recommendations') {
             iconName = focused ? 'document-text' : 'document-text-outline';
+          } else if (route.name === 'Saved') {
+            iconName = focused ? 'bookmark' : 'bookmark-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -119,6 +140,7 @@ function AppShell() {
     >
       <Tab.Screen name="Recommendations" component={RecommendationsStack} options={{ title: 'Home' }} />
       <Tab.Screen name="Home" component={HomeStack} options={{ title: 'Search' }} />
+      <Tab.Screen name="Saved" component={SavedStack} options={{ title: 'Saved' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
@@ -130,7 +152,9 @@ export default function App(): JSX.Element {
       <NavigationContainer>
         <StatusBar style="light" />
         <AuthProvider>
-          <AppShell />
+          <SavedProvider>
+            <AppShell />
+          </SavedProvider>
         </AuthProvider>
       </NavigationContainer>
     </SafeAreaProvider>

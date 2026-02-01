@@ -22,6 +22,7 @@ import AppLogo from '../components/AppLogo';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useAuth } from '../context/AuthContext';
+import { useSaved } from '../context/SavedContext';
 
 type RecommendationsScreenProps = StackScreenProps<RootStackParamList, 'RecommendationsMain'>;
 
@@ -35,12 +36,13 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   );
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<BillRecommendation[]>([]);
-  const [limit, setLimit] = useState<number>(5);
+  const [limit] = useState<number>(20);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
   const { user, authToken } = useAuth();
+  const { isSaved, toggleSave } = useSaved();
 
   useEffect(() => {
     if (route.params?.username) {
@@ -170,24 +172,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
           </View>
         ) : null}
 
-        <View style={styles.limitRow}>
-          <Text style={styles.limitLabel}>Results</Text>
-          <View style={styles.limitControls}>
-            <TouchableOpacity
-              style={styles.limitButton}
-              onPress={() => setLimit((prev) => Math.max(1, prev - 1))}
-            >
-              <Ionicons name="remove" size={16} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.limitValue}>{limit}</Text>
-            <TouchableOpacity
-              style={styles.limitButton}
-              onPress={() => setLimit((prev) => Math.min(20, prev + 1))}
-            >
-              <Ionicons name="add" size={16} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {null}
       </LinearGradient>
 
       {error ? (
@@ -223,7 +208,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             <>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>
-                  {recommendations.length} Bills Recommended
+                  For You
                 </Text>
               </View>
               {recommendations.map((bill) => (
@@ -231,6 +216,8 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
                   key={bill.bill_id}
                   bill={bill}
                   onPress={() => handleBillPress(bill)}
+                  isSaved={isSaved(bill.bill_id)}
+                  onToggleSave={toggleSave}
                 />
               ))}
             </>
@@ -307,35 +294,6 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     padding: 12,
-  },
-  limitRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  limitLabel: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  limitControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  limitButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  limitValue: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
   },
   content: {
     flex: 1,

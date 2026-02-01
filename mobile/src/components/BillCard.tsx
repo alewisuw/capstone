@@ -1,24 +1,43 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Ionicons from './Icon';
 import type { BillCardProps } from '../types';
 import { theme } from '../theme';
 
-const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
+const BillCard: React.FC<BillCardProps> = ({
+  bill,
+  onPress,
+  isSaved = false,
+  onToggleSave,
+}) => {
   const truncateText = (text: string, maxLength: number): string => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
 
   return (
-    <TouchableOpacity 
+    <Pressable 
       style={styles.container}
       onPress={onPress}
-      activeOpacity={0.8}
+      android_ripple={{ color: 'rgba(0, 0, 0, 0.05)' }}
     >
       <View style={styles.card}>
-        {null}
-        {null}
+        {onToggleSave ? (
+          <Pressable
+            style={styles.bookmarkButton}
+            onPress={(event) => {
+              event.stopPropagation();
+              onToggleSave(bill);
+            }}
+            hitSlop={8}
+          >
+            <Ionicons
+              name={isSaved ? 'bookmark' : 'bookmark-outline'}
+              size={22}
+              color={theme.colors.accent}
+            />
+          </Pressable>
+        ) : null}
         
         <Text style={styles.title}>
           {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
@@ -35,7 +54,7 @@ const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -58,11 +77,22 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     padding: 16,
   },
+  bookmarkButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
   title: {
     fontSize: 18,
     fontWeight: '700',
     color: theme.colors.textDark,
     marginBottom: 8,
+    paddingRight: 48,
     lineHeight: 24,
   },
   summary: {

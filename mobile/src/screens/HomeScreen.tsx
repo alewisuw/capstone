@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,37 +13,25 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
-import { getHealth, searchBills } from '../services/apiService';
+import { searchBills } from '../services/apiService';
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
+import { useSaved } from '../context/SavedContext';
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const [query, setQuery] = useState<string>('climate');
+  const { isSaved, toggleSave } = useSaved();
+  const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<BillRecommendation[]>([]);
-  const [limit, setLimit] = useState<number>(3);
+  const [limit] = useState<number>(20);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [healthStatus, setHealthStatus] = useState<'loading' | 'ok' | 'down'>('loading');
-
-  useEffect(() => {
-    loadHealth();
-  }, []);
-
-  const loadHealth = async (): Promise<void> => {
-    try {
-      const data = await getHealth();
-      setHealthStatus(data.status === 'ok' ? 'ok' : 'down');
-    } catch (err) {
-      setHealthStatus('down');
-    }
-  };
 
   const handleSearch = async (term?: string | null): Promise<void> => {
     const searchTerm = term || query;
@@ -77,24 +65,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Search Bills</Text>
-        <Text style={styles.headerSubtitle}>Semantic search across bill summaries</Text>
+        {null}
         <View style={styles.topRightLogo}>
           <AppLogo width={44} height={44} />
-        </View>
-
-        <View style={styles.statusRow}>
-          <View
-            style={[
-              styles.statusDot,
-              healthStatus === 'ok' ? styles.statusOk : styles.statusDown,
-            ]}
-          />
-          <Text style={styles.statusText}>
-            API {healthStatus === 'loading' ? 'checking' : healthStatus}
-          </Text>
-          <TouchableOpacity style={styles.statusRefresh} onPress={loadHealth}>
-            <Ionicons name="refresh" size={16} color="#fff" />
-          </TouchableOpacity>
         </View>
 
         <View style={styles.searchContainer}>
@@ -118,24 +91,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.limitRow}>
-          <Text style={styles.limitLabel}>Results</Text>
-          <View style={styles.limitControls}>
-            <TouchableOpacity
-              style={styles.limitButton}
-              onPress={() => setLimit((prev) => Math.max(1, prev - 1))}
-            >
-              <Ionicons name="remove" size={16} color="#fff" />
-            </TouchableOpacity>
-            <Text style={styles.limitValue}>{limit}</Text>
-            <TouchableOpacity
-              style={styles.limitButton}
-              onPress={() => setLimit((prev) => Math.min(10, prev + 1))}
-            >
-              <Ionicons name="add" size={16} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {null}
       </LinearGradient>
 
       <ScrollView 
@@ -159,30 +115,38 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 key={bill.bill_id}
                 bill={bill}
                 onPress={() => handleBillPress(bill)}
+                isSaved={isSaved(bill.bill_id)}
+                onToggleSave={toggleSave}
               />
             ))}
           </>
         ) : (
           <View style={styles.emptyState}>
+            <View style={styles.suggestionsContainer}>
+              <Text style={styles.suggestionsTitle}>Try a Quick Search:</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.suggestionsRow}
+              >
+                {['Climate', 'Healthcare', 'Housing', 'Education', 'Taxes'].map((term) => (
+                  <TouchableOpacity
+                    key={term}
+                    style={styles.suggestionChip}
+                    onPress={() => {
+                      setQuery(term);
+                      handleSearch(term);
+                    }}
+                  >
+                    <Text style={styles.suggestionChipText}>{term}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
             <Ionicons name="document-text-outline" size={64} color="#d1d5db" />
             <Text style={styles.emptyStateText}>
               Search for a topic to see related bills
             </Text>
-            <View style={styles.suggestionsContainer}>
-              <Text style={styles.suggestionsTitle}>Try a quick search:</Text>
-              {['climate', 'healthcare', 'housing', 'education', 'tax'].map((term) => (
-                <TouchableOpacity
-                  key={term}
-                  style={styles.suggestionChip}
-                  onPress={() => {
-                    setQuery(term);
-                    handleSearch(term);
-                  }}
-                >
-                  <Text style={styles.suggestionChipText}>{term}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
         )}
       </ScrollView>
@@ -198,7 +162,7 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     paddingTop: 10,
-    paddingBottom: 24,
+    paddingBottom: 18,
   },
   topRightLogo: {
     position: 'absolute',
@@ -215,32 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: 16,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 16,
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  statusOk: {
-    backgroundColor: '#2ecc71',
-  },
-  statusDown: {
-    backgroundColor: theme.colors.accent,
-  },
-  statusText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  statusRefresh: {
-    marginLeft: 'auto',
-    padding: 6,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -261,40 +199,11 @@ const styles = StyleSheet.create({
   searchIconButton: {
     padding: 6,
   },
-  limitRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  limitLabel: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  limitControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  limitButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  limitValue: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
   content: {
     flex: 1,
   },
   contentContainer: {
-    paddingVertical: 16,
+    paddingBottom: 16,
   },
   sectionHeader: {
     paddingHorizontal: 16,
@@ -308,9 +217,11 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: 40,
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    marginTop: 12,
     minHeight: 400,
   },
   emptyStateText: {
@@ -320,22 +231,25 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   suggestionsContainer: {
-    marginTop: 24,
+    marginTop: 0,
     width: '100%',
+    marginBottom: 16,
+  },
+  suggestionsRow: {
+    gap: 8,
+    paddingHorizontal: 4,
   },
   suggestionsTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: theme.colors.textMuted,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   suggestionChip: {
     backgroundColor: theme.colors.surface,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    marginBottom: 8,
-    alignSelf: 'flex-start',
     borderWidth: 1,
     borderColor: theme.colors.accent,
   },

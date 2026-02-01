@@ -18,3 +18,6 @@ def upsert_profile(user_id: str, data: Dict) -> Dict:
     payload = {"user_id": user_id, **data}
     _table().put_item(Item=payload)
     return payload
+
+def delete_profile(user_id: str) -> None:
+    _table().delete_item(Key={"user_id": user_id})

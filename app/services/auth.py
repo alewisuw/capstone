@@ -4,6 +4,7 @@ from typing import Dict
 import requests
 from jose import jwt
 from jose.exceptions import JWTError
+import boto3
 
 from app.config.settings import settings
 
@@ -44,3 +45,11 @@ def verify_id_token(token: str) -> Dict:
         )
     except JWTError as exc:
         raise AuthError("Invalid token") from exc
+
+def delete_cognito_user(username: str) -> None:
+    region = settings["auth"]["cognito_region"]
+    user_pool_id = settings["auth"]["user_pool_id"]
+    if not region or not user_pool_id:
+        raise AuthError("Cognito configuration is missing")
+    client = boto3.client("cognito-idp", region_name=region)
+    client.admin_delete_user(UserPoolId=user_pool_id, Username=username)
