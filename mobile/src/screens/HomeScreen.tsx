@@ -8,7 +8,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -24,6 +24,7 @@ import { theme } from '../theme';
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const [query, setQuery] = useState<string>('climate');
   const [results, setResults] = useState<BillRecommendation[]>([]);
   const [limit, setLimit] = useState<number>(3);
@@ -70,10 +71,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <LinearGradient
         colors={theme.gradients.header}
-        style={styles.header}
+        style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Search Bills</Text>
         <Text style={styles.headerSubtitle}>Semantic search across bill summaries</Text>
@@ -201,8 +202,8 @@ const styles = StyleSheet.create({
   },
   topRightLogo: {
     position: 'absolute',
-    top: 12,
     right: 16,
+    top: 55,
   },
   headerTitle: {
     fontSize: 32,

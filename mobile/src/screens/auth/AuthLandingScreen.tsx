@@ -11,9 +11,6 @@ type AuthLandingProps = StackScreenProps<AuthStackParamList, 'AuthLanding'>;
 const AuthLandingScreen: React.FC<AuthLandingProps> = ({ navigation }) => {
   return (
     <LinearGradient colors={theme.gradients.auth} style={styles.container}>
-      <View style={styles.topRightLogo}>
-        <AppLogo width={44} height={44} />
-      </View>
 
       <View style={styles.hero}>
         <AppLogo width={140} height={140} />
@@ -47,11 +44,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 56,
     paddingBottom: 48,
-  },
-  topRightLogo: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
   },
   hero: {
     flex: 1,

@@ -9,7 +9,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -29,6 +29,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   navigation, 
   route 
 }) => {
+  const insets = useSafeAreaInsets();
   const [username, setUsername] = useState<string>(
     route?.params?.username || 'su_victor21'
   );
@@ -109,8 +110,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <LinearGradient colors={theme.gradients.header} style={styles.header}>
+      <SafeAreaView style={styles.container} edges={[]}>
+        <LinearGradient
+          colors={theme.gradients.header}
+          style={[styles.header, { paddingTop: insets.top + 10 }]}
+        >
           <Text style={styles.headerTitle}>Recommendations</Text>
         </LinearGradient>
         <LoadingSpinner />
@@ -119,8 +123,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <LinearGradient colors={theme.gradients.header} style={styles.header}>
+    <SafeAreaView style={styles.container} edges={[]}>
+      <LinearGradient
+        colors={theme.gradients.header}
+        style={[styles.header, { paddingTop: insets.top + 10 }]}
+      >
         <Text style={styles.headerTitle}>Recommendations</Text>
         <Text style={styles.headerSubtitle}>
           Personalized bills for {user?.username || username}
@@ -251,8 +258,8 @@ const styles = StyleSheet.create({
   },
   topRightLogo: {
     position: 'absolute',
-    top: 12,
     right: 16,
+    top: 55,
   },
   headerTitle: {
     fontSize: 28,

@@ -1,6 +1,7 @@
 // API Response Types
 export interface BillRecommendation {
   bill_id: number;
+  bill_number?: string | null;
   title: string;
   summary: string;
   score?: number | null;

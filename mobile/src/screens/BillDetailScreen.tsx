@@ -4,8 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import AppLogo from '../components/AppLogo';
@@ -15,7 +16,8 @@ import { theme } from '../theme';
 
 type BillDetailScreenProps = StackScreenProps<RootStackParamList, 'BillDetail'>;
 
-const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
+const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }) => {
+  const insets = useSafeAreaInsets();
   const { bill } = route.params;
 
   return (
@@ -26,28 +28,28 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route }) => {
       >
         <LinearGradient
           colors={theme.gradients.header}
-          style={styles.header}
+          style={[styles.header, { paddingTop: insets.top + 16 }]}
         >
-          <View style={styles.billIdContainer}>
-            <Text style={styles.billIdText}>Bill #{bill.bill_id}</Text>
-          </View>
-          <View style={styles.topRightLogo}>
+          <TouchableOpacity
+            style={[styles.backButton, { top: insets.top + 20, left: 16 }]}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={18} color={theme.colors.accentDark} />
+          </TouchableOpacity>
+
+          <View style={styles.logoWrap}>
             <AppLogo width={44} height={44} />
           </View>
-          {bill.score !== null && bill.score !== undefined && (
-            <View style={styles.scoreContainer}>
-              <Ionicons name="star" size={16} color="#fff" />
-              <Text style={styles.scoreText}>
-                Match: {(bill.score * 100).toFixed(0)}%
-              </Text>
-            </View>
-          )}
+
+          <View style={styles.headerRow} />
         </LinearGradient>
 
         <View style={styles.card}>
           <View style={styles.titleSection}>
             <Ionicons name="document-text" size={24} color={theme.colors.accent} />
-            <Text style={styles.title}>{bill.title}</Text>
+            <Text style={styles.title}>
+              {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
+            </Text>
           </View>
 
           <View style={styles.summarySection}>
@@ -82,25 +84,25 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 14,
   },
-  topRightLogo: {
+  backButton: {
     position: 'absolute',
-    top: 0,
-    right: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  billIdContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+  logoWrap: {
+    width: '100%',
+    alignItems: 'flex-end',
+    paddingRight: 16,
   },
-  billIdText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
+  headerRow: {
+    width: '100%',
   },
   scoreContainer: {
     flexDirection: 'row',

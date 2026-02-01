@@ -86,8 +86,8 @@ const styles = StyleSheet.create({
   },
   topRightLogo: {
     position: 'absolute',
-    top: 12,
     right: 16,
+    top: 55,
   },
   backButton: {
     position: 'absolute',

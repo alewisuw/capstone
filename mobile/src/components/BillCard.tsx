@@ -17,20 +17,12 @@ const BillCard: React.FC<BillCardProps> = ({ bill, onPress }) => {
       activeOpacity={0.8}
     >
       <View style={styles.card}>
-        <View style={styles.accentBar} />
-        <View style={styles.header}>
-          <View style={styles.billIdContainer}>
-            <Text style={styles.billIdText}>Bill #{bill.bill_id}</Text>
-          </View>
-          {bill.score !== null && bill.score !== undefined && (
-            <View style={styles.scoreContainer}>
-              <Ionicons name="star" size={14} color={theme.colors.accent} />
-              <Text style={styles.scoreText}>{(bill.score * 100).toFixed(0)}%</Text>
-            </View>
-          )}
-        </View>
+        {null}
+        {null}
         
-        <Text style={styles.title}>{bill.title}</Text>
+        <Text style={styles.title}>
+          {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
+        </Text>
         
         <Text style={styles.summary} numberOfLines={3}>
           {truncateText(bill.summary, 150)}
@@ -65,43 +57,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.surface,
     padding: 16,
-  },
-  accentBar: {
-    height: 3,
-    backgroundColor: theme.colors.accent,
-    borderRadius: 999,
-    marginBottom: 12,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  billIdContainer: {
-    backgroundColor: theme.colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  billIdText: {
-    color: theme.colors.accent,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  scoreContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.accentSoft,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  scoreText: {
-    color: theme.colors.accent,
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 4,
   },
   title: {
     fontSize: 18,

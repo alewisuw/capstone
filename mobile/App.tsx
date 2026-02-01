@@ -41,11 +41,7 @@ function HomeStack() {
       <Stack.Screen 
         name="BillDetail" 
         component={BillDetailScreen}
-        options={{ 
-          title: 'Bill Details',
-          headerStyle: { backgroundColor: theme.colors.accentDark },
-          headerTintColor: '#fff',
-        }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -62,11 +58,7 @@ function RecommendationsStack() {
       <Stack.Screen 
         name="BillDetail" 
         component={BillDetailScreen}
-        options={{ 
-          title: 'Bill Details',
-          headerStyle: { backgroundColor: theme.colors.accentDark },
-          headerTintColor: '#fff',
-        }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

@@ -53,7 +53,7 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 cur.execute("""
-SELECT count(*) from bills_billtext where llm_tags is null
+SELECT id from bills_bill limit 1
 """)
 
 # Get column names from cursor description
@@ -66,6 +66,19 @@ for idx, row in enumerate(rows):
     print(f"\nRow {idx + 1}:")
     for col_name, value in zip(columns, row):
         print(f"  {col_name}: {value}")
+
+print(columns)
+
+# cur.execute("""
+# SELECT table_schema, table_name
+# FROM information_schema.tables
+# WHERE table_type = 'BASE TABLE'
+# ORDER BY table_schema, table_name;
+# """)
+
+# tables = cur.fetchall()
+# for schema, table in tables:
+#     print(f"{schema}.{table}")
 
 # --- Cleanup ---
 cur.close()

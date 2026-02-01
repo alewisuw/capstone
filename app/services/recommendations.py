@@ -19,6 +19,7 @@ def _build_recommendations(hits) -> List[BillRecommendation]:
         output.append(
             BillRecommendation(
                 bill_id=bill_id,
+                bill_number=info.get("bill_number"),
                 title=info["title"],
                 summary=info["summary"],
                 score=float(hit.score),

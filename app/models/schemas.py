@@ -3,6 +3,7 @@ from typing import List, Optional, Dict
 
 class BillRecommendation(BaseModel):
     bill_id: int
+    bill_number: Optional[str] = None
     title: str
     summary: str
     score: Optional[float] = None

@@ -17,6 +17,7 @@ def semantic_search(query: str, limit: int = 3):
         info = get_bill_info(bill_id)
         output.append({
             "bill_id": bill_id,
+            "bill_number": info.get("bill_number"),
             "title": info["title"],
             "summary": info["summary"],
             "score": float(hit.score),
