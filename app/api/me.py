@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.models.schemas import (
@@ -65,7 +65,7 @@ def put_my_profile(payload: UserProfileInput, user=Depends(_get_user)):
 
 
 @router.get("/me/recommendations", response_model=RecommendationResponse)
-def get_my_recommendations(limit: int = 5, user=Depends(_get_user)):
+def get_my_recommendations(limit: int = Query(10, ge=1, le=100), user=Depends(_get_user)):
     item = get_profile(user["sub"])
     if not item:
         raise HTTPException(status_code=404, detail="Profile not found")

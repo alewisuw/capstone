@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   RefreshControl,
   TouchableOpacity,
   TextInput,
@@ -36,11 +36,13 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   );
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<BillRecommendation[]>([]);
-  const [limit] = useState<number>(20);
+  const [currentLimit, setCurrentLimit] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const { user, authToken } = useAuth();
   const { isSaved, toggleSave } = useSaved();
 
@@ -55,7 +57,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       loadProfiles();
     }
     loadRecommendations();
-  }, [username, limit, user]);
+  }, [username, user]);
 
   const loadProfiles = async (): Promise<void> => {
     try {
@@ -66,15 +68,33 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
     }
   };
 
-  const loadRecommendations = async (): Promise<void> => {
+  const loadRecommendations = async (append: boolean = false): Promise<void> => {
     try {
       setError(null);
-      if (!refreshing) {
+      if (!refreshing && !append) {
         setLoading(true);
       }
+      if (append) {
+        setLoadingMore(true);
+      }
+
+      const limit = append ? currentLimit + 10 : 10;
+
       if (user && authToken) {
         const data = await getMyRecommendations(authToken, limit);
-        setRecommendations(data.recommendations || []);
+        const newRecommendations = data.recommendations || [];
+        
+        if (append) {
+          const existingIds = new Set(recommendations.map(b => b.bill_id));
+          const newBills = newRecommendations.filter(b => !existingIds.has(b.bill_id));
+          setRecommendations([...recommendations, ...newBills]);
+          setCurrentLimit(limit);
+          setHasMore(newBills.length > 0 && newRecommendations.length === limit);
+        } else {
+          setRecommendations(newRecommendations);
+          setCurrentLimit(limit);
+          setHasMore(newRecommendations.length === limit);
+        }
         return;
       }
       if (user && !authToken) {
@@ -83,14 +103,36 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       }
       const normalized = (user?.username || username).trim().toLowerCase();
       const data = await getRecommendations(normalized, limit);
-      setRecommendations(data.recommendations || []);
+      const newRecommendations = data.recommendations || [];
+      
+      if (append) {
+        const existingIds = new Set(recommendations.map(b => b.bill_id));
+        const newBills = newRecommendations.filter(b => !existingIds.has(b.bill_id));
+        setRecommendations([...recommendations, ...newBills]);
+        setCurrentLimit(limit);
+        setHasMore(newBills.length > 0 && newRecommendations.length === limit);
+      } else {
+        setRecommendations(newRecommendations);
+        setCurrentLimit(limit);
+        setHasMore(newRecommendations.length === limit);
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load recommendations');
+      if (!append) {
+        setRecommendations([]);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
       setRefreshing(false);
     }
   };
+
+  const loadMore = useCallback(() => {
+    if (!loadingMore && hasMore && !refreshing) {
+      loadRecommendations(true);
+    }
+  }, [loadingMore, hasMore, refreshing]);
 
   const onRefresh = (): void => {
     setRefreshing(true);
@@ -175,60 +217,74 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         {null}
       </LinearGradient>
 
-      {error ? (
-        <ErrorMessage message={error} onRetry={loadRecommendations} />
+      {error && recommendations.length === 0 ? (
+        <ErrorMessage message={error} onRetry={() => loadRecommendations(false)} />
       ) : (
-        <ScrollView
-          style={styles.content}
-          contentContainerStyle={styles.contentContainer}
+        <FlatList
+          data={recommendations}
+          keyExtractor={(item) => item.bill_id.toString()}
+          renderItem={({ item }) => (
+            <BillCard
+              bill={item}
+              onPress={() => handleBillPress(item)}
+              isSaved={isSaved(item.bill_id)}
+              onToggleSave={toggleSave}
+            />
+          )}
+          ListHeaderComponent={
+            <>
+              {availableProfiles.length > 0 && !user && (
+                <View style={styles.profileChips}>
+                  <Text style={styles.profileChipsLabel}>Try another profile:</Text>
+                  <View style={styles.profileChipRow}>
+                    {availableProfiles.slice(0, 6).map((profile) => (
+                      <TouchableOpacity
+                        key={profile}
+                        style={styles.profileChip}
+                        onPress={() => {
+                          setUsername(profile);
+                          setShowUsernameInput(false);
+                        }}
+                      >
+                        <Text style={styles.profileChipText}>{profile}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
+              {recommendations.length > 0 && (
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>
+                    For You
+                  </Text>
+                </View>
+              )}
+            </>
+          }
+          ListFooterComponent={
+            loadingMore ? (
+              <View style={styles.loadingMore}>
+                <LoadingSpinner />
+              </View>
+            ) : null
+          }
+          ListEmptyComponent={
+            !loading ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>
+                  No recommendations available
+                </Text>
+              </View>
+            ) : null
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-        >
-          {availableProfiles.length > 0 && !user && (
-            <View style={styles.profileChips}>
-              <Text style={styles.profileChipsLabel}>Try another profile:</Text>
-              <View style={styles.profileChipRow}>
-                {availableProfiles.slice(0, 6).map((profile) => (
-                  <TouchableOpacity
-                    key={profile}
-                    style={styles.profileChip}
-                    onPress={() => {
-                      setUsername(profile);
-                      setShowUsernameInput(false);
-                    }}
-                  >
-                    <Text style={styles.profileChipText}>{profile}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          )}
-          {recommendations.length > 0 ? (
-            <>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>
-                  For You
-                </Text>
-              </View>
-              {recommendations.map((bill) => (
-                <BillCard
-                  key={bill.bill_id}
-                  bill={bill}
-                  onPress={() => handleBillPress(bill)}
-                  isSaved={isSaved(bill.bill_id)}
-                  onToggleSave={toggleSave}
-                />
-              ))}
-            </>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>
-                No recommendations available
-              </Text>
-            </View>
-          )}
-        </ScrollView>
+          contentContainerStyle={styles.contentContainer}
+          style={styles.content}
+        />
       )}
     </SafeAreaView>
   );
@@ -300,6 +356,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingVertical: 16,
+  },
+  loadingMore: {
+    paddingVertical: 20,
   },
   sectionHeader: {
     paddingHorizontal: 16,

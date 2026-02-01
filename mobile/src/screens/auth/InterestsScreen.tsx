@@ -16,6 +16,22 @@ import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
 import { interestGroups } from '../../data/interestGroups';
 
+// Color mapping for each interest group
+const groupColors: Record<string, string> = {
+  'Social & Civil Rights': '#b91c1c', // Red
+  'Economic Issues': '#1d4ed8', // Blue
+  'Environmental Policy': '#0f766e', // Teal
+  'Healthcare': '#9d174d', // Pink
+  'Education': '#6d28d9', // Purple
+  'Technology & Innovation': '#0f172a', // Dark gray/black
+  'Foreign Policy': '#a16207', // Amber
+  'Democracy & Governance': '#374151', // Gray
+  'Housing & Infrastructure': '#7c2d12', // Brown
+  'Indigenous Affairs': '#7f1d1d', // Dark red
+  'Public Safety & Emergency Response': '#0b1324', // Very dark blue
+  'Transportation & Mobility': '#047857', // Green
+};
+
 type InterestsProps = StackScreenProps<AuthStackParamList, 'Interests'>;
 
 const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
@@ -53,6 +69,13 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
 
   const handleComplete = async () => {
     setError(null);
+    
+    // Validate that at least one interest is selected
+    if (selectedTags.length === 0) {
+      setError('Please select at least one interest to continue.');
+      return;
+    }
+    
     const result = await completeOnboarding(route.params.demographics, selectedTags);
     if (!result.ok && result.error) {
       setError(result.error);
@@ -73,7 +96,7 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
 
       <ScrollView style={styles.card} contentContainerStyle={styles.cardContent}>
         <Text style={styles.title}>What are you interested in?</Text>
-        <Text style={styles.subtitle}>Select your areas of interest to follow.</Text>
+        <Text style={styles.subtitle}>Tap to select or unselect your areas of interest.</Text>
 
         <View style={styles.searchRow}>
           <Ionicons name="search" size={18} color="#b0b0b0" />
@@ -106,20 +129,32 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
                   <View style={styles.tagWrap}>
                     {group.tags.map((tag) => {
                       const isSelected = !!selected[tag];
+                      const groupColor = groupColors[group.title] || theme.colors.accent;
                       return (
                         <TouchableOpacity
                           key={tag}
-                          style={[styles.tagChip, isSelected && styles.tagChipSelected]}
+                          style={[
+                            styles.tagChip,
+                            { borderColor: groupColor },
+                            isSelected && { 
+                              borderColor: groupColor,
+                              backgroundColor: groupColor,
+                            },
+                          ]}
                           onPress={() => toggleTag(tag)}
                         >
                           <Text
                             style={[
                               styles.tagText,
+                              !isSelected && { color: groupColor },
                               isSelected && styles.tagTextSelected,
                             ]}
                           >
                             {tag}
                           </Text>
+                          {isSelected ? (
+                            <Ionicons name="close-circle" size={14} color="#fff" style={styles.tagCloseIcon} />
+                          ) : null}
                         </TouchableOpacity>
                       );
                     })}
@@ -132,8 +167,20 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <TouchableOpacity style={styles.primaryButton} onPress={handleComplete}>
-          <Text style={styles.primaryButtonText}>Complete</Text>
+        <TouchableOpacity 
+          style={[
+            styles.primaryButton,
+            selectedTags.length === 0 && styles.primaryButtonDisabled
+          ]} 
+          onPress={handleComplete}
+          disabled={selectedTags.length === 0}
+        >
+          <Text style={[
+            styles.primaryButtonText,
+            selectedTags.length === 0 && styles.primaryButtonTextDisabled
+          ]}>
+            Complete
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -229,24 +276,24 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   tagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    borderWidth: 1,
-    borderColor: theme.colors.borderLight,
+    borderWidth: 1.5,
     backgroundColor: '#fff',
-  },
-  tagChipSelected: {
-    borderColor: theme.colors.accent,
-    backgroundColor: theme.colors.accent,
+    gap: 6,
   },
   tagText: {
     fontSize: 12,
-    color: theme.colors.textDark,
     fontWeight: '600',
   },
   tagTextSelected: {
     color: '#fff',
+  },
+  tagCloseIcon: {
+    marginLeft: 2,
   },
   primaryButton: {
     marginTop: 24,
@@ -255,10 +302,17 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
   },
+  primaryButtonDisabled: {
+    backgroundColor: '#d1d5db',
+    opacity: 0.6,
+  },
   primaryButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+  },
+  primaryButtonTextDisabled: {
+    color: '#9ca3af',
   },
   errorText: {
     marginTop: 12,

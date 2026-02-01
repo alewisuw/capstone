@@ -5,6 +5,9 @@ export interface BillRecommendation {
   title: string;
   summary: string;
   score?: number | null;
+  url?: string | null;
+  parliament_session?: string | null;
+  last_updated?: string | null;
 }
 
 export interface UserProfile {
@@ -50,6 +53,8 @@ export type RootStackParamList = {
   HomeMain: undefined;
   RecommendationsMain: { username?: string };
   SavedMain: undefined;
+  ProfileMain: undefined;
+  EditProfile: undefined;
   BillDetail: { bill: BillRecommendation };
 };
 

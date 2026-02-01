@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   TextInput,
   Alert,
@@ -29,30 +29,67 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { isSaved, toggleSave } = useSaved();
   const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<BillRecommendation[]>([]);
-  const [limit] = useState<number>(20);
+  const [currentLimit, setCurrentLimit] = useState<number>(10);
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
 
-  const handleSearch = async (term?: string | null): Promise<void> => {
+  const handleSearch = async (term?: string | null, append: boolean = false): Promise<void> => {
     const searchTerm = term || query;
     if (!searchTerm || !searchTerm.trim()) {
       Alert.alert('Error', 'Please enter a search query');
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    // Reset if it's a new search
+    if (!append) {
+      setCurrentSearchTerm(searchTerm.trim());
+      setCurrentLimit(10);
+      setHasMore(true);
+      setResults([]);
+    }
+
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setError(null);
+    }
     
     try {
+      const limit = append ? currentLimit + 10 : 10;
       const data = await searchBills(searchTerm.trim(), limit);
-      setResults(data || []);
+      
+      if (append) {
+        // Append new results, avoiding duplicates
+        const existingIds = new Set(results.map(b => b.bill_id));
+        const newBills = data.filter(b => !existingIds.has(b.bill_id));
+        setResults([...results, ...newBills]);
+        setCurrentLimit(limit);
+        setHasMore(newBills.length > 0 && data.length === limit);
+      } else {
+        setResults(data || []);
+        setCurrentLimit(limit);
+        setHasMore((data?.length || 0) === limit);
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to search bills');
-      setResults([]);
+      if (!append) {
+        setResults([]);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
+
+  const loadMore = useCallback(() => {
+    if (!loadingMore && hasMore && currentSearchTerm) {
+      handleSearch(currentSearchTerm, true);
+    }
+  }, [loadingMore, hasMore, currentSearchTerm]);
 
   const handleBillPress = (bill: BillRecommendation): void => {
     navigation.navigate('BillDetail', { bill });
@@ -94,62 +131,71 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {null}
       </LinearGradient>
 
-      <ScrollView 
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-      >
-        {loading ? (
-          <LoadingSpinner />
-        ) : error ? (
-          <ErrorMessage 
-            message={error} 
-            onRetry={() => handleSearch()}
-          />
-        ) : results.length > 0 ? (
-          <>
+      {loading && results.length === 0 ? (
+        <LoadingSpinner />
+      ) : error && results.length === 0 ? (
+        <ErrorMessage 
+          message={error} 
+          onRetry={() => handleSearch()}
+        />
+      ) : results.length > 0 ? (
+        <FlatList
+          data={results}
+          keyExtractor={(item) => item.bill_id.toString()}
+          renderItem={({ item }) => (
+            <BillCard
+              bill={item}
+              onPress={() => handleBillPress(item)}
+              isSaved={isSaved(item.bill_id)}
+              onToggleSave={toggleSave}
+            />
+          )}
+          ListHeaderComponent={
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Search Results</Text>
             </View>
-            {results.map((bill) => (
-              <BillCard
-                key={bill.bill_id}
-                bill={bill}
-                onPress={() => handleBillPress(bill)}
-                isSaved={isSaved(bill.bill_id)}
-                onToggleSave={toggleSave}
-              />
-            ))}
-          </>
-        ) : (
-          <View style={styles.emptyState}>
-            <View style={styles.suggestionsContainer}>
-              <Text style={styles.suggestionsTitle}>Try a Quick Search:</Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.suggestionsRow}
-              >
-                {['Climate', 'Healthcare', 'Housing', 'Education', 'Taxes'].map((term) => (
-                  <TouchableOpacity
-                    key={term}
-                    style={styles.suggestionChip}
-                    onPress={() => {
-                      setQuery(term);
-                      handleSearch(term);
-                    }}
-                  >
-                    <Text style={styles.suggestionChipText}>{term}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-            <Ionicons name="document-text-outline" size={64} color="#d1d5db" />
-            <Text style={styles.emptyStateText}>
-              Search for a topic to see related bills
-            </Text>
+          }
+          ListFooterComponent={
+            loadingMore ? (
+              <View style={styles.loadingMore}>
+                <LoadingSpinner />
+              </View>
+            ) : null
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          contentContainerStyle={styles.contentContainer}
+          style={styles.content}
+        />
+      ) : (
+        <View style={styles.emptyState}>
+          <View style={styles.suggestionsContainer}>
+            <Text style={styles.suggestionsTitle}>Try a Quick Search:</Text>
+            <FlatList
+              horizontal
+              data={['Climate', 'Healthcare', 'Housing', 'Education', 'Taxes']}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.suggestionChip}
+                  onPress={() => {
+                    setQuery(item);
+                    handleSearch(item);
+                  }}
+                >
+                  <Text style={styles.suggestionChipText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.suggestionsRow}
+            />
           </View>
-        )}
-      </ScrollView>
+          <Ionicons name="document-text-outline" size={64} color="#d1d5db" />
+          <Text style={styles.emptyStateText}>
+            Search for a topic to see related bills
+          </Text>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -204,6 +250,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingBottom: 16,
+  },
+  loadingMore: {
+    paddingVertical: 20,
   },
   sectionHeader: {
     paddingHorizontal: 16,

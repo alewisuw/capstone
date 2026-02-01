@@ -15,6 +15,53 @@ const BillCard: React.FC<BillCardProps> = ({
     return text.substring(0, maxLength) + '...';
   };
 
+  const renderSummary = (summary: string, maxLength: number) => {
+    const truncated = truncateText(summary, maxLength);
+    const lines = truncated.split('\n');
+    
+    // Check if text contains bullet points
+    const hasBullets = lines.some(line => 
+      /^[\s]*[•\-\*▪▫◦‣⁃]\s/.test(line.trim()) || 
+      /^[\s]*[0-9]+[\.\)]\s/.test(line.trim())
+    );
+
+    if (!hasBullets) {
+      return <Text style={styles.summary}>{truncated}</Text>;
+    }
+
+    return (
+      <View style={styles.summaryContainer}>
+        {lines.map((line, index) => {
+          const trimmed = line.trim();
+          const isBullet = /^[•\-\*▪▫◦‣⁃]\s/.test(trimmed) || /^[0-9]+[\.\)]\s/.test(trimmed);
+          
+          if (isBullet) {
+            const bulletMatch = trimmed.match(/^([•\-\*▪▫◦‣⁃]|[0-9]+[\.\)])\s(.+)/);
+            if (bulletMatch) {
+              const [, bullet, content] = bulletMatch;
+              return (
+                <View key={index} style={styles.bulletRow}>
+                  <View style={styles.bulletDot} />
+                  <Text style={styles.bulletText}>{content}</Text>
+                </View>
+              );
+            }
+          }
+          
+          if (trimmed) {
+            return (
+              <Text key={index} style={styles.summary}>
+                {trimmed}
+              </Text>
+            );
+          }
+          
+          return null;
+        })}
+      </View>
+    );
+  };
+
   return (
     <Pressable 
       style={styles.container}
@@ -43,9 +90,7 @@ const BillCard: React.FC<BillCardProps> = ({
           {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
         </Text>
         
-        <Text style={styles.summary} numberOfLines={3}>
-          {truncateText(bill.summary, 150)}
-        </Text>
+        {renderSummary(bill.summary, 150)}
 
         <View style={styles.footer}>
           <View style={styles.readMoreContainer}>
@@ -95,11 +140,34 @@ const styles = StyleSheet.create({
     paddingRight: 48,
     lineHeight: 24,
   },
+  summaryContainer: {
+    marginBottom: 12,
+  },
   summary: {
     fontSize: 14,
     color: theme.colors.textMuted,
     lineHeight: 20,
-    marginBottom: 12,
+    marginBottom: 4,
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+    paddingLeft: 4,
+  },
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.accent,
+    marginTop: 7,
+    marginRight: 10,
+  },
+  bulletText: {
+    flex: 1,
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    lineHeight: 20,
   },
   footer: {
     flexDirection: 'row',

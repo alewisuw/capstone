@@ -11,6 +11,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import HomeScreen from './src/screens/HomeScreen';
 import RecommendationsScreen from './src/screens/RecommendationsScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
 import BillDetailScreen from './src/screens/BillDetailScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import AuthLandingScreen from './src/screens/auth/AuthLandingScreen';
@@ -83,6 +84,23 @@ function SavedStack() {
   );
 }
 
+function ProfileStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="ProfileMain" 
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="EditProfile" 
+        component={EditProfileScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 function AuthFlow() {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
@@ -141,7 +159,7 @@ function AppShell() {
       <Tab.Screen name="Recommendations" component={RecommendationsStack} options={{ title: 'Home' }} />
       <Tab.Screen name="Home" component={HomeStack} options={{ title: 'Search' }} />
       <Tab.Screen name="Saved" component={SavedStack} options={{ title: 'Saved' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }

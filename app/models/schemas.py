@@ -7,12 +7,16 @@ class BillRecommendation(BaseModel):
     title: str
     summary: str
     score: Optional[float] = None
+    parliament_session: Optional[str] = None
+    last_updated: Optional[str] = None
 
 class SavedBill(BaseModel):
     bill_id: int
     bill_number: Optional[str] = None
     title: str
     summary: str
+    parliament_session: Optional[str] = None
+    last_updated: Optional[str] = None
 
 class SaveBillRequest(BaseModel):
     bill_id: int

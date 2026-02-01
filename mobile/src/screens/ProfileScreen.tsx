@@ -11,8 +11,8 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { RootTabParamList } from '../types';
+import type { StackScreenProps } from '@react-navigation/stack';
+import type { RootStackParamList } from '../types';
 import { deleteMyAccount, getMyProfile, getProfile, getProfiles } from '../services/apiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -22,7 +22,7 @@ import { theme } from '../theme';
 import { categoryColors, normalizeTag, tagCategoryLookup } from '../data/tagCategories';
 import { useAuth } from '../context/AuthContext';
 
-type ProfileScreenProps = BottomTabScreenProps<RootTabParamList, 'Profile'>;
+type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileMain'>;
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -45,6 +45,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       loadProfile(effective);
     }
   }, [user]);
+
+  // Refresh profile when screen comes into focus (e.g., after editing)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (user?.username) {
+        loadProfile(user.username);
+      }
+    });
+    return unsubscribe;
+  }, [navigation, user]);
 
   const loadProfiles = async (): Promise<void> => {
     if (user) {
@@ -104,7 +114,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
       return;
     }
     const targetName = 'username' in profile ? profile.username : profile.name;
-    navigation.navigate('Recommendations', { username: targetName });
+    // Navigate to Recommendations tab
+    navigation.getParent()?.navigate('Recommendations', { username: targetName });
   };
 
   const handleDeleteAccount = (): void => {
@@ -288,12 +299,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             </TouchableOpacity>
 
             {user ? (
-              <TouchableOpacity
-                style={styles.deleteAccountButton}
-                onPress={handleDeleteAccount}
-              >
-                <Text style={styles.deleteAccountText}>Delete Account</Text>
-              </TouchableOpacity>
+              <>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate('EditProfile')}
+                >
+                  <Ionicons name="create-outline" size={20} color={theme.colors.accent} />
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteAccountButton}
+                  onPress={handleDeleteAccount}
+                >
+                  <Text style={styles.deleteAccountText}>Delete Account</Text>
+                </TouchableOpacity>
+              </>
             ) : null}
           </View>
 
@@ -482,6 +502,24 @@ const styles = StyleSheet.create({
   },
   recommendationsButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  editButton: {
+    marginTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: theme.colors.accent,
+    backgroundColor: '#fff',
+    gap: 8,
+  },
+  editButtonText: {
+    color: theme.colors.accent,
     fontSize: 16,
     fontWeight: '600',
   },

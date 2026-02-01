@@ -23,6 +23,8 @@ def _build_recommendations(hits) -> List[BillRecommendation]:
                 title=info["title"],
                 summary=info["summary"],
                 score=float(hit.score),
+                parliament_session=info.get("parliament_session"),
+                last_updated=info.get("last_updated"),
             )
         )
     return output

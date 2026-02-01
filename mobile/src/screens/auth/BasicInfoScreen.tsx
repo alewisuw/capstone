@@ -315,37 +315,58 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
             return (
               <View key={field.key} style={styles.field}>
                 <Text style={styles.label}>{field.label}</Text>
-                <TouchableOpacity
-                  style={styles.inputRow}
-                  onPress={() => setOpenKey(isOpen ? null : field.key)}
-                >
-                  <Text style={styles.inputText}>
-                    {field.value || 'Select an option'}
-                  </Text>
-                  <Ionicons
-                    name={isOpen ? 'chevron-up' : 'chevron-down'}
-                    size={16}
-                    color="#9b9b9b"
-                  />
-                </TouchableOpacity>
+                <View style={styles.inputContainer}>
+                  <TouchableOpacity
+                    style={[styles.inputRow, field.value && styles.inputRowWithValue]}
+                    onPress={() => setOpenKey(isOpen ? null : field.key)}
+                  >
+                    <Text style={[styles.inputText, !field.value && styles.inputTextPlaceholder]}>
+                      {field.value || 'Select an option'}
+                    </Text>
+                    <Ionicons
+                      name={isOpen ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      color="#9b9b9b"
+                    />
+                  </TouchableOpacity>
+                  {field.value ? (
+                    <TouchableOpacity
+                      style={styles.clearButton}
+                      onPress={() => {
+                        field.setter('');
+                        setOpenKey(null);
+                      }}
+                    >
+                      <Ionicons name="close-circle" size={20} color="#9b9b9b" />
+                    </TouchableOpacity>
+                  ) : null}
+                </View>
                 {isOpen ? (
                   <View style={styles.dropdown}>
-                    {field.options.map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={styles.optionRow}
-                        onPress={() => {
-                          if (option === field.value) {
-                            field.setter('');
-                          } else {
-                            field.setter(option);
-                          }
-                          setOpenKey(null);
-                        }}
-                      >
-                        <Text style={styles.optionText}>{option}</Text>
-                      </TouchableOpacity>
-                    ))}
+                    {field.options.map((option) => {
+                      const isSelected = option === field.value;
+                      return (
+                        <TouchableOpacity
+                          key={option}
+                          style={[styles.optionRow, isSelected && styles.optionRowSelected]}
+                          onPress={() => {
+                            if (isSelected) {
+                              field.setter('');
+                            } else {
+                              field.setter(option);
+                            }
+                            setOpenKey(null);
+                          }}
+                        >
+                          <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                            {option}
+                          </Text>
+                          {isSelected ? (
+                            <Ionicons name="checkmark-circle" size={18} color={theme.colors.accent} />
+                          ) : null}
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 ) : null}
               </View>
@@ -437,7 +458,13 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     marginBottom: 6,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   inputRow: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
@@ -447,10 +474,20 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     paddingVertical: 10,
   },
+  inputRowWithValue: {
+    borderColor: theme.colors.accent,
+    backgroundColor: '#fff',
+  },
   inputText: {
     flex: 1,
     fontSize: 15,
     color: theme.colors.textDark,
+  },
+  inputTextPlaceholder: {
+    color: '#9b9b9b',
+  },
+  clearButton: {
+    padding: 4,
   },
   dropdown: {
     borderWidth: 1,
@@ -461,14 +498,25 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   optionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderTopWidth: 1,
     borderTopColor: theme.colors.borderLight,
   },
+  optionRowSelected: {
+    backgroundColor: theme.colors.accent + '10',
+  },
   optionText: {
+    flex: 1,
     fontSize: 14,
     color: theme.colors.textDark,
+  },
+  optionTextSelected: {
+    color: theme.colors.accent,
+    fontWeight: '600',
   },
   primaryButton: {
     marginTop: 24,

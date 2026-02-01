@@ -21,6 +21,8 @@ def semantic_search(query: str, limit: int = 3):
             "title": info["title"],
             "summary": info["summary"],
             "score": float(hit.score),
+            "parliament_session": info.get("parliament_session"),
+            "last_updated": info.get("last_updated"),
         })
 
     return output

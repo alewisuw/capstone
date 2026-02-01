@@ -1,12 +1,16 @@
 from typing import Dict, Optional
 import boto3
+import os
 
 from app.config.settings import settings
+
+# Get AWS region from environment or default to ca-central-1
+AWS_REGION = os.getenv("AWS_REGION", "ca-central-1")
 
 
 def _table():
     table_name = settings["dynamodb"]["table"]
-    return boto3.resource("dynamodb").Table(table_name)
+    return boto3.resource("dynamodb", region_name=AWS_REGION).Table(table_name)
 
 
 def get_profile(user_id: str) -> Optional[Dict]:
