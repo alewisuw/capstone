@@ -1,7 +1,6 @@
 import json
 import psycopg2
 import os
-import torch
 import collections.abc
 import boto3
 from transformers import pipeline
@@ -52,7 +51,6 @@ def main():
     classifier = pipeline(
         "zero-shot-classification",
         model = "facebook/bart-large-mnli",
-        device=0 if torch.cuda.is_available() else -1
     )
 
     # Connect to db
@@ -65,6 +63,7 @@ def main():
     ALTER TABLE bills_billtext
     ADD COLUMN IF NOT EXISTS llm_tags JSON
     """)
+
     cursor.execute("SELECT bill_id, llm_summary FROM bills_billtext WHERE llm_summary IS NOT NULL AND llm_tags IS NULL")
     bills = cursor.fetchall()
 
@@ -98,6 +97,7 @@ def main():
                     (json.dumps(tag_scores), bill_id)
                 )
                 conn.commit()
+                print(llm_summary)
                 print(f"Tagged bill_id {bill_id}: {tag_scores}")
             else:
                 print(f"No valid result for bill_id {bill_id}")

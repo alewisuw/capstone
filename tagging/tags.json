@@ -7,8 +7,7 @@
     "Refugee support",
     "Criminal justice reform",
     "Freedom of speech",
-    "Charter of Rights and Freedoms",
-    "Labor rights"
+    "Charter of Rights and Freedoms"
   ],
   "Economics": [
     "Minimum wage",
@@ -23,7 +22,7 @@
     "Employment Insurance",
     "Anti-money laundering"
   ],
-  "Environmental Policy": [
+  "Environment": [
     "Climate change",
     "Sustainability",
     "Renewable energy investment",
@@ -54,7 +53,7 @@
     "Early childhood education",
     "Digital literacy"
   ],
-  "Technology, Science, and Innovation": [
+  "Technology and Science": [
     "AI regulation",
     "Data privacy",
     "Cybersecurity",
@@ -106,7 +105,7 @@
     "Counter-terrorism",
     "Human trafficking"
   ],
-  "Transportation & Mobility": [
+  "Transportation": [
     "Public transit",
     "Aviation safety",
     "Rail regulation",
@@ -116,7 +115,7 @@
     "Transportation Accessibility",
     "Electric Vehicles"
   ],
-  "Crime, Justice and Public Safety": [
+  "Crime and Justice": [
     "Policing",
     "Prison reform",
     "Public safety",
@@ -126,6 +125,9 @@
     "Public holidays",
     "Indigenous heritage",
     "Arts and culture"
+  ],
+  "Labor and Employment": [
+    "Minimum wage"
   ]
 
 }

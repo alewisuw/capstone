@@ -110,6 +110,31 @@
             overflow-y: auto;
         }
 
+        .bill-summary h1, .bill-summary h2, .bill-summary h3 {
+            font-size: 1em;
+            font-weight: 600;
+            margin: 10px 0 5px 0;
+            color: #333;
+        }
+
+        .bill-summary ul, .bill-summary ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .bill-summary p {
+            margin-bottom: 8px;
+        }
+
+        .bill-summary strong {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bill-summary em {
+            font-style: italic;
+        }
+
         .relevance-buttons {
             display: flex;
             gap: 10px;
@@ -142,11 +167,84 @@
             border-color: #e74c3c;
         }
 
-        .submit-section {
-            text-align: center;
+        .summary-question {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .summary-question label {
+            display: block;
+            font-size: 0.85em;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .summary-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .summary-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .summary-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .summary-btn.selected.yes {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .summary-btn.selected.no {
+            background: #e67e22;
+            color: white;
+            border-color: #e67e22;
+        }
+
+        .feedback-section {
             margin-top: 40px;
             padding-top: 30px;
             border-top: 2px solid #e0e0e0;
+        }
+
+        .feedback-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 30px;
         }
 
         .submit-btn {
@@ -207,6 +305,7 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -236,6 +335,15 @@
             </div>
         </div>
 
+        <div class="feedback-section">
+            <div class="feedback-title">General Feedback (Optional)</div>
+            <textarea 
+                id="generalFeedback" 
+                class="feedback-textarea" 
+                placeholder="Please share any general thoughts about the bill recommendations, the interface, or suggestions for improvement..."
+            ></textarea>
+        </div>
+
         <div class="submit-section">
             <button class="submit-btn" id="submitBtn" onclick="submitResults()" disabled>
                 Submit Ratings & Start New Test
@@ -248,7 +356,8 @@
         let userProfile = {};
         let fusedResponses = {};
         let tagResponses = {};
-        let totalBills = 10;
+        let totalBills = 6;
+        const md = window.markdownit();
 
         function loadData() {
             const recsData = sessionStorage.getItem('recommendations');
@@ -278,7 +387,7 @@
                 <div class="bill-card">
                     <div class="bill-id">Bill #${index + 1}: ${bill.bill_id}</div>
                     <div class="bill-title">${bill.title}</div>
-                    <div class="bill-summary">${bill.summary}</div>
+                    <div class="bill-summary">${md.render(bill.summary)}</div>
                     <div class="relevance-buttons">
                         <button class="relevance-btn" onclick="selectRelevance('fused', '${bill.bill_id}', 'relevant', '${bill.title.replace(/'/g, "\\'")}')">
                             ✓ Relevant
@@ -286,6 +395,17 @@
                         <button class="relevance-btn" onclick="selectRelevance('fused', '${bill.bill_id}', 'non-relevant', '${bill.title.replace(/'/g, "\\'")}')">
                             ✗ Non-Relevant
                         </button>
+                    </div>
+                    <div class="summary-question">
+                        <label>Does this summary effectively inform you what this bill does?</label>
+                        <div class="summary-buttons">
+                            <button class="summary-btn" onclick="selectSummaryEffectiveness('fused', '${bill.bill_id}', 'yes')">
+                                Yes
+                            </button>
+                            <button class="summary-btn" onclick="selectSummaryEffectiveness('fused', '${bill.bill_id}', 'no')">
+                                No
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -295,7 +415,7 @@
                 <div class="bill-card">
                     <div class="bill-id">Bill #${index + 1}: ${bill.bill_id}</div>
                     <div class="bill-title">${bill.title}</div>
-                    <div class="bill-summary">${bill.summary}</div>
+                    <div class="bill-summary">${md.render(bill.summary)}</div>
                     <div class="relevance-buttons">
                         <button class="relevance-btn" onclick="selectRelevance('tag', '${bill.bill_id}', 'relevant', '${bill.title.replace(/'/g, "\\'")}')">
                             ✓ Relevant
@@ -303,6 +423,17 @@
                         <button class="relevance-btn" onclick="selectRelevance('tag', '${bill.bill_id}', 'non-relevant', '${bill.title.replace(/'/g, "\\'")}')">
                             ✗ Non-Relevant
                         </button>
+                    </div>
+                    <div class="summary-question">
+                        <label>Does this summary effectively inform you what this bill does?</label>
+                        <div class="summary-buttons">
+                            <button class="summary-btn" onclick="selectSummaryEffectiveness('tag', '${bill.bill_id}', 'yes')">
+                                Yes
+                            </button>
+                            <button class="summary-btn" onclick="selectSummaryEffectiveness('tag', '${bill.bill_id}', 'no')">
+                                No
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -312,10 +443,11 @@
             const responses = method === 'fused' ? fusedResponses : tagResponses;
             
             // Store response
-            responses[billId] = {
-                relevance: relevance,
-                title: title
-            };
+            if (!responses[billId]) {
+                responses[billId] = { title: title };
+            }
+            responses[billId].relevance = relevance;
+            responses[billId].title = title;
 
             // Update button styling
             const card = event.target.closest('.bill-card');
@@ -326,22 +458,45 @@
             updateProgress();
         }
 
+        function selectSummaryEffectiveness(method, billId, effectiveness) {
+            const responses = method === 'fused' ? fusedResponses : tagResponses;
+            
+            // Store response
+            if (!responses[billId]) {
+                responses[billId] = {};
+            }
+            responses[billId].summary_effective = effectiveness;
+
+            // Update button styling
+            const card = event.target.closest('.bill-card');
+            const buttons = card.querySelectorAll('.summary-btn');
+            buttons.forEach(btn => btn.classList.remove('selected', 'yes', 'no'));
+            event.target.classList.add('selected', effectiveness);
+
+            updateProgress();
+        }
+
         function updateProgress() {
-            const totalResponses = Object.keys(fusedResponses).length + Object.keys(tagResponses).length;
-            const percentage = (totalResponses / totalBills) * 100;
+            // Count bills with both relevance and summary effectiveness ratings
+            const fusedComplete = Object.values(fusedResponses).filter(r => r.relevance && r.summary_effective).length;
+            const tagComplete = Object.values(tagResponses).filter(r => r.relevance && r.summary_effective).length;
+            const totalComplete = fusedComplete + tagComplete;
+            const percentage = (totalComplete / totalBills) * 100;
 
             document.getElementById('progressFill').style.width = percentage + '%';
             document.getElementById('progressText').textContent = 
-                `${totalResponses} of ${totalBills} bills rated`;
+                `${totalComplete} of ${totalBills} bills fully rated`;
 
-            // Enable submit button when all bills are rated
-            document.getElementById('submitBtn').disabled = totalResponses < totalBills;
+            // Enable submit button when all bills are fully rated
+            document.getElementById('submitBtn').disabled = totalComplete < totalBills;
         }
 
         async function submitResults() {
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
+
+            const generalFeedback = document.getElementById('generalFeedback').value;
 
             try {
                 const response = await fetch('/api/submit', {
@@ -353,7 +508,8 @@
                         interests: userProfile.interests,
                         demographics: userProfile.demographics,
                         fused_responses: fusedResponses,
-                        tag_responses: tagResponses
+                        tag_responses: tagResponses,
+                        general_feedback: generalFeedback
                     })
                 });
 

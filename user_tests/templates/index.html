@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 16px;
@@ -170,13 +170,35 @@
             border-bottom: 2px solid #f0f0f0;
         }
 
-        .demographics-grid {
+        #tagsContainer {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
 
+        #tagsContainer > div {
+            break-inside: avoid;
+        }
+
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            #tagsContainer {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .demographics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
+            #tagsContainer {
+                grid-template-columns: 1fr;
+            }
             .demographics-grid {
                 grid-template-columns: 1fr;
             }
@@ -201,17 +223,16 @@
             <div class="section-title">Demographics (Optional)</div>
             <div class="demographics-grid">
                 <div class="form-group">
-                    <label for="age_group">Age Group:</label>
+                    <label for="age_group">Age:</label>
                     <select id="age_group" name="age_group">
                         <option value="">Select...</option>
-                        <option value="under_18">Under 18</option>
-                        <option value="18_24">18-24</option>
-                        <option value="25_34">25-34</option>
-                        <option value="35_44">35-44</option>
-                        <option value="45_54">45-54</option>
-                        <option value="55_64">55-64</option>
-                        <option value="65_plus">65+</option>
-                        <option value="prefer_not_to_say">Prefer not to say</option>
+                        <option value="Under 18">Under 18</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55-64">55-64</option>
+                        <option value="65 or older">65 or older</option>
                     </select>
                 </div>
 
@@ -219,42 +240,250 @@
                     <label for="gender_identity">Gender Identity:</label>
                     <select id="gender_identity" name="gender_identity">
                         <option value="">Select...</option>
-                        <option value="woman">Woman</option>
-                        <option value="man">Man</option>
-                        <option value="non_binary">Non-binary</option>
-                        <option value="two_spirit">Two-spirit</option>
-                        <option value="prefer_to_self_describe">Prefer to self-describe</option>
-                        <option value="prefer_not_to_say">Prefer not to say</option>
+                        <option value="Woman">Woman</option>
+                        <option value="Man">Man</option>
+                        <option value="Non-binary">Non-binary</option>
+                        <option value="Two-Spirit">Two-Spirit</option>
+                        <option value="Prefer to self-describe">Prefer to self-describe</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="income_range">Income Range:</label>
+                    <label for="sex_assigned_at_birth">Sex Assigned at Birth:</label>
+                    <select id="sex_assigned_at_birth" name="sex_assigned_at_birth">
+                        <option value="">Select...</option>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Intersex">Intersex</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ethnicity_racial_identity">Ethnicity / Racial Identity:</label>
+                    <select id="ethnicity_racial_identity" name="ethnicity_racial_identity">
+                        <option value="">Select...</option>
+                        <option value="Indigenous (First Nations - Status)">Indigenous (First Nations - Status)</option>
+                        <option value="Indigenous (First Nations - Non-Status)">Indigenous (First Nations - Non-Status)</option>
+                        <option value="Metis">Metis</option>
+                        <option value="Inuit">Inuit</option>
+                        <option value="Black">Black</option>
+                        <option value="East Asian">East Asian</option>
+                        <option value="South Asian">South Asian</option>
+                        <option value="Southeast Asian">Southeast Asian</option>
+                        <option value="Middle Eastern or North African">Middle Eastern or North African</option>
+                        <option value="Latino or Hispanic">Latino or Hispanic</option>
+                        <option value="White / Caucasian">White / Caucasian</option>
+                        <option value="Mixed ethnicity">Mixed ethnicity</option>
+                        <option value="Other (please specify)">Other (please specify)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="indigenous_status">Indigenous Status:</label>
+                    <select id="indigenous_status" name="indigenous_status">
+                        <option value="">Select...</option>
+                        <option value="First Nations (Status)">First Nations (Status)</option>
+                        <option value="First Nations (Non-Status)">First Nations (Non-Status)</option>
+                        <option value="Metis">Metis</option>
+                        <option value="Inuit">Inuit</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sexual_orientation">Sexual Orientation:</label>
+                    <select id="sexual_orientation" name="sexual_orientation">
+                        <option value="">Select...</option>
+                        <option value="Heterosexual (Straight)">Heterosexual (Straight)</option>
+                        <option value="Gay">Gay</option>
+                        <option value="Lesbian">Lesbian</option>
+                        <option value="Bisexual">Bisexual</option>
+                        <option value="Pansexual">Pansexual</option>
+                        <option value="Asexual">Asexual</option>
+                        <option value="Queer">Queer</option>
+                        <option value="Prefer to self-describe">Prefer to self-describe</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="citizenship_status">Citizenship Status:</label>
+                    <select id="citizenship_status" name="citizenship_status">
+                        <option value="">Select...</option>
+                        <option value="Canadian Citizen">Canadian Citizen</option>
+                        <option value="Permanent Resident">Permanent Resident</option>
+                        <option value="Temporary Foreign Worker">Temporary Foreign Worker</option>
+                        <option value="International Student">International Student</option>
+                        <option value="Refugee or Protected Person">Refugee or Protected Person</option>
+                        <option value="Other Immigration Status">Other Immigration Status</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="place_of_birth">Place of Birth:</label>
+                    <select id="place_of_birth" name="place_of_birth">
+                        <option value="">Select...</option>
+                        <option value="Born in Canada">Born in Canada</option>
+                        <option value="Born outside Canada">Born outside Canada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="time_in_canada">Length of Time in Canada:</label>
+                    <select id="time_in_canada" name="time_in_canada">
+                        <option value="">Select...</option>
+                        <option value="Less than 1 year">Less than 1 year</option>
+                        <option value="1-5 years">1-5 years</option>
+                        <option value="6-10 years">6-10 years</option>
+                        <option value="11 or more years">11 or more years</option>
+                        <option value="Not applicable">Not applicable</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="religious_affiliation">Religious Affiliation:</label>
+                    <select id="religious_affiliation" name="religious_affiliation">
+                        <option value="">Select...</option>
+                        <option value="No religion / Atheist">No religion / Atheist</option>
+                        <option value="Agnostic">Agnostic</option>
+                        <option value="Christian (Catholic)">Christian (Catholic)</option>
+                        <option value="Christian (Protestant)">Christian (Protestant)</option>
+                        <option value="Muslim">Muslim</option>
+                        <option value="Jewish">Jewish</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Sikh">Sikh</option>
+                        <option value="Buddhist">Buddhist</option>
+                        <option value="Indigenous Spirituality">Indigenous Spirituality</option>
+                        <option value="Other (please specify)">Other (please specify)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="marital_status">Marital Status:</label>
+                    <select id="marital_status" name="marital_status">
+                        <option value="">Select...</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Common-law">Common-law</option>
+                        <option value="Divorced">Divorced</option>
+                        <option value="Separated">Separated</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="family_status">Family Status:</label>
+                    <select id="family_status" name="family_status">
+                        <option value="">Select...</option>
+                        <option value="No dependents">No dependents</option>
+                        <option value="Parent/guardian to child(ren) under 18">Parent/guardian to child(ren) under 18</option>
+                        <option value="Caregiver to adult family member">Caregiver to adult family member</option>
+                        <option value="Both child and adult caregiver (sandwich generation)">Both child and adult caregiver (sandwich generation)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="education_level">Education Level:</label>
+                    <select id="education_level" name="education_level">
+                        <option value="">Select...</option>
+                        <option value="Less than high school diploma">Less than high school diploma</option>
+                        <option value="High school diploma or equivalent">High school diploma or equivalent</option>
+                        <option value="Some college or university, no degree">Some college or university, no degree</option>
+                        <option value="College diploma or certificate">College diploma or certificate</option>
+                        <option value="Bachelor's degree">Bachelor's degree</option>
+                        <option value="Graduate or professional degree (Master's, PhD, etc.)">Graduate or professional degree (Master's, PhD, etc.)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="income_range">Income Range (Annual, Before Tax):</label>
                     <select id="income_range" name="income_range">
                         <option value="">Select...</option>
-                        <option value="under_20000">Under $20,000</option>
-                        <option value="20000_39999">$20,000 - $39,999</option>
-                        <option value="40000_59999">$40,000 - $59,999</option>
-                        <option value="60000_79999">$60,000 - $79,999</option>
-                        <option value="80000_99999">$80,000 - $99,999</option>
-                        <option value="100000_149999">$100,000 - $149,999</option>
-                        <option value="150000_200000">$150,000 - $200,000</option>
-                        <option value="200000_250000">$200,000+</option>
-                        <option value="prefer_not_to_say">Prefer not to say</option>
+                        <option value="Under $20,000">Under $20,000</option>
+                        <option value="$20,000-$39,999">$20,000-$39,999</option>
+                        <option value="$40,000-$59,999">$40,000-$59,999</option>
+                        <option value="$60,000-$79,999">$60,000-$79,999</option>
+                        <option value="$80,000-$99,999">$80,000-$99,999</option>
+                        <option value="$100,000-$149,999">$100,000-$149,999</option>
+                        <option value="$150,000-$200,000">$150,000-$200,000</option>
+                        <option value="$200,000-$250,000">$200,000-$250,000</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="disability_status">Disability Status:</label>
+                    <label for="employment_status">Employment Status:</label>
+                    <select id="employment_status" name="employment_status">
+                        <option value="">Select...</option>
+                        <option value="Employed full-time">Employed full-time</option>
+                        <option value="Employed part-time">Employed part-time</option>
+                        <option value="Self-employed">Self-employed</option>
+                        <option value="Unemployed, looking for work">Unemployed, looking for work</option>
+                        <option value="Not in labour force (e.g. student, retired, caregiver)">Not in labour force (e.g. student, retired, caregiver)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="occupation_type">Occupation Type:</label>
+                    <select id="occupation_type" name="occupation_type">
+                        <option value="">Select...</option>
+                        <option value="Management">Management</option>
+                        <option value="Business, finance & administration">Business, finance & administration</option>
+                        <option value="Natural and applied sciences">Natural and applied sciences</option>
+                        <option value="Health occupations">Health occupations</option>
+                        <option value="Education, law, and social services">Education, law, and social services</option>
+                        <option value="Art, culture, recreation, sport">Art, culture, recreation, sport</option>
+                        <option value="Sales and service">Sales and service</option>
+                        <option value="Trades, transport, and equipment operation">Trades, transport, and equipment operation</option>
+                        <option value="Natural resources and agriculture">Natural resources and agriculture</option>
+                        <option value="Manufacturing and utilities">Manufacturing and utilities</option>
+                        <option value="Student">Student</option>
+                        <option value="Unemployed">Unemployed</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="industry">Industry:</label>
+                    <select id="industry" name="industry">
+                        <option value="">Select...</option>
+                        <option value="Health care and social assistance">Health care and social assistance</option>
+                        <option value="Educational services">Educational services</option>
+                        <option value="Professional, scientific and technical services">Professional, scientific and technical services</option>
+                        <option value="Finance and insurance">Finance and insurance</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Construction">Construction</option>
+                        <option value="Retail trade">Retail trade</option>
+                        <option value="Public administration">Public administration</option>
+                        <option value="Accommodation and food services">Accommodation and food services</option>
+                        <option value="Transportation and warehousing">Transportation and warehousing</option>
+                        <option value="Information and cultural industries">Information and cultural industries</option>
+                        <option value="Agriculture, forestry, fishing and hunting">Agriculture, forestry, fishing and hunting</option>
+                        <option value="Mining, quarrying, and oil & gas">Mining, quarrying, and oil & gas</option>
+                        <option value="Arts, entertainment and recreation">Arts, entertainment and recreation</option>
+                        <option value="Other services (repair, personal services, etc.)">Other services (repair, personal services, etc.)</option>
+                        <option value="Student / Not in labour force">Student / Not in labour force</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="disability_status">Disability Status / Functional Ability:</label>
                     <select id="disability_status" name="disability_status">
                         <option value="">Select...</option>
-                        <option value="no_disability">No disability</option>
-                        <option value="physical_disability">Physical disability</option>
-                        <option value="sensory_disability">Sensory disability</option>
-                        <option value="cognitive_learning_disability">Cognitive/learning disability</option>
-                        <option value="mental_health_disability">Mental health disability</option>
-                        <option value="chronic_illness">Chronic illness</option>
-                        <option value="prefer_not_to_say">Prefer not to say</option>
+                        <option value="No disability">No disability</option>
+                        <option value="Physical disability">Physical disability</option>
+                        <option value="Sensory disability (e.g. visual or hearing impairment)">Sensory disability (e.g. visual or hearing impairment)</option>
+                        <option value="Cognitive or learning disability">Cognitive or learning disability</option>
+                        <option value="Mental health-related disability">Mental health-related disability</option>
+                        <option value="Chronic illness or health condition">Chronic illness or health condition</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="housing_status">Housing Status:</label>
+                    <select id="housing_status" name="housing_status">
+                        <option value="">Select...</option>
+                        <option value="Homeowner">Homeowner</option>
+                        <option value="Renter">Renter</option>
+                        <option value="Living with family/friends (not paying rent)">Living with family/friends (not paying rent)</option>
+                        <option value="Transitional / Homeless">Transitional / Homeless</option>
                     </select>
                 </div>
             </div>
@@ -315,10 +544,25 @@
 
             // Collect demographics
             const demographics = {
-                age_group: document.getElementById('age_group').value,
+                age: document.getElementById('age_group').value,
                 gender_identity: document.getElementById('gender_identity').value,
-                income_range: document.getElementById('income_range').value,
-                disability_status: document.getElementById('disability_status').value
+                sex_assigned_at_birth: document.getElementById('sex_assigned_at_birth').value,
+                ethnicity_racial_identity: document.getElementById('ethnicity_racial_identity').value,
+                indigenous_status: document.getElementById('indigenous_status').value,
+                sexual_orientation: document.getElementById('sexual_orientation').value,
+                citizenship_status: document.getElementById('citizenship_status').value,
+                place_of_birth: document.getElementById('place_of_birth').value,
+                time_in_canada: document.getElementById('time_in_canada').value,
+                religious_affiliation: document.getElementById('religious_affiliation').value,
+                marital_status: document.getElementById('marital_status').value,
+                family_status: document.getElementById('family_status').value,
+                education_level: document.getElementById('education_level').value,
+                'income_range_(annual,_before_tax)': document.getElementById('income_range').value,
+                employment_status: document.getElementById('employment_status').value,
+                occupation_type: document.getElementById('occupation_type').value,
+                industry: document.getElementById('industry').value,
+                disability_status: document.getElementById('disability_status').value,
+                housing_status: document.getElementById('housing_status').value
             };
 
             // Show loading

@@ -106,7 +106,7 @@ def get_bill_info(bill_id):
             "title": f"[DB error: {e}]"
         }
 
-def get_fused_recommendations(interests, demographics, limit=5):
+def get_fused_recommendations(interests, demographics, limit=3):
     """Method 1: Fused embedding search (interests + demographics)"""
     fused_vector = fusion.create_fused_embedding(
         interests=interests,
@@ -135,7 +135,7 @@ def get_fused_recommendations(interests, demographics, limit=5):
     
     return bills
 
-def get_tag_query_recommendations(interests, limit=5):
+def get_tag_query_recommendations(interests, limit=3):
     """Method 2: Individual tag queries (collect top scores)"""
     individual_results = []
     
@@ -182,7 +182,7 @@ def save_to_csv(data):
     filename = os.path.join(CSV_OUTPUT_DIR, f"user_test_{timestamp}.csv")
     
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['method', 'bill_id', 'bill_title', 'relevance', 'interests', 'demographics']
+        fieldnames = ['method', 'bill_id', 'bill_title', 'relevance', 'summary_effective', 'interests', 'demographics']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         
@@ -190,6 +190,22 @@ def save_to_csv(data):
             writer.writerow(row)
     
     return filename
+
+def save_feedback_to_csv(feedback_data):
+    """Append feedback to a single feedback CSV file"""
+    feedback_file = os.path.join(CSV_OUTPUT_DIR, "general_feedback.csv")
+    file_exists = os.path.exists(feedback_file)
+    
+    with open(feedback_file, 'a', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['timestamp', 'interests', 'demographics', 'general_feedback']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        
+        if not file_exists:
+            writer.writeheader()
+        
+        writer.writerow(feedback_data)
+    
+    return feedback_file
 
 # --- Routes ---
 @app.route('/')
@@ -235,6 +251,7 @@ def submit_results():
     demographics = data.get('demographics', {})
     fused_responses = data.get('fused_responses', {})
     tag_responses = data.get('tag_responses', {})
+    general_feedback = data.get('general_feedback', '')
     
     # Prepare CSV rows
     csv_data = []
@@ -247,7 +264,8 @@ def submit_results():
             'method': 'fused_embedding',
             'bill_id': bill_id,
             'bill_title': bill_data['title'],
-            'relevance': bill_data['relevance'],
+            'relevance': 1 if bill_data['relevance'] == 'relevant' else 0,
+            'summary_effective': 1 if bill_data.get('summary_effective', '') == 'yes' else 0,
             'interests': interests_str,
             'demographics': demographics_str
         })
@@ -258,13 +276,26 @@ def submit_results():
             'method': 'tag_query',
             'bill_id': bill_id,
             'bill_title': bill_data['title'],
-            'relevance': bill_data['relevance'],
+            'relevance': 1 if bill_data['relevance'] == 'relevant' else 0,
+            'summary_effective': 1 if bill_data.get('summary_effective', '') == 'yes' else 0,
             'interests': interests_str,
             'demographics': demographics_str
         })
     
     try:
+        # Save bill ratings
         filename = save_to_csv(csv_data)
+        
+        # Save general feedback to separate CSV (only if feedback provided)
+        if general_feedback.strip():
+            feedback_data = {
+                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'interests': interests_str,
+                'demographics': demographics_str,
+                'general_feedback': general_feedback
+            }
+            save_feedback_to_csv(feedback_data)
+        
         return jsonify({
             'success': True,
             'filename': filename
