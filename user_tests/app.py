@@ -136,43 +136,47 @@ def get_fused_recommendations(interests, demographics, limit=3):
     return bills
 
 def get_tag_query_recommendations(interests, limit=3):
-    """Method 2: Individual tag queries (collect top scores)"""
-    individual_results = []
+    """Method 2: Reciprocal Rank Fusion across individual tag queries"""
+    if not interests:
+        return []
     
+    # Get separate rankings for each interest/tag
+    all_rankings = []
     for tag in interests:
         vector = model.encode(tag).tolist()
         results = qdrant.search(
             collection_name=COLLECTION_NAME,
             query_vector=vector,
-            limit=5,
+            limit=10,  # Get more results per tag for better fusion
             with_payload=True,
             with_vectors=False,
         )
-        individual_results.extend(results)
+        all_rankings.append(results)
     
-    # Deduplicate by ID, sort by score
-    seen_ids = set()
-    unique_results = []
+    # Apply reciprocal rank fusion
+    k = 60
+    scores = {}
     
-    for hit in sorted(individual_results, key=lambda x: -x.score):
-        bill_id = hit.payload.get("bill_id")
-        if bill_id not in seen_ids:
-            seen_ids.add(bill_id)
-            unique_results.append(hit)
-        if len(unique_results) == limit:
-            break
+    for ranking in all_rankings:
+        weight = 1.0 / len(all_rankings)  # Equal weight for each tag
+        for rank, hit in enumerate(ranking, start=1):
+            bill_id = hit.payload.get("bill_id")
+            if bill_id:
+                scores[bill_id] = scores.get(bill_id, 0) + weight / (k + rank)
     
+    # Sort by fused score
+    sorted_bills = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    
+    # Get top N bills
     bills = []
-    for hit in unique_results:
-        bill_id = hit.payload.get("bill_id")
-        if bill_id:
-            info = get_bill_info(bill_id)
-            bills.append({
-                "bill_id": bill_id,
-                "title": info["title"],
-                "summary": info["summary"],
-                "score": float(hit.score)
-            })
+    for bill_id, fused_score in sorted_bills[:limit]:
+        info = get_bill_info(bill_id)
+        bills.append({
+            "bill_id": bill_id,
+            "title": info["title"],
+            "summary": info["summary"],
+            "score": float(fused_score)
+        })
     
     return bills
 
