@@ -201,7 +201,7 @@ def save_feedback_to_csv(feedback_data):
     file_exists = os.path.exists(feedback_file)
     
     with open(feedback_file, 'a', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['timestamp', 'interests', 'demographics', 'general_feedback']
+        fieldnames = ['timestamp', 'interests', 'demographics', 'method_preference', 'general_feedback']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         
         if not file_exists:
@@ -255,6 +255,7 @@ def submit_results():
     demographics = data.get('demographics', {})
     fused_responses = data.get('fused_responses', {})
     tag_responses = data.get('tag_responses', {})
+    method_preference = data.get('method_preference', '')
     general_feedback = data.get('general_feedback', '')
     
     # Prepare CSV rows
@@ -290,15 +291,15 @@ def submit_results():
         # Save bill ratings
         filename = save_to_csv(csv_data)
         
-        # Save general feedback to separate CSV (only if feedback provided)
-        if general_feedback.strip():
-            feedback_data = {
-                'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'interests': interests_str,
-                'demographics': demographics_str,
-                'general_feedback': general_feedback
-            }
-            save_feedback_to_csv(feedback_data)
+        # Save general feedback to separate CSV (include method preference)
+        feedback_data = {
+            'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'interests': interests_str,
+            'demographics': demographics_str,
+            'method_preference': method_preference,
+            'general_feedback': general_feedback
+        }
+        save_feedback_to_csv(feedback_data)
         
         return jsonify({
             'success': True,

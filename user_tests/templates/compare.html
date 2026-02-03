@@ -226,6 +226,36 @@
             font-weight: 600;
         }
 
+        .method-preference {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .preference-btn {
+            flex: 1;
+            max-width: 200px;
+            padding: 15px 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .preference-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .preference-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
         .feedback-textarea {
             width: 100%;
             min-height: 120px;
@@ -336,6 +366,21 @@
         </div>
 
         <div class="feedback-section">
+            <div class="feedback-title">Which list do you prefer?</div>
+            <div class="method-preference">
+                <button class="preference-btn" onclick="selectMethodPreference('method1')" id="method1Btn">
+                    <strong>Method 1</strong>
+                </button>
+                <button class="preference-btn" onclick="selectMethodPreference('method2')" id="method2Btn">
+                    <strong>Method 2</strong>
+                </button>
+                <button class="preference-btn" onclick="selectMethodPreference('no_preference')" id="noPreferenceBtn">
+                    <strong>No Preference</strong>
+                </button>
+            </div>
+        </div>
+
+        <div class="feedback-section">
             <div class="feedback-title">General Feedback (Optional)</div>
             <textarea 
                 id="generalFeedback" 
@@ -346,7 +391,7 @@
 
         <div class="submit-section">
             <button class="submit-btn" id="submitBtn" onclick="submitResults()" disabled>
-                Submit Ratings & Start New Test
+                Submit Ratings
             </button>
         </div>
     </div>
@@ -356,6 +401,7 @@
         let userProfile = {};
         let fusedResponses = {};
         let tagResponses = {};
+        let methodPreference = null;
         let totalBills = 6;
         const md = window.markdownit();
 
@@ -476,6 +522,25 @@
             updateProgress();
         }
 
+        function selectMethodPreference(preference) {
+            methodPreference = preference;
+            
+            // Update button styling
+            document.querySelectorAll('.preference-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            if (preference === 'method1') {
+                document.getElementById('method1Btn').classList.add('selected');
+            } else if (preference === 'method2') {
+                document.getElementById('method2Btn').classList.add('selected');
+            } else if (preference === 'no_preference') {
+                document.getElementById('noPreferenceBtn').classList.add('selected');
+            }
+            
+            updateProgress();
+        }
+
         function updateProgress() {
             // Count bills with both relevance and summary effectiveness ratings
             const fusedComplete = Object.values(fusedResponses).filter(r => r.relevance && r.summary_effective).length;
@@ -487,8 +552,8 @@
             document.getElementById('progressText').textContent = 
                 `${totalComplete} of ${totalBills} bills fully rated`;
 
-            // Enable submit button when all bills are fully rated
-            document.getElementById('submitBtn').disabled = totalComplete < totalBills;
+            // Enable submit button when all bills are fully rated AND method preference is selected
+            document.getElementById('submitBtn').disabled = totalComplete < totalBills || methodPreference === null;
         }
 
         async function submitResults() {
@@ -509,6 +574,7 @@
                         demographics: userProfile.demographics,
                         fused_responses: fusedResponses,
                         tag_responses: tagResponses,
+                        method_preference: methodPreference,
                         general_feedback: generalFeedback
                     })
                 });
