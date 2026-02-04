@@ -53,7 +53,7 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 cur.execute("""
-SELECT id from bills_bill limit 1
+SELECT id, status_code from bills_bill limit 20
 """)
 
 # Get column names from cursor description

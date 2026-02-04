@@ -28,7 +28,7 @@ def get_bill_info(bill_id: int):
         conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags
+            SELECT bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code
             FROM bills_billtext bt
             JOIN bills_bill b ON bt.bill_id = b.id
             WHERE bt.bill_id = %s;
@@ -49,6 +49,7 @@ def get_bill_info(bill_id: int):
     session_id = row[4]
     status_date = row[5]
     tags = _extract_tag_labels(row[6])
+    status_code = row[7]
     return {
         "summary": summary,
         "title": title,
@@ -56,6 +57,7 @@ def get_bill_info(bill_id: int):
         "parliament_session": session_id,
         "last_updated": status_date.isoformat() if status_date else None,
         "tags": tags,
+        "status_code": status_code,
     }
 
 def get_bills_info(bill_ids: List[int]) -> List[Dict]:
@@ -67,7 +69,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
         conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags
+            SELECT bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code
             FROM bills_billtext bt
             JOIN bills_bill b ON bt.bill_id = b.id
             WHERE bt.bill_id = ANY(%s);
@@ -91,7 +93,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
 
     info_map = {}
     for row in rows:
-        bill_id, llm_summary, summary_en, title, bill_number, session_id, status_date, llm_tags = row
+        bill_id, llm_summary, summary_en, title, bill_number, session_id, status_date, llm_tags, status_code = row
         summary = llm_summary or summary_en or "[No summary found]"
         info_map[bill_id] = {
             "bill_id": bill_id,
@@ -101,6 +103,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
             "parliament_session": session_id,
             "last_updated": status_date.isoformat() if status_date else None,
             "tags": _extract_tag_labels(llm_tags),
+            "status_code": status_code,
         }
 
     output = []
@@ -115,6 +118,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
                 "parliament_session": None,
                 "last_updated": None,
                 "tags": None,
+                "status_code": None,
             },
         ))
     return output

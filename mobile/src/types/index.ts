@@ -9,6 +9,7 @@ export interface BillRecommendation {
   tags?: string[] | null;
   parliament_session?: string | null;
   last_updated?: string | null;
+  status_code?: string | null;
 }
 
 export interface UserProfile {

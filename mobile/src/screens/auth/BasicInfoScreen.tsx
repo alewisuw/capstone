@@ -297,10 +297,10 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={20} color="#fff" />
+        </TouchableOpacity>
         <AppLogo width={90} height={90} />
-        <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
-        </View>
       </LinearGradient>
 
       <Pressable style={styles.card} onPress={() => setOpenKey(null)}>
@@ -422,10 +422,16 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     alignItems: 'center',
   },
-  topRightLogo: {
+  backButton: {
     position: 'absolute',
-    right: 16,
-    top: 55,
+    left: 16,
+    top: 56,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
   },
   card: {
     flex: 1,

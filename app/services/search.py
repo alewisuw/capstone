@@ -24,6 +24,7 @@ def semantic_search(query: str, limit: int = 3):
             "parliament_session": info.get("parliament_session"),
             "last_updated": info.get("last_updated"),
             "tags": info.get("tags"),
+            "status_code": info.get("status_code"),
         })
 
     return output

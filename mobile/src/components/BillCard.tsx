@@ -4,6 +4,7 @@ import Ionicons from './Icon';
 import type { BillCardProps } from '../types';
 import { theme } from '../theme';
 import { getTagColor } from '../data/tagCategories';
+import BillStatusBadge from './BillStatusBadge';
 
 const BillCard: React.FC<BillCardProps> = ({
   bill,
@@ -91,6 +92,10 @@ const BillCard: React.FC<BillCardProps> = ({
           {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
         </Text>
 
+        <View style={styles.statusRow}>
+          <BillStatusBadge statusCode={bill.status_code} />
+        </View>
+
         {bill.tags && bill.tags.length > 0 ? (
           <View style={styles.tagsRow}>
             {bill.tags.map((tag) => {
@@ -155,6 +160,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingRight: 48,
     lineHeight: 24,
+  },
+  statusRow: {
+    marginBottom: 10,
   },
   summaryContainer: {
     marginBottom: 12,

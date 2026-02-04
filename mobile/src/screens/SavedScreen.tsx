@@ -7,6 +7,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { useSaved } from '../context/SavedContext';
 import BillCard from '../components/BillCard';
+import AppLogo from '../components/AppLogo';
 import { theme } from '../theme';
 
 type SavedScreenProps = StackScreenProps<RootStackParamList, 'SavedMain'>;
@@ -29,6 +30,9 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.headerTitle}>Saved</Text>
         <Text style={styles.headerSubtitle}>Your bookmarked bills</Text>
+        <View style={styles.topRightLogo}>
+          <AppLogo width={44} height={44} />
+        </View>
       </LinearGradient>
 
       <ScrollView
@@ -77,6 +81,11 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.9)',
+  },
+  topRightLogo: {
+    position: 'absolute',
+    right: 16,
+    top: 55,
   },
   content: {
     flex: 1,

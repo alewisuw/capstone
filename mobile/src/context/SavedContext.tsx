@@ -14,12 +14,12 @@ type SavedContextValue = {
 const SavedContext = createContext<SavedContextValue | undefined>(undefined);
 
 export const SavedProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { authToken } = useAuth();
+  const { authToken, user } = useAuth();
   const [savedBills, setSavedBills] = useState<BillRecommendation[]>([]);
   const [savedIds, setSavedIds] = useState<Set<number>>(new Set());
 
   const refreshSaved = useCallback(async (): Promise<void> => {
-    if (!authToken) {
+    if (!authToken || !user) {
       setSavedBills([]);
       setSavedIds(new Set());
       return;
@@ -27,11 +27,11 @@ export const SavedProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const bills = await getMySaved(authToken);
     setSavedBills(bills);
     setSavedIds(new Set(bills.map((bill) => bill.bill_id)));
-  }, [authToken]);
+  }, [authToken, user]);
 
   useEffect(() => {
     void refreshSaved();
-  }, [authToken]);
+  }, [authToken, user, refreshSaved]);
 
   const isSaved = (billId: number): boolean => savedIds.has(billId);
 

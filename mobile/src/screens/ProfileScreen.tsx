@@ -214,11 +214,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               <Ionicons name="close" size={24} color="#fff" />
             </TouchableOpacity>
           </View>
-        ) : (
-          <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
-        )}
+        ) : null}
       </LinearGradient>
 
       {loading ? (
@@ -231,6 +227,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
           contentContainerStyle={styles.contentContainer}
         >
           <View style={styles.profileCard}>
+            {user ? (
+              <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
+                <Text style={styles.signOutText}>Sign Out</Text>
+              </TouchableOpacity>
+            ) : null}
             <View style={styles.profileNameContainer}>
               <Ionicons name="person-circle" size={64} color={theme.colors.accent} />
               <Text style={styles.profileName}>
@@ -408,12 +409,14 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   signOutButton: {
-    alignSelf: 'flex-start',
+    position: 'absolute',
+    right: 16,
+    top: 16,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   signOutText: {
-    color: theme.colors.textLight,
+    color: '#ef4444',
     fontWeight: '600',
   },
   content: {

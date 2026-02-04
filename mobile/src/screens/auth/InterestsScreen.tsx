@@ -74,9 +74,6 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
-        <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
-        </View>
       </LinearGradient>
 
       <ScrollView style={styles.card} contentContainerStyle={styles.cardContent}>
@@ -181,11 +178,6 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: 24,
     alignItems: 'center',
-  },
-  topRightLogo: {
-    position: 'absolute',
-    right: 16,
-    top: 55,
   },
   backButton: {
     position: 'absolute',

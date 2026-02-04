@@ -16,6 +16,8 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { theme } from '../theme';
 import { useSaved } from '../context/SavedContext';
+import { getTagColor } from '../data/tagCategories';
+import BillStatusBadge from '../components/BillStatusBadge';
 
 type BillDetailScreenProps = StackScreenProps<RootStackParamList, 'BillDetail'>;
 
@@ -155,27 +157,28 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
             <AppLogo width={44} height={44} />
           </View>
 
-          <View style={styles.headerRow}>
-            <TouchableOpacity
-              style={styles.bookmarkButton}
-              onPress={() => toggleSave(bill)}
-            >
-              <Ionicons
-                name={saved ? 'bookmark' : 'bookmark-outline'}
-                size={18}
-                color="#fff"
-              />
-            </TouchableOpacity>
-          </View>
         </LinearGradient>
 
         <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.bookmarkButton}
+            onPress={() => toggleSave(bill)}
+          >
+            <Ionicons
+              name={saved ? 'bookmark' : 'bookmark-outline'}
+              size={22}
+              color={theme.colors.accent}
+            />
+          </TouchableOpacity>
           <View style={styles.titleSection}>
             <Ionicons name="document-text" size={24} color={theme.colors.accent} />
             <View style={styles.titleContainer}>
               <Text style={styles.title}>
                 {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
               </Text>
+              <View style={styles.statusRow}>
+                <BillStatusBadge statusCode={bill.status_code} />
+              </View>
               {bill.last_updated && (
                 <View style={styles.lastUpdatedContainer}>
                   <Ionicons name="time-outline" size={14} color={theme.colors.textMuted} />
@@ -186,6 +189,20 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
               )}
             </View>
           </View>
+          {bill.tags && bill.tags.length > 0 ? (
+            <View style={styles.tagsRow}>
+              {bill.tags.map((tag) => {
+                const tagColor = getTagColor(tag);
+                const backgroundColor = tagColor || theme.colors.surfaceMuted;
+                const textColor = tagColor ? '#fff' : theme.colors.textDark;
+                return (
+                  <View key={tag} style={[styles.tagChip, { backgroundColor }]}>
+                    <Text style={[styles.tagText, { color: textColor }]}>{tag}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          ) : null}
 
           <View style={styles.summarySection}>
             <Text style={styles.summaryLabel}>Summary</Text>
@@ -246,20 +263,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingRight: 16,
   },
-  headerRow: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
   bookmarkButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 2,
   },
   card: {
     backgroundColor: theme.colors.surface,
@@ -279,7 +291,7 @@ const styles = StyleSheet.create({
   titleSection: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 24,
+    marginBottom: 12,
     gap: 12,
   },
   titleContainer: {
@@ -291,6 +303,25 @@ const styles = StyleSheet.create({
     color: theme.colors.textDark,
     lineHeight: 32,
     marginBottom: 8,
+    paddingRight: 48,
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  statusRow: {
+    marginBottom: 10,
+  },
+  tagChip: {
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
   lastUpdatedContainer: {
     flexDirection: 'row',

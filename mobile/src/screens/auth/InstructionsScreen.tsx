@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
@@ -12,10 +13,10 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={20} color="#fff" />
+        </TouchableOpacity>
         <AppLogo width={90} height={90} />
-        <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
-        </View>
       </LinearGradient>
 
       <View style={styles.card}>
@@ -72,10 +73,16 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     alignItems: 'center',
   },
-  topRightLogo: {
+  backButton: {
     position: 'absolute',
-    right: 16,
-    top: 55,
+    left: 16,
+    top: 56,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
   },
   card: {
     flex: 1,
