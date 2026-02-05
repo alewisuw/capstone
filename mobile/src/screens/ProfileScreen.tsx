@@ -9,7 +9,6 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
@@ -21,6 +20,7 @@ import type { UserProfile, MyProfileRecord } from '../types';
 import { theme } from '../theme';
 import { categoryColors, getTagCategory } from '../data/tagCategories';
 import { useAuth } from '../context/AuthContext';
+import GradientBackground from '../components/GradientBackground';
 
 type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileMain'>;
 
@@ -168,13 +168,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <LinearGradient
-        colors={theme.gradients.header}
+      <GradientBackground
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Profile</Text>
         <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
+          <AppLogo width={56} height={56} />
         </View>
         
         {!showUsernameInput && !user ? (
@@ -215,7 +214,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         ) : null}
-      </LinearGradient>
+      </GradientBackground>
 
       {loading ? (
         <LoadingSpinner />
@@ -287,15 +286,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               style={styles.recommendationsButton}
               onPress={handleViewRecommendations}
             >
-              <LinearGradient
-                colors={theme.gradients.header}
+              <GradientBackground
                 style={styles.recommendationsButtonGradient}
               >
                 <Ionicons name="document-text" size={20} color="#fff" />
                 <Text style={styles.recommendationsButtonText}>
                   View Recommendations
                 </Text>
-              </LinearGradient>
+              </GradientBackground>
             </TouchableOpacity>
 
             {user ? (
@@ -370,11 +368,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 12,
     backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
@@ -391,6 +390,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 12,
   },
   searchInput: {
     flex: 1,

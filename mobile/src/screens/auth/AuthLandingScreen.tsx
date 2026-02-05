@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import AppLogo from '../../components/AppLogo';
+import GradientBackground from '../../components/GradientBackground';
 
 type AuthLandingProps = StackScreenProps<AuthStackParamList, 'AuthLanding'>;
 
 const AuthLandingScreen: React.FC<AuthLandingProps> = ({ navigation }) => {
   return (
-    <LinearGradient colors={theme.gradients.auth} style={styles.container}>
+    <GradientBackground style={styles.container}>
 
       <View style={styles.hero}>
         <AppLogo width={140} height={140} />
@@ -33,7 +33,7 @@ const AuthLandingScreen: React.FC<AuthLandingProps> = ({ navigation }) => {
           <Text style={styles.secondaryButtonText}>Log In</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </GradientBackground>
   );
 };
 

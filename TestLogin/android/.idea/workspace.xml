@@ -6,21 +6,24 @@
   <component name="ChangeListManager">
     <list default="true" id="8d19efea-4018-4fec-a464-375ee69afb79" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/models/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/models/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/services/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/services/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/services/recommendations.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/services/recommendations.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/services/search.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/services/search.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/metro.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/metro.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/components/AppLogo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/AppLogo.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/components/BillCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/BillCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/context/SavedContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/context/SavedContext.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/components/BillStatusBadge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/BillStatusBadge.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/BillDetailScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/BillDetailScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/EditProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/EditProfileScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/HomeScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/HomeScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/RecommendationsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/RecommendationsScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/SavedScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/SavedScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/AuthLandingScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/AuthLandingScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/InstructionsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/InstructionsScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/InterestsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/InterestsScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/LoginScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/LoginScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/SignUpScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/SignUpScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/VerifyEmailScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/VerifyEmailScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/services/apiService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/services/apiService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/types/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../summaries/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../summaries/test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

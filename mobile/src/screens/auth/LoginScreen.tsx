@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
+import GradientBackground from '../../components/GradientBackground';
 
 type LoginProps = StackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -15,27 +15,34 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleLogin = async () => {
+    if (isSubmitting) return;
     setError(null);
-    const result = await signIn(username, password);
-    if (!result.ok) {
-      setError(result.error || 'Sign in failed. Please try again.');
-      return;
-    }
-    if (result.needsOnboarding) {
-      navigation.navigate('Instructions');
+    setIsSubmitting(true);
+    try {
+      const result = await signIn(username.trim(), password);
+      if (!result.ok) {
+        setError(result.error || 'Sign in failed. Please try again.');
+        return;
+      }
+      if (result.needsOnboarding) {
+        navigation.navigate('Instructions');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+      <GradientBackground style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
-      </LinearGradient>
+      </GradientBackground>
 
       <View style={styles.card}>
         <Text style={styles.title}>Log in to your account</Text>
@@ -61,10 +68,18 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         />
 
         <TouchableOpacity
-          style={styles.primaryButton}
+          style={[styles.primaryButton, isSubmitting && styles.primaryButtonDisabled]}
           onPress={handleLogin}
+          disabled={isSubmitting}
         >
-          <Text style={styles.primaryButtonText}>Log In</Text>
+          {isSubmitting ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.primaryButtonText}>Signing In...</Text>
+            </View>
+          ) : (
+            <Text style={styles.primaryButtonText}>Log In</Text>
+          )}
         </TouchableOpacity>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -138,6 +153,14 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 14,
     alignItems: 'center',
+  },
+  primaryButtonDisabled: {
+    opacity: 0.7,
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   primaryButtonText: {
     color: '#fff',

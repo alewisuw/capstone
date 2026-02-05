@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
+import GradientBackground from '../../components/GradientBackground';
 
 type VerifyEmailProps = StackScreenProps<AuthStackParamList, 'VerifyEmail'>;
 
@@ -38,7 +38,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+      <GradientBackground style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
@@ -46,7 +46,7 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ navigation }) => {
         <View style={styles.topRightLogo}>
           <AppLogo width={44} height={44} />
         </View>
-      </LinearGradient>
+      </GradientBackground>
 
       <View style={styles.card}>
         <Text style={styles.title}>Verify your email</Text>

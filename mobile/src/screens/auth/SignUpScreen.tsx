@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
+import GradientBackground from '../../components/GradientBackground';
 
 type SignUpProps = StackScreenProps<AuthStackParamList, 'SignUp'>;
 
@@ -48,7 +48,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+      <GradientBackground style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('AuthLanding')}
@@ -56,7 +56,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
-      </LinearGradient>
+      </GradientBackground>
 
       <View style={styles.card}>
         <Text style={styles.title}>Create your account</Text>

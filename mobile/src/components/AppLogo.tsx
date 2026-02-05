@@ -1,7 +1,7 @@
 import React from 'react';
 import { SvgXml } from 'react-native-svg';
 
-const logoXml = `<svg width="1740" height="1765" viewBox="0 0 1740 1765" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const logoXml = `<svg width="1740" height="1765" viewBox="0 0 1740 1765" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect x="137.4" y="1334" width="277" height="73" fill="white"/>
 <rect x="137.4" y="1150" width="277" height="72" fill="white"/>
 <rect x="137.4" y="1242" width="277" height="73" fill="white"/>

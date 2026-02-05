@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import AppLogo from '../../components/AppLogo';
+import GradientBackground from '../../components/GradientBackground';
 
 type BasicInfoProps = StackScreenProps<AuthStackParamList, 'BasicInfo'>;
 
@@ -296,12 +296,12 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+      <GradientBackground style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
-      </LinearGradient>
+      </GradientBackground>
 
       <Pressable style={styles.card} onPress={() => setOpenKey(null)}>
         <ScrollView contentContainerStyle={styles.cardContent}>

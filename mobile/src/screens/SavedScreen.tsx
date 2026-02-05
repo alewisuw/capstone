@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
@@ -9,6 +8,7 @@ import { useSaved } from '../context/SavedContext';
 import BillCard from '../components/BillCard';
 import AppLogo from '../components/AppLogo';
 import { theme } from '../theme';
+import GradientBackground from '../components/GradientBackground';
 
 type SavedScreenProps = StackScreenProps<RootStackParamList, 'SavedMain'>;
 
@@ -24,16 +24,15 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <LinearGradient
-        colors={theme.gradients.header}
+      <GradientBackground
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Saved</Text>
         <Text style={styles.headerSubtitle}>Your bookmarked bills</Text>
         <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
+          <AppLogo width={56} height={56} />
         </View>
-      </LinearGradient>
+      </GradientBackground>
 
       <ScrollView
         style={styles.content}

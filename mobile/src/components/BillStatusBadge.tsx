@@ -5,6 +5,10 @@ import { theme } from '../theme';
 
 type BillStatusBadgeProps = {
   statusCode?: string | null;
+  showLabel?: boolean;
+  size?: number;
+  labelStyle?: object;
+  containerStyle?: object;
 };
 
 const leafSvg = `
@@ -73,7 +77,7 @@ const getStatusConfig = (statusCode: string) => {
   const normalized = normalize(statusCode);
 
   if (normalized === 'royalassentgiven') {
-    return { icon: leafSvg, label: 'Royal Assent' };
+    return { icon: leafSvg, label: 'Royal Assent', scale: 1.25 };
   }
 
   if (
@@ -125,14 +129,25 @@ const getStatusConfig = (statusCode: string) => {
   return { icon: pageSvg(theme.colors.textMuted), label: statusCode };
 };
 
-const BillStatusBadge: React.FC<BillStatusBadgeProps> = ({ statusCode }) => {
+const BillStatusBadge: React.FC<BillStatusBadgeProps> = ({
+  statusCode,
+  showLabel = true,
+  size = 22,
+  labelStyle,
+  containerStyle,
+}) => {
   if (!statusCode) return null;
-  const { icon, label } = getStatusConfig(statusCode);
+  const { icon, label, scale = 1 } = getStatusConfig(statusCode) as {
+    icon: string;
+    label: string;
+    scale?: number;
+  };
+  const iconSize = Math.round(size * scale);
 
   return (
-    <View style={styles.container}>
-      <SvgXml xml={icon} width={22} height={22} />
-      <Text style={styles.label}>{label}</Text>
+    <View style={[styles.container, containerStyle]}>
+      <SvgXml xml={icon} width={iconSize} height={iconSize} />
+      {showLabel ? <Text style={[styles.label, labelStyle]}>{label}</Text> : null}
     </View>
   );
 };

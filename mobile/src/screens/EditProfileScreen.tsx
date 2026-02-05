@@ -10,7 +10,6 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
@@ -20,6 +19,7 @@ import { putMyProfile, getMyProfile } from '../services/apiService';
 import AppLogo from '../components/AppLogo';
 import { interestGroups } from '../data/interestGroups';
 import type { MyProfileRecord } from '../types';
+import GradientBackground from '../components/GradientBackground';
 
 type EditProfileProps = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -482,12 +482,12 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={[]}>
-        <LinearGradient colors={theme.gradients.header} style={[styles.header, { paddingTop: insets.top + 10 }]}>
+        <GradientBackground style={[styles.header, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="chevron-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
-        </LinearGradient>
+        </GradientBackground>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Loading profile...</Text>
         </View>
@@ -497,7 +497,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <LinearGradient colors={theme.gradients.header} style={[styles.header, { paddingTop: insets.top + 10 }]}>
+      <GradientBackground style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
@@ -505,7 +505,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
         <View style={styles.topRightLogo}>
           <AppLogo width={44} height={44} />
         </View>
-      </LinearGradient>
+      </GradientBackground>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity

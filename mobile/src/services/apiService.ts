@@ -192,7 +192,7 @@ export const searchBills = async (
   limit: number = 3
 ): Promise<BillRecommendation[]> => {
   try {
-    const response = await api.get<BillRecommendation[]>('/api/search', {
+    const response = await api.get<BillRecommendation[]>('/api/search/', {
       params: { q: query, limit },
     });
     return response.data;

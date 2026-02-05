@@ -1,23 +1,23 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
 import AppLogo from '../../components/AppLogo';
+import GradientBackground from '../../components/GradientBackground';
 
 type InstructionsProps = StackScreenProps<AuthStackParamList, 'Instructions'>;
 
 const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+      <GradientBackground style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
-      </LinearGradient>
+      </GradientBackground>
 
       <View style={styles.card}>
         <Text style={styles.title}>How does Bill Board work?</Text>

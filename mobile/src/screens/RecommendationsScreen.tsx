@@ -10,7 +10,6 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
@@ -23,6 +22,7 @@ import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { useSaved } from '../context/SavedContext';
+import GradientBackground from '../components/GradientBackground';
 
 type RecommendationsScreenProps = StackScreenProps<RootStackParamList, 'RecommendationsMain'>;
 
@@ -155,12 +155,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={[]}>
-        <LinearGradient
-          colors={theme.gradients.header}
+        <GradientBackground
           style={[styles.header, { paddingTop: insets.top + 10 }]}
         >
           <Text style={styles.headerTitle}>Recommendations</Text>
-        </LinearGradient>
+        </GradientBackground>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -168,8 +167,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <LinearGradient
-        colors={theme.gradients.header}
+      <GradientBackground
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Recommendations</Text>
@@ -177,7 +175,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
           Personalized bills for {user?.username || username}
         </Text>
         <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
+          <AppLogo width={56} height={56} />
         </View>
 
         {!showUsernameInput && !user ? (
@@ -215,7 +213,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         ) : null}
 
         {null}
-      </LinearGradient>
+      </GradientBackground>
 
       {error && recommendations.length === 0 ? (
         <ErrorMessage message={error} onRetry={() => loadRecommendations(false)} />
@@ -313,11 +311,12 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 12,
+    marginBottom: 20,
   },
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 12,
     backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
@@ -334,6 +333,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 12,
   },
   searchInput: {
     flex: 1,

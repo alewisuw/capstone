@@ -9,7 +9,6 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
@@ -21,6 +20,7 @@ import AppLogo from '../components/AppLogo';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useSaved } from '../context/SavedContext';
+import GradientBackground from '../components/GradientBackground';
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
@@ -97,14 +97,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container} edges={[]}>
-      <LinearGradient
-        colors={theme.gradients.header}
+      <GradientBackground
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Search Bills</Text>
         {null}
         <View style={styles.topRightLogo}>
-          <AppLogo width={44} height={44} />
+          <AppLogo width={56} height={56} />
         </View>
 
         <View style={styles.searchContainer}>
@@ -129,7 +128,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </View>
 
         {null}
-      </LinearGradient>
+      </GradientBackground>
 
       {loading && results.length === 0 ? (
         <LoadingSpinner />
@@ -224,12 +223,13 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 16,
+    marginBottom: 24,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    marginTop: 12,
     backgroundColor: theme.colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 8,

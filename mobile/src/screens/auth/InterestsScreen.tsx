@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
@@ -16,6 +15,7 @@ import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
 import { interestGroups } from '../../data/interestGroups';
 import { getTagColor } from '../../data/tagCategories';
+import GradientBackground from '../../components/GradientBackground';
 
 type InterestsProps = StackScreenProps<AuthStackParamList, 'Interests'>;
 
@@ -69,12 +69,12 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={theme.gradients.auth} style={styles.header}>
+      <GradientBackground style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={20} color="#fff" />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
-      </LinearGradient>
+      </GradientBackground>
 
       <ScrollView style={styles.card} contentContainerStyle={styles.cardContent}>
         <Text style={styles.title}>What are you interested in?</Text>

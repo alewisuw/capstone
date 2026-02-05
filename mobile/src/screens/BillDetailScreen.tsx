@@ -9,15 +9,15 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import Ionicons from '../components/Icon';
-import AppLogo from '../components/AppLogo';
+import AppLogoHorizontal from '../components/AppLogoHorizontal';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { theme } from '../theme';
 import { useSaved } from '../context/SavedContext';
 import { getTagColor } from '../data/tagCategories';
 import BillStatusBadge from '../components/BillStatusBadge';
+import GradientBackground from '../components/GradientBackground';
 
 type BillDetailScreenProps = StackScreenProps<RootStackParamList, 'BillDetail'>;
 
@@ -142,8 +142,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
       >
-        <LinearGradient
-          colors={theme.gradients.header}
+        <GradientBackground
           style={[styles.header, { paddingTop: insets.top + 16 }]}
         >
           <TouchableOpacity
@@ -154,10 +153,10 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
           </TouchableOpacity>
 
           <View style={styles.logoWrap}>
-            <AppLogo width={44} height={44} />
+            <AppLogoHorizontal textSize={22} logoSize={52} />
           </View>
 
-        </LinearGradient>
+        </GradientBackground>
 
         <View style={styles.card}>
           <TouchableOpacity
@@ -171,13 +170,17 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
             />
           </TouchableOpacity>
           <View style={styles.titleSection}>
-            <Ionicons name="document-text" size={24} color={theme.colors.accent} />
             <View style={styles.titleContainer}>
               <Text style={styles.title}>
                 {bill.bill_number || `#${bill.bill_id}`}: {bill.title}
               </Text>
               <View style={styles.statusRow}>
-                <BillStatusBadge statusCode={bill.status_code} />
+                <BillStatusBadge
+                  statusCode={bill.status_code}
+                  size={28}
+                  labelStyle={styles.statusLabel}
+                  containerStyle={styles.statusContainer}
+                />
               </View>
               {bill.last_updated && (
                 <View style={styles.lastUpdatedContainer}>
@@ -245,7 +248,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
-    padding: 20,
+    padding: 24,
+    paddingBottom: 36,
     alignItems: 'center',
     gap: 14,
   },
@@ -289,10 +293,9 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   titleSection: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'flex-start',
     marginBottom: 12,
-    gap: 12,
   },
   titleContainer: {
     flex: 1,
@@ -313,6 +316,14 @@ const styles = StyleSheet.create({
   },
   statusRow: {
     marginBottom: 10,
+  },
+  statusContainer: {
+    gap: 10,
+  },
+  statusLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textDark,
   },
   tagChip: {
     borderRadius: 12,
