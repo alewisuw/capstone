@@ -40,6 +40,12 @@ def get_my_profile(user=Depends(_get_user)):
     item = get_profile(user["sub"])
     if not item:
         raise HTTPException(status_code=404, detail="Profile not found")
+    if "electoral_district_id" in item and item["electoral_district_id"] is not None:
+        item["electoral_district_id"] = str(item["electoral_district_id"])
+    if isinstance(item.get("demographics"), dict):
+        demo_id = item["demographics"].get("electoral_district_id")
+        if demo_id is not None:
+            item["demographics"]["electoral_district_id"] = str(demo_id)
     return item
 
 
@@ -47,6 +53,8 @@ def get_my_profile(user=Depends(_get_user)):
 def put_my_profile(payload: UserProfileInput, user=Depends(_get_user)):
     now = datetime.now(timezone.utc).isoformat()
     existing = get_profile(user["sub"])
+    electoral_district = payload.electoral_district or payload.demographics.get("electoral_district")
+    electoral_district_id = payload.electoral_district_id or payload.demographics.get("electoral_district_id")
     item = {
         "user_id": user["sub"],
         "username": payload.username,
@@ -56,6 +64,10 @@ def put_my_profile(payload: UserProfileInput, user=Depends(_get_user)):
         "onboarded": payload.onboarded,
         "updatedAt": now,
     }
+    if electoral_district:
+        item["electoral_district"] = electoral_district
+    if electoral_district_id:
+        item["electoral_district_id"] = str(electoral_district_id)
     if existing and "saved_bill_ids" in existing:
         item["saved_bill_ids"] = existing.get("saved_bill_ids") or []
     if not existing:

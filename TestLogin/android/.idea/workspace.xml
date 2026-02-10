@@ -6,24 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="8d19efea-4018-4fec-a464-375ee69afb79" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/metro.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/metro.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/components/AppLogo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/AppLogo.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/components/BillCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/BillCard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/components/BillStatusBadge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/components/BillStatusBadge.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/BillDetailScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/BillDetailScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/EditProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/EditProfileScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/HomeScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/HomeScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/api/me.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/api/me.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../app/models/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/models/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/context/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/context/AuthContext.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/RecommendationsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/RecommendationsScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/SavedScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/SavedScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/AuthLandingScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/AuthLandingScreen.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/InstructionsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/InstructionsScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/InterestsScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/InterestsScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/LoginScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/LoginScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/SignUpScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/SignUpScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/VerifyEmailScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/VerifyEmailScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/services/apiService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/services/apiService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,18 +35,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Mdotto15"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Mdotto15&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/alewisuw/capstone.git",
-    "accountId": "f25bc19e-99a2-4a9d-ba55-e8b0ac3b7f0b"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/alewisuw/capstone.git&quot;,
+    &quot;accountId&quot;: &quot;f25bc19e-99a2-4a9d-ba55-e8b0ac3b7f0b&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 4
 }</component>

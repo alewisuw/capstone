@@ -145,6 +145,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   };
 
   const formatLabel = (key: string): string => {
+    if (key === 'electoral_district') return 'Electoral District';
+    if (key === 'electoral_district_id') return 'Electoral District ID';
     return key
       .replace(/_/g, ' ')
       .replace(/([A-Z])/g, ' $1')
@@ -272,7 +274,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Demographics</Text>
                 {Object.entries(profile.demographics).map(([key, value]) => (
-                  value && value !== 'prefer_not_to_say' && (
+                  value && value !== 'prefer_not_to_say' && key !== 'electoral_district_id' && (
                     <View key={key} style={styles.demographicRow}>
                       <Text style={styles.demographicLabel}>{formatLabel(key)}:</Text>
                       <Text style={styles.demographicValue}>{formatValue(value)}</Text>

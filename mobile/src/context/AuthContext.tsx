@@ -175,7 +175,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ) => {
     if (pendingUsername && authToken) {
       const filteredDemographics = Object.fromEntries(
-        Object.entries(demographics).filter(([, value]) => value && value.trim().length > 0)
+        Object.entries(demographics).filter(([, value]) => {
+          if (value === null || value === undefined) return false;
+          if (typeof value === 'string') return value.trim().length > 0;
+          return true;
+        })
       );
       try {
         await putMyProfile(

@@ -20,6 +20,7 @@ import SignUpScreen from './src/screens/auth/SignUpScreen';
 import VerifyEmailScreen from './src/screens/auth/VerifyEmailScreen';
 import InstructionsScreen from './src/screens/auth/InstructionsScreen';
 import BasicInfoScreen from './src/screens/auth/BasicInfoScreen';
+import ElectoralDistrictScreen from './src/screens/auth/ElectoralDistrictScreen';
 import InterestsScreen from './src/screens/auth/InterestsScreen';
 import type { AuthStackParamList, RootStackParamList, RootTabParamList } from './src/types';
 import { theme } from './src/theme';
@@ -110,6 +111,7 @@ function AuthFlow() {
       <AuthStack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
       <AuthStack.Screen name="Instructions" component={InstructionsScreen} />
       <AuthStack.Screen name="BasicInfo" component={BasicInfoScreen} />
+      <AuthStack.Screen name="ElectoralDistrict" component={ElectoralDistrictScreen} />
       <AuthStack.Screen name="Interests" component={InterestsScreen} />
     </AuthStack.Navigator>
   );

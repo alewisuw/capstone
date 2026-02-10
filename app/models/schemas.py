@@ -37,6 +37,8 @@ class UserProfileInput(BaseModel):
     interests: List[str] = []
     demographics: Dict = {}
     onboarded: bool = False
+    electoral_district: Optional[str] = None
+    electoral_district_id: Optional[str] = None
 
 
 class UserProfileResponse(UserProfileInput):

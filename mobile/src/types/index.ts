@@ -74,6 +74,7 @@ export type AuthStackParamList = {
   VerifyEmail: undefined;
   Instructions: undefined;
   BasicInfo: undefined;
+  ElectoralDistrict: { demographics: Record<string, string> };
   Interests: { demographics: Record<string, string> };
 };
 

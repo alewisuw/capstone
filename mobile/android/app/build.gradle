@@ -92,6 +92,16 @@ android {
         versionName "1.0.0"
 
         buildConfigField("boolean", "REACT_NATIVE_UNSTABLE_USE_RUNTIME_SCHEDULER_ALWAYS", (findProperty("reactNative.unstable_useRuntimeSchedulerAlways") ?: true).toString())
+        def mapsApiKey = System.getenv("EXPO_PUBLIC_MAPS_ANDROID_KEY") ?: System.getenv("MAPS_ANDROID_KEY")
+        if (!mapsApiKey) {
+            try {
+                def cmd = "aws ssm get-parameter --name /billBoard/MAPS_ANDROID_KEY --with-decryption --query Parameter.Value --output text"
+                mapsApiKey = cmd.execute(null, rootDir).text.trim()
+            } catch (Exception ignored) {
+                mapsApiKey = ""
+            }
+        }
+        resValue "string", "google_maps_api_key", mapsApiKey ?: ""
     }
     signingConfigs {
         debug {

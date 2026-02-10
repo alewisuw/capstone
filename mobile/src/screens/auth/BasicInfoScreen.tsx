@@ -401,7 +401,7 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
                 housing_status: housingStatus,
                 language_at_home: languageAtHome,
               };
-              navigation.navigate('Interests', { demographics });
+              navigation.navigate('ElectoralDistrict', { demographics });
             }}
           >
             <Text style={styles.primaryButtonText}>Continue</Text>
