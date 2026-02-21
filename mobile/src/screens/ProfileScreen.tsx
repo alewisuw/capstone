@@ -5,18 +5,17 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Alert,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
-import { deleteMyAccount, getMyProfile, getProfile, getProfiles } from '../services/apiService';
+import { deleteMyAccount, getMyProfile } from '../services/apiService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
-import type { UserProfile, MyProfileRecord } from '../types';
+import type { MyProfileRecord } from '../types';
 import { theme } from '../theme';
 import { categoryColors, getTagCategory } from '../data/tagCategories';
 import { useAuth } from '../context/AuthContext';
@@ -27,68 +26,38 @@ type ProfileScreenProps = StackScreenProps<RootStackParamList, 'ProfileMain'>;
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { user, authToken, signOut } = useAuth();
-  const [username, setUsername] = useState<string>('su_victor21');
-  const [profile, setProfile] = useState<UserProfile | MyProfileRecord | null>(null);
-  const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
+  const [profile, setProfile] = useState<MyProfileRecord | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
 
   useEffect(() => {
-    loadProfiles();
-  }, []);
-
-  useEffect(() => {
-    const effective = user?.username || username;
-    if (effective) {
-      setUsername(effective);
-      loadProfile(effective);
+    if (user?.username && authToken) {
+      loadMyProfile();
     }
-  }, [user]);
+  }, [user, authToken]);
 
   // Refresh profile when screen comes into focus (e.g., after editing)
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      if (user?.username) {
-        loadProfile(user.username);
+      if (user?.username && authToken) {
+        loadMyProfile();
       }
     });
     return unsubscribe;
-  }, [navigation, user]);
+  }, [navigation, user, authToken]);
 
-  const loadProfiles = async (): Promise<void> => {
-    if (user) {
-      return;
-    }
-    try {
-      const data = await getProfiles();
-      setAvailableProfiles(data);
-    } catch (err) {
-      console.error('Failed to load profiles:', err);
-    }
-  };
-
-  const loadProfile = async (user: string): Promise<void> => {
-    if (!user) return;
-    
+  const loadMyProfile = async (): Promise<void> => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      if (user) {
-        if (!authToken) {
-          setError('Missing session. Please sign in again.');
-          setProfile(null);
-          return;
-        }
-        const data = await getMyProfile(authToken);
-        setProfile(data);
-        setShowUsernameInput(false);
+      if (!authToken) {
+        setError('Missing session. Please sign in again.');
+        setProfile(null);
         return;
       }
-      const data = await getProfile(user.toLowerCase());
+      const data = await getMyProfile(authToken);
       setProfile(data);
-      setShowUsernameInput(false);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load profile');
       setProfile(null);
@@ -97,25 +66,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     }
   };
 
-  const handleUsernameChange = (text: string): void => {
-    setUsername(text);
-  };
-
-  const handleLoadProfile = (): void => {
-    if (!username.trim()) {
-      Alert.alert('Error', 'Please enter a username');
-      return;
-    }
-    loadProfile(username.trim());
-  };
-
   const handleViewRecommendations = (): void => {
     if (!profile) {
       return;
     }
-    const targetName = 'username' in profile ? profile.username : profile.name;
     // Navigate to Recommendations tab
-    navigation.getParent()?.navigate('Recommendations', { username: targetName });
+    navigation.getParent()?.navigate('Recommendations', { username: profile.username });
   };
 
   const handleDeleteAccount = (): void => {
@@ -174,54 +130,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
         <Text style={styles.headerTitle}>Profile</Text>
-        <View style={styles.topRightLogo}>
-          <AppLogo width={56} height={56} />
+        <View style={[styles.topRightLogo, { top: insets.top + 10 }]}>
+          <AppLogo width={44} height={44} />
         </View>
         
-        {!showUsernameInput && !user ? (
-          <TouchableOpacity
-            style={styles.searchButton}
-            onPress={() => setShowUsernameInput(true)}
-          >
-            <Ionicons name="person" size={20} color={theme.colors.accent} />
-            <Text style={styles.searchButtonText}>
-              {username || 'Enter username'}
-            </Text>
-          </TouchableOpacity>
-        ) : !user ? (
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Enter username"
-              placeholderTextColor="#6b6b6b"
-              value={username}
-              onChangeText={handleUsernameChange}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            <TouchableOpacity
-              style={styles.searchIconButton}
-              onPress={handleLoadProfile}
-            >
-              <Ionicons name="checkmark" size={24} color={theme.colors.accent} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                setShowUsernameInput(false);
-                setError(null);
-              }}
-            >
-              <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        ) : null}
       </GradientBackground>
 
       {loading ? (
         <LoadingSpinner />
       ) : error ? (
-        <ErrorMessage message={error} onRetry={() => loadProfile(username)} />
+        <ErrorMessage message={error} onRetry={loadMyProfile} />
       ) : profile ? (
         <ScrollView
           style={styles.content}
@@ -235,9 +153,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             ) : null}
             <View style={styles.profileNameContainer}>
               <Ionicons name="person-circle" size={64} color={theme.colors.accent} />
-              <Text style={styles.profileName}>
-                {'username' in profile ? profile.username : profile.name}
-              </Text>
+              <Text style={styles.profileName}>{profile.username}</Text>
             </View>
 
             {profile.interests && profile.interests.length > 0 && (
@@ -316,34 +232,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
               </>
             ) : null}
           </View>
-
-          {availableProfiles.length > 0 && !user && (
-            <View style={styles.profilesListSection}>
-              <Text style={styles.profilesListTitle}>Other Profiles</Text>
-              {availableProfiles
-                .filter((p) => p !== ('username' in profile ? profile.username : profile.name))
-                .slice(0, 10)
-                .map((profileName) => (
-                  <TouchableOpacity
-                    key={profileName}
-                    style={styles.profileListItem}
-                    onPress={() => {
-                      setUsername(profileName);
-                      loadProfile(profileName);
-                    }}
-                  >
-                    <Text style={styles.profileListItemText}>{profileName}</Text>
-                    <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-                  </TouchableOpacity>
-                ))}
-            </View>
-          )}
         </ScrollView>
       ) : (
         <View style={styles.emptyState}>
           <Ionicons name="person-outline" size={64} color="#d1d5db" />
           <Text style={styles.emptyStateText}>
-            Enter a username to view profile
+            Sign in to view your profile
           </Text>
         </View>
       )}
@@ -357,58 +251,20 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 10,
-    paddingBottom: 24,
+    padding: 16,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.md,
   },
   topRightLogo: {
     position: 'absolute',
-    right: 16,
+    right: 14,
     top: 55,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 24,
-  },
-  searchButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    backgroundColor: theme.colors.surface,
-    padding: 12,
-    borderRadius: 12,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-  },
-  searchButtonText: {
-    fontSize: 16,
-    color: theme.colors.accent,
-    fontWeight: '600',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: 12,
-  },
-  searchInput: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    padding: 12,
-    borderRadius: 12,
-    color: theme.colors.textDark,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-  },
-  searchIconButton: {
-    padding: 12,
-  },
-  cancelButton: {
-    padding: 12,
+    marginBottom: 12,
   },
   signOutButton: {
     position: 'absolute',
@@ -430,7 +286,7 @@ const styles = StyleSheet.create({
   profileCard: {
     backgroundColor: theme.colors.surface,
     borderRadius: 16,
-    padding: 20,
+    padding: theme.spacing.lg,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -464,7 +320,7 @@ const styles = StyleSheet.create({
   },
   interestChip: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: theme.spacing.xs,
     borderRadius: 16,
     borderWidth: 0,
   },
@@ -536,40 +392,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
-  profilesListSection: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  profilesListTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textDark,
-    marginBottom: 12,
-  },
-  profileListItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderLight,
-  },
-  profileListItemText: {
-    fontSize: 16,
-    color: theme.colors.textDark,
-    fontWeight: '500',
-  },
   emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: theme.spacing.lg,
   },
   emptyStateText: {
     fontSize: 16,

@@ -5,7 +5,7 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
-  TouchableOpacity,
+  Pressable,
   TextInput,
   Alert,
 } from 'react-native';
@@ -18,6 +18,7 @@ import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
+import BillCardSkeleton from '../components/BillCardSkeleton';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useAuth } from '../context/AuthContext';
@@ -160,7 +161,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         >
           <Text style={styles.headerTitle}>Recommendations</Text>
         </GradientBackground>
-        <LoadingSpinner />
+        <BillCardSkeleton count={4} />
       </SafeAreaView>
     );
   }
@@ -174,18 +175,19 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         <Text style={styles.headerSubtitle}>
           Personalized bills for {user?.username || username}
         </Text>
-        <View style={styles.topRightLogo}>
-          <AppLogo width={56} height={56} />
+        <View style={[styles.topRightLogo, { top: insets.top + 10 }]}>
+          <AppLogo width={44} height={44} />
         </View>
 
         {!showUsernameInput && !user ? (
-          <TouchableOpacity
-            style={styles.searchButton}
+          <Pressable
+            style={({ pressed }) => [styles.searchButton, pressed && styles.buttonPressed]}
             onPress={() => setShowUsernameInput(true)}
+            android_ripple={{ color: 'rgba(0, 0, 0, 0.06)' }}
           >
             <Ionicons name="person" size={20} color={theme.colors.accent} />
             <Text style={styles.searchButtonText}>{username}</Text>
-          </TouchableOpacity>
+          </Pressable>
         ) : !user ? (
           <View style={styles.searchContainer}>
             <TextInput
@@ -197,18 +199,23 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
               autoCapitalize="none"
               autoCorrect={false}
             />
-            <TouchableOpacity style={styles.searchIconButton} onPress={handleLoad}>
+            <Pressable
+              style={({ pressed }) => [styles.searchIconButton, pressed && styles.buttonPressed]}
+              onPress={handleLoad}
+              android_ripple={{ color: 'rgba(193,0,0,0.12)', borderless: true }}
+            >
               <Ionicons name="checkmark" size={24} color={theme.colors.accent} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.cancelButton, pressed && styles.buttonPressed]}
               onPress={() => {
                 setShowUsernameInput(false);
                 setError(null);
               }}
+              android_ripple={{ color: 'rgba(255,255,255,0.14)', borderless: true }}
             >
               <Ionicons name="close" size={24} color="#fff" />
-            </TouchableOpacity>
+            </Pressable>
           </View>
         ) : null}
 
@@ -236,16 +243,17 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
                   <Text style={styles.profileChipsLabel}>Try another profile:</Text>
                   <View style={styles.profileChipRow}>
                     {availableProfiles.slice(0, 6).map((profile) => (
-                      <TouchableOpacity
+                      <Pressable
                         key={profile}
-                        style={styles.profileChip}
+                        style={({ pressed }) => [styles.profileChip, pressed && styles.buttonPressed]}
                         onPress={() => {
                           setUsername(profile);
                           setShowUsernameInput(false);
                         }}
+                        android_ripple={{ color: 'rgba(193,0,0,0.10)' }}
                       >
                         <Text style={styles.profileChipText}>{profile}</Text>
-                      </TouchableOpacity>
+                      </Pressable>
                     ))}
                   </View>
                 </View>
@@ -294,29 +302,32 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingBottom: 16,
+    padding: 16,
+    paddingBottom: theme.spacing.sm,
   },
   topRightLogo: {
     position: 'absolute',
-    right: 16,
+    right: 14,
     top: 55,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+    paddingRight: 84,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginBottom: 20,
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.82)',
+    marginBottom: 16,
+    paddingRight: 84,
   },
   searchButton: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
+    marginRight: 84,
     backgroundColor: theme.colors.surface,
     padding: 12,
     borderRadius: 12,
@@ -334,6 +345,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginTop: 12,
+    marginRight: 84,
   },
   searchInput: {
     flex: 1,
@@ -347,9 +359,15 @@ const styles = StyleSheet.create({
   },
   searchIconButton: {
     padding: 12,
+    borderRadius: 12,
   },
   cancelButton: {
     padding: 12,
+    borderRadius: 12,
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   content: {
     flex: 1,
@@ -358,7 +376,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   loadingMore: {
-    paddingVertical: 20,
+    paddingVertical: theme.spacing.lg,
   },
   sectionHeader: {
     paddingHorizontal: 16,
@@ -387,7 +405,7 @@ const styles = StyleSheet.create({
   profileChip: {
     backgroundColor: theme.colors.surface,
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: theme.spacing.xs,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: theme.colors.accent,
@@ -401,7 +419,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 40,
+    padding: theme.spacing.lg,
     minHeight: 300,
   },
   emptyStateText: {

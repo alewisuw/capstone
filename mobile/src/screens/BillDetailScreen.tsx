@@ -178,6 +178,8 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
                 <BillStatusBadge
                   statusCode={bill.status_code}
                   size={28}
+                  showPhaseTag
+                  enableTooltip
                   labelStyle={styles.statusLabel}
                   containerStyle={styles.statusContainer}
                 />

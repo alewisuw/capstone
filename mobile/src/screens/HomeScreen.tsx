@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  TouchableOpacity,
+  Pressable,
   TextInput,
   Alert,
 } from 'react-native';
@@ -17,6 +17,7 @@ import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
+import BillCardSkeleton from '../components/BillCardSkeleton';
 import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useSaved } from '../context/SavedContext';
@@ -102,8 +103,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.headerTitle}>Search Bills</Text>
         {null}
-        <View style={styles.topRightLogo}>
-          <AppLogo width={56} height={56} />
+        <View style={[styles.topRightLogo, { top: insets.top + 10 }]}>
+          <AppLogo width={44} height={44} />
         </View>
 
         <View style={styles.searchContainer}>
@@ -119,19 +120,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             autoCapitalize="none"
             autoCorrect={false}
           />
-          <TouchableOpacity
-            style={styles.searchIconButton}
+          <Pressable
+            style={({ pressed }) => [styles.searchIconButton, pressed && styles.buttonPressed]}
             onPress={() => handleSearch()}
+            android_ripple={{ color: 'rgba(193,0,0,0.12)', borderless: true }}
           >
             <Ionicons name="arrow-forward" size={20} color={theme.colors.accent} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {null}
       </GradientBackground>
 
       {loading && results.length === 0 ? (
-        <LoadingSpinner />
+        <BillCardSkeleton count={4} />
       ) : error && results.length === 0 ? (
         <ErrorMessage 
           message={error} 
@@ -175,15 +177,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               data={['Climate', 'Healthcare', 'Housing', 'Education', 'Taxes']}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.suggestionChip}
+                <Pressable
+                  style={({ pressed }) => [styles.suggestionChip, pressed && styles.buttonPressed]}
                   onPress={() => {
                     setQuery(item);
                     handleSearch(item);
                   }}
+                  android_ripple={{ color: 'rgba(193,0,0,0.10)' }}
                 >
                   <Text style={styles.suggestionChipText}>{item}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.suggestionsRow}
@@ -205,20 +208,21 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 10,
-    paddingBottom: 18,
+    padding: 16,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
   },
   topRightLogo: {
     position: 'absolute',
-    right: 16,
+    right: 14,
     top: 55,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
+    paddingRight: 84,
   },
   headerSubtitle: {
     fontSize: 16,
@@ -229,7 +233,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginTop: 12,
+    marginTop: theme.spacing.lg,
     backgroundColor: theme.colors.surface,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -243,7 +247,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchIconButton: {
-    padding: 6,
+    padding: theme.spacing.xs,
+    borderRadius: 10,
+  },
+  buttonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   content: {
     flex: 1,
@@ -252,7 +261,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   loadingMore: {
-    paddingVertical: 20,
+    paddingVertical: theme.spacing.lg,
   },
   sectionHeader: {
     paddingHorizontal: 16,
@@ -262,7 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: theme.colors.textDark,
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   emptyState: {
     flex: 1,
@@ -286,7 +295,7 @@ const styles = StyleSheet.create({
   },
   suggestionsRow: {
     gap: 8,
-    paddingHorizontal: 4,
+    paddingHorizontal: theme.spacing.xs,
   },
   suggestionsTitle: {
     fontSize: 14,

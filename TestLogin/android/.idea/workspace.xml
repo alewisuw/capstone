@@ -6,17 +6,61 @@
   <component name="ChangeListManager">
     <list default="true" id="8d19efea-4018-4fec-a464-375ee69afb79" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/api/me.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/api/me.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../app/models/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../app/models/schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/assets/fonts/Ionicons.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/java/com/billboard/app/MainApplication.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/src/main/java/com/billboard/app/MainApplication.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable-hdpi/splashscreen_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable-mdpi/splashscreen_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable-xhdpi/splashscreen_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable-xxhdpi/splashscreen_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable-xxxhdpi/splashscreen_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable/rn_edit_text_material.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable/rn_edit_text_material.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/drawable/splashscreen.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/app/src/main/res/values/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/gradlew" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/gradlew.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/android/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/android/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/app.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/app.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/BillBoard.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/AppDelegate.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/AppDelegate.mm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/BillBoard-Bridging-Header.h" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/BillBoard/BillBoard-Bridging-Header.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/BillBoard.entitlements" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/BillBoard/BillBoard.entitlements" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Images.xcassets/SplashScreen.imageset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Images.xcassets/SplashScreen.imageset/image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Images.xcassets/SplashScreenBackground.imageset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Images.xcassets/SplashScreenBackground.imageset/image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/SplashScreen.storyboard" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/BillBoard/SplashScreen.storyboard" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Supporting/Expo.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/BillBoard/Supporting/Expo.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/main.m" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/BillBoard/noop-file.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../mobile/ios/Podfile" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/ios/Podfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../mobile/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/context/AuthContext.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/context/AuthContext.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/ProfileScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/screens/auth/BasicInfoScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mobile/src/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../mobile/src/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +70,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/home/marc/.android/avd/Pixel_9_Pro_XL_2.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/home/marc/.android/avd/Pixel_9_Pro_XL.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />

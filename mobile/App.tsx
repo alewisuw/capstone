@@ -1,10 +1,13 @@
+import 'react-native-get-random-values';
+import 'react-native-url-polyfill/auto';
 import React from 'react';
+import { LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import Ionicons from './src/components/Icon';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { StackScreenProps } from '@react-navigation/stack';
 
@@ -26,6 +29,12 @@ import type { AuthStackParamList, RootStackParamList, RootTabParamList } from '.
 import { theme } from './src/theme';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { SavedProvider } from './src/context/SavedContext';
+
+if (__DEV__) {
+  LogBox.ignoreLogs([
+    'Using an insecure random number generator, this should only happen when running in a debugger without support for crypto.getRandomValues',
+  ]);
+}
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
@@ -119,6 +128,7 @@ function AuthFlow() {
 
 function AppShell() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   if (!user) {
     return <AuthFlow />;
@@ -152,9 +162,9 @@ function AppShell() {
           backgroundColor: '#ffffff',
           borderTopWidth: 1,
           borderTopColor: theme.colors.borderLight,
-          paddingBottom: 5,
+          paddingBottom: Math.max(insets.bottom, 8),
           paddingTop: 5,
-          height: 60,
+          height: 56 + Math.max(insets.bottom, 8),
         },
       })}
     >

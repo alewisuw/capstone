@@ -1,4 +1,10 @@
 export const theme = {
+  spacing: {
+    xs: 8,
+    sm: 12,
+    md: 16,
+    lg: 24,
+  },
   colors: {
     background: '#ffffff',
     authBackground: '#0f0f0f',

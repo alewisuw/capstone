@@ -1,19 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { theme } from '../theme';
 
 type BillStatusBadgeProps = {
   statusCode?: string | null;
   showLabel?: boolean;
+  showPhaseTag?: boolean;
+  enableTooltip?: boolean;
   size?: number;
   labelStyle?: object;
   containerStyle?: object;
 };
 
-const leafSvg = `
+const STAGE_COLORS = {
+  final: theme.colors.success,
+  withdrawn: theme.colors.accentDark,
+  reading: '#1f5fbf',
+  committee: '#5b3db2',
+  report: '#a16207',
+  pending: theme.colors.textMuted,
+};
+
+const CHAMBER_COLORS = {
+  senate: '#990100',
+  house: '#007411',
+};
+
+const leafSvg = (color: string) => `
 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M51.076 36.7895L42.1598 41.3684L43.6997 44.4211L37.5399 43.2763V49H34.4601V43.2763L28.3003 44.4211L29.8402 41.3684L20.924 36.7895L22.4639 34.1489L20 29.1579L25.5438 28.8068L27.0837 26.1053L32.3503 32.0579L29.8402 24.5789H32.9201L36 20L39.0799 24.5789H42.1598L39.6497 32.0579L44.9163 26.1053L46.4562 28.7458L52 29.0968L49.5361 34.0268L51.076 36.7895Z" fill="#1C24C3"/>
+  <path d="M51.076 36.7895L42.1598 41.3684L43.6997 44.4211L37.5399 43.2763V49H34.4601V43.2763L28.3003 44.4211L29.8402 41.3684L20.924 36.7895L22.4639 34.1489L20 29.1579L25.5438 28.8068L27.0837 26.1053L32.3503 32.0579L29.8402 24.5789H32.9201L36 20L39.0799 24.5789H42.1598L39.6497 32.0579L44.9163 26.1053L46.4562 28.7458L52 29.0968L49.5361 34.0268L51.076 36.7895Z" fill="${color}"/>
 </svg>
 `;
 
@@ -52,10 +68,10 @@ const clipboardSvg = (color: string) => `
 </svg>
 `;
 
-const withdrawnSvg = `
+const withdrawnSvg = (color: string) => `
 <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="36" cy="36" r="20" fill="#ffffff" stroke="#990100" stroke-width="8"/>
-  <line x1="22" y1="22" x2="50" y2="50" stroke="#990100" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="36" cy="36" r="20" fill="#ffffff" stroke="${color}" stroke-width="8"/>
+  <line x1="22" y1="22" x2="50" y2="50" stroke="${color}" stroke-width="8" stroke-linecap="round"/>
 </svg>
 `;
 
@@ -73,82 +89,174 @@ const getReadingNumber = (value: string) => {
   return null;
 };
 
-const getStatusConfig = (statusCode: string) => {
+type StatusConfig = {
+  icon: string;
+  label: string;
+  phaseLabel: string;
+  description: string;
+  color: string;
+  scale?: number;
+};
+
+const getChamberColor = (normalizedStatus: string): string | null => {
+  if (normalizedStatus.includes('senate')) return CHAMBER_COLORS.senate;
+  if (normalizedStatus.includes('house')) return CHAMBER_COLORS.house;
+  return null;
+};
+
+const getStatusConfig = (statusCode: string): StatusConfig => {
   const normalized = normalize(statusCode);
+  const chamberColor = getChamberColor(normalized);
 
   if (normalized === 'royalassentgiven') {
-    return { icon: leafSvg, label: 'Royal Assent', scale: 1.25 };
+    return {
+      icon: leafSvg(STAGE_COLORS.final),
+      label: 'Royal Assent',
+      phaseLabel: 'Assented',
+      description: 'This bill has completed the legislative process.',
+      color: STAGE_COLORS.final,
+      scale: 1.25,
+    };
   }
 
   if (
     normalized === 'billdefeated' ||
     normalized === 'willnotbeproceededwith'
   ) {
-    return { icon: withdrawnSvg, label: 'Withdrawn from Parliament' };
+    return {
+      icon: withdrawnSvg(STAGE_COLORS.withdrawn),
+      label: 'Withdrawn from Parliament',
+      phaseLabel: 'Stopped',
+      description: 'This bill is no longer moving forward.',
+      color: STAGE_COLORS.withdrawn,
+    };
   }
 
   if (normalized === 'outsideorderprecedence') {
     return {
-      icon: timerSvg(theme.colors.textMuted),
+      icon: timerSvg(STAGE_COLORS.pending),
       label: 'Outside Order of Precedence',
+      phaseLabel: 'Hold',
+      description: 'This bill is not currently prioritized for debate.',
+      color: STAGE_COLORS.pending,
     };
   }
 
   if (normalized === 'senateatreportstage') {
-    return { icon: clipboardSvg('#990100'), label: 'Report Stage (Senate)' };
+    const color = chamberColor ?? STAGE_COLORS.report;
+    return {
+      icon: clipboardSvg(color),
+      label: 'Report Stage (Senate)',
+      phaseLabel: 'Report',
+      description: 'Committee findings are being reported back to the chamber.',
+      color,
+    };
   }
 
   if (normalized === 'houseatreportstage') {
-    return { icon: clipboardSvg('#007411'), label: 'Report Stage (House)' };
+    const color = chamberColor ?? STAGE_COLORS.report;
+    return {
+      icon: clipboardSvg(color),
+      label: 'Report Stage (House)',
+      phaseLabel: 'Report',
+      description: 'Committee findings are being reported back to the chamber.',
+      color,
+    };
   }
 
   if (normalized === 'senateincommittee') {
-    return { icon: groupSvg('#990100'), label: 'In Committee (Senate)' };
+    const color = chamberColor ?? STAGE_COLORS.committee;
+    return {
+      icon: groupSvg(color),
+      label: 'In Committee (Senate)',
+      phaseLabel: 'Committee',
+      description: 'A committee is reviewing and potentially amending this bill.',
+      color,
+    };
   }
 
   if (normalized === 'houseincommittee') {
-    return { icon: groupSvg('#007411'), label: 'In Committee (House)' };
+    const color = chamberColor ?? STAGE_COLORS.committee;
+    return {
+      icon: groupSvg(color),
+      label: 'In Committee (House)',
+      phaseLabel: 'Committee',
+      description: 'A committee is reviewing and potentially amending this bill.',
+      color,
+    };
   }
 
   if (normalized.startsWith('senateat') && normalized.includes('reading')) {
     const reading = getReadingNumber(normalized);
+    const color = chamberColor ?? STAGE_COLORS.reading;
     return {
-      icon: pageSvg('#007411', reading ? reading[0] : undefined),
+      icon: pageSvg(color, reading ? reading[0] : undefined),
       label: reading ? `${reading} Reading (Senate)` : 'Reading (Senate)',
+      phaseLabel: 'Reading',
+      description: 'This bill is currently in one of the chamber reading stages.',
+      color,
     };
   }
 
   if (normalized.startsWith('houseat') && normalized.includes('reading')) {
     const reading = getReadingNumber(normalized);
+    const color = chamberColor ?? STAGE_COLORS.reading;
     return {
-      icon: pageSvg('#990100', reading ? reading[0] : undefined),
+      icon: pageSvg(color, reading ? reading[0] : undefined),
       label: reading ? `${reading} Reading (House)` : 'Reading (House)',
+      phaseLabel: 'Reading',
+      description: 'This bill is currently in one of the chamber reading stages.',
+      color,
     };
   }
 
-  return { icon: pageSvg(theme.colors.textMuted), label: statusCode };
+  return {
+    icon: pageSvg(theme.colors.textMuted),
+    label: statusCode,
+    phaseLabel: 'Status',
+    description: 'Current stage reported by Parliament.',
+    color: theme.colors.textMuted,
+  };
 };
 
 const BillStatusBadge: React.FC<BillStatusBadgeProps> = ({
   statusCode,
   showLabel = true,
+  showPhaseTag = false,
+  enableTooltip = false,
   size = 22,
   labelStyle,
   containerStyle,
 }) => {
   if (!statusCode) return null;
-  const { icon, label, scale = 1 } = getStatusConfig(statusCode) as {
-    icon: string;
-    label: string;
-    scale?: number;
-  };
+  const { icon, label, phaseLabel, description, color, scale = 1 } = getStatusConfig(statusCode);
   const iconSize = Math.round(size * scale);
 
+  const handleLongPress = () => {
+    if (!enableTooltip) return;
+    Alert.alert('Bill Stage', `${label}\n\n${description}`);
+  };
+
   return (
-    <View style={[styles.container, containerStyle]}>
-      <SvgXml xml={icon} width={iconSize} height={iconSize} />
-      {showLabel ? <Text style={[styles.label, labelStyle]}>{label}</Text> : null}
-    </View>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onLongPress={handleLongPress}
+      delayLongPress={300}
+      disabled={!enableTooltip}
+      accessibilityRole="button"
+      accessibilityLabel={`Bill stage: ${label}`}
+      accessibilityHint={enableTooltip ? 'Long press to learn what this stage means.' : undefined}
+    >
+      <View style={[styles.container, containerStyle]}>
+        <SvgXml xml={icon} width={iconSize} height={iconSize} />
+        {showPhaseTag ? (
+          <View style={[styles.phaseTag, { borderColor: color }]}>
+            <Text style={[styles.phaseTagText, { color }]}>{phaseLabel}</Text>
+          </View>
+        ) : null}
+        {showLabel ? <Text style={[styles.label, labelStyle]}>{label}</Text> : null}
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -162,6 +270,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: theme.colors.textMuted,
+  },
+  phaseTag: {
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  phaseTagText: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
   },
 });
 

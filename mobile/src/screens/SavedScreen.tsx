@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,6 +6,7 @@ import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
 import { useSaved } from '../context/SavedContext';
 import BillCard from '../components/BillCard';
+import BillCardSkeleton from '../components/BillCardSkeleton';
 import AppLogo from '../components/AppLogo';
 import { theme } from '../theme';
 import GradientBackground from '../components/GradientBackground';
@@ -15,10 +16,20 @@ type SavedScreenProps = StackScreenProps<RootStackParamList, 'SavedMain'>;
 const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { savedBills, refreshSaved, isSaved, toggleSave } = useSaved();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useFocusEffect(
     useCallback(() => {
-      void refreshSaved();
+      let active = true;
+      setLoading(true);
+      void refreshSaved()
+        .catch(() => undefined)
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+      return () => {
+        active = false;
+      };
     }, [refreshSaved])
   );
 
@@ -29,8 +40,8 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.headerTitle}>Saved</Text>
         <Text style={styles.headerSubtitle}>Your bookmarked bills</Text>
-        <View style={styles.topRightLogo}>
-          <AppLogo width={56} height={56} />
+        <View style={[styles.topRightLogo, { top: insets.top + 10 }]}>
+          <AppLogo width={44} height={44} />
         </View>
       </GradientBackground>
 
@@ -38,7 +49,9 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
       >
-        {savedBills.length > 0 ? (
+        {loading ? (
+          <BillCardSkeleton count={3} />
+        ) : savedBills.length > 0 ? (
           savedBills.map((bill) => (
             <BillCard
               key={bill.bill_id}
@@ -67,23 +80,23 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 10,
-    paddingBottom: 24,
+    padding: 16,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.md,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
     color: '#fff',
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   topRightLogo: {
     position: 'absolute',
-    right: 16,
+    right: 14,
     top: 55,
   },
   content: {
@@ -93,7 +106,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   emptyState: {
-    padding: 32,
+    padding: theme.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -101,7 +114,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: theme.colors.textDark,
-    marginBottom: 6,
+    marginBottom: theme.spacing.xs,
   },
   emptyText: {
     fontSize: 14,

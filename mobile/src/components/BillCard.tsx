@@ -12,47 +12,83 @@ const BillCard: React.FC<BillCardProps> = ({
   isSaved = false,
   onToggleSave,
 }) => {
-  const truncateText = (text: string, maxLength: number): string => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  const visibleTags = bill.tags?.slice(0, 2) ?? [];
+  const extraTagsCount = bill.tags && bill.tags.length > 2 ? bill.tags.length - 2 : 0;
+
+  const formatDate = (dateString?: string | null): string => {
+    if (!dateString) return '';
+    const dateMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      return `${month}/${day}/${year}`;
+    }
+    const parsed = new Date(dateString);
+    if (Number.isNaN(parsed.getTime())) return '';
+    return parsed.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric',
+    });
   };
 
+  const updatedDate = formatDate(bill.last_updated);
 
   return (
-    <Pressable 
-      style={styles.container}
+    <Pressable
+      style={({ pressed }) => [styles.container, pressed && styles.containerPressed]}
       onPress={onPress}
       android_ripple={{ color: 'rgba(0, 0, 0, 0.05)' }}
     >
       <View style={styles.card}>
-        <View style={styles.numberRow}>
-          <View style={styles.numberGroup}>
+        {onToggleSave ? (
+          <Pressable
+            style={styles.bookmarkButton}
+            onPress={(event) => {
+              event.stopPropagation();
+              onToggleSave(bill);
+            }}
+            hitSlop={8}
+            android_ripple={{ color: 'rgba(0, 0, 0, 0.08)', borderless: true }}
+          >
+            <Ionicons
+              name={isSaved ? 'bookmark' : 'bookmark-outline'}
+              size={26}
+              color={theme.colors.accent}
+            />
+          </Pressable>
+        ) : null}
+
+        <View style={styles.titleRow}>
+          <Text style={styles.fullTitle} numberOfLines={3} ellipsizeMode="tail">
+            {bill.title}
+          </Text>
+        </View>
+
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
             <Text style={styles.billNumber}>
               {bill.bill_number || `#${bill.bill_id}`}
             </Text>
-            <BillStatusBadge statusCode={bill.status_code} showLabel={false} size={36} />
           </View>
-          {onToggleSave ? (
-            <Pressable
-              style={styles.bookmarkButton}
-              onPress={(event) => {
-                event.stopPropagation();
-                onToggleSave(bill);
-              }}
-              hitSlop={8}
-            >
-              <Ionicons
-                name={isSaved ? 'bookmark' : 'bookmark-outline'}
-                size={26}
-                color={theme.colors.accent}
-              />
-            </Pressable>
+          <View style={styles.metaItem}>
+            <BillStatusBadge
+              statusCode={bill.status_code}
+              showLabel={false}
+              showPhaseTag
+              enableTooltip
+              size={20}
+            />
+          </View>
+          {updatedDate ? (
+            <View style={styles.metaItem}>
+              <Text style={styles.metaText}>Updated {updatedDate}</Text>
+            </View>
           ) : null}
         </View>
 
-        {bill.tags && bill.tags.length > 0 ? (
+        {visibleTags.length > 0 ? (
           <View style={styles.tagsRow}>
-            {bill.tags.map((tag) => {
+            {visibleTags.map((tag) => {
               const tagColor = getTagColor(tag);
               const backgroundColor = tagColor || theme.colors.surfaceMuted;
               const textColor = tagColor ? '#fff' : theme.colors.textDark;
@@ -62,10 +98,13 @@ const BillCard: React.FC<BillCardProps> = ({
                 </View>
               );
             })}
+            {extraTagsCount > 0 ? (
+              <View style={[styles.tagChip, styles.extraTagChip]}>
+                <Text style={[styles.tagText, styles.extraTagText]}>+{extraTagsCount}</Text>
+              </View>
+            ) : null}
           </View>
         ) : null}
-
-        <Text style={styles.fullTitle}>{bill.title}</Text>
         
         <View style={styles.footer}>
           <View style={styles.readMoreContainer}>
@@ -93,57 +132,80 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
   },
+  containerPressed: {
+    transform: [{ scale: 0.985 }, { translateY: 1 }],
+    shadowOpacity: 0.04,
+    elevation: 2,
+  },
   card: {
     backgroundColor: theme.colors.surface,
     padding: 16,
+    position: 'relative',
   },
   bookmarkButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
     width: 36,
     height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   billNumber: {
-    fontSize: 22,
+    fontSize: 17,
     fontWeight: '700',
     color: theme.colors.textDark,
-    lineHeight: 28,
-  },
-  numberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  numberGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  fullTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: theme.colors.textDark,
-    marginBottom: 12,
     lineHeight: 22,
   },
-  statusRow: {
-    marginBottom: 10,
+  titleRow: {
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    paddingRight: 44,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+  metaText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.textMuted,
+  },
+  fullTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    color: theme.colors.textDark,
+    lineHeight: 24,
   },
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 10,
+    marginBottom: theme.spacing.sm,
   },
   tagChip: {
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
   },
   tagText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  extraTagChip: {
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  extraTagText: {
+    color: theme.colors.textMuted,
   },
   footer: {
     flexDirection: 'row',
@@ -158,7 +220,7 @@ const styles = StyleSheet.create({
     color: theme.colors.accent,
     fontSize: 14,
     fontWeight: '600',
-    marginRight: 4,
+    marginRight: theme.spacing.xs,
   },
 });
 

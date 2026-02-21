@@ -17,14 +17,14 @@ A React Native cross-platform mobile application (built with TypeScript) for dis
 - For Android: Android Studio + Android SDK
 - Java 17 (set `JAVA_HOME`, e.g., `/usr/lib/jvm/java-17-openjdk-amd64`)
 
-## Installation (SDK 50)
+## Installation (SDK 54)
 
 1. Navigate to the mobile directory:
 ```bash
 cd mobile
 ```
 
-2. Install dependencies (Expo SDK 50):
+2. Install dependencies (Expo SDK 54):
 ```bash
 npm install
 ```
@@ -66,8 +66,7 @@ EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:8000 npm run android
 
 ## Notes
 
-- This project is pinned to **Expo SDK 50** (`expo@~50.0.0`).
-- If you are prompted to upgrade to SDK 54, do not accept unless you plan to migrate dependencies.
+- This project is pinned to **Expo SDK 54** (`expo@^54.0.0`).
 
 ## Project Structure
 
