@@ -5,10 +5,10 @@ import collections.abc
 import boto3
 
 # Load tags from tags.json
-TAGS_PATH = os.path.join(os.path.dirname(__file__), 'new_tags.json')
-with open(TAGS_PATH, 'r', encoding='utf-8') as f:
-    tags_data = json.load(f)
-CANDIDATE_LABELS = list(tags_data.keys())
+# TAGS_PATH = os.path.join(os.path.dirname(__file__), 'new_tags.json')
+# with open(TAGS_PATH, 'r', encoding='utf-8') as f:
+#     tags_data = json.load(f)
+# CANDIDATE_LABELS = list(tags_data.keys())
 
 # Database config (should match generate_summaries.py)
 ssm = boto3.client('ssm', region_name='ca-central-1')
@@ -51,13 +51,10 @@ def main():
     cursor = conn.cursor()
     print("connected to DB")
 
-    cursor.execute("SELECT bill_id, count(bill_id) from bills_billtext where bill_id = 8135 group by bill_id order by count(bill_id) DESC ")
-
-
-    # cursor.execute("SELECT bill_id, llm_summary, llm_tags FROM bills_billtext WHERE llm_summary ilike '%Sections 9(2) and 18(4) are amended to specify that employees who self-identify or agree to be identified%' limit 1")
-    bills = cursor.fetchall()
-    print(bills)
-
+    # Duplicate the bills_billtext table
+    cursor.execute("SELECT * FROM bills_billtext_copy")
+    conn.commit()
+    print("Table duplicated successfully")
 
     cursor.close()
     conn.close()
