@@ -116,11 +116,6 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
       return;
     }
 
-    // Validate interests
-    if (selectedTags.length === 0) {
-      setError('Please select at least one interest.');
-      return;
-    }
 
     setSaving(true);
     setError(null);

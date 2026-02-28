@@ -55,12 +55,6 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation }) => {
   const handleContinue = () => {
     setError(null);
     
-    // Validate that at least one interest is selected
-    if (selectedTags.length === 0) {
-      setError('Please select at least one interest to continue.');
-      return;
-    }
-    
     // Show modal asking about personalization
     setShowPersonalizationModal(true);
   };
@@ -162,17 +156,10 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation }) => {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <TouchableOpacity 
-          style={[
-            styles.primaryButton,
-            selectedTags.length === 0 && styles.primaryButtonDisabled
-          ]} 
+          style={styles.primaryButton}
           onPress={handleContinue}
-          disabled={selectedTags.length === 0}
         >
-          <Text style={[
-            styles.primaryButtonText,
-            selectedTags.length === 0 && styles.primaryButtonTextDisabled
-          ]}>
+          <Text style={styles.primaryButtonText}>
             Continue
           </Text>
         </TouchableOpacity>
