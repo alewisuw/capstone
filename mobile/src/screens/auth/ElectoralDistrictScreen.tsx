@@ -16,6 +16,7 @@ import Ionicons from '../../components/Icon';
 import AppLogo from '../../components/AppLogo';
 import GradientBackground from '../../components/GradientBackground';
 import { theme } from '../../theme';
+import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import {
   geocodeAddress,
@@ -48,6 +49,7 @@ const DEFAULT_REGION: Region = {
 };
 
 const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation, route }) => {
+  const { completeOnboarding } = useAuth();
   const [addressQuery, setAddressQuery] = useState('');
   const [manualQuery, setManualQuery] = useState('');
   const [district, setDistrict] = useState<SelectedDistrict | null>(null);
@@ -161,7 +163,8 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
     setDistrict({ name: trimmed, source: 'manual' });
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    setError(null);
     const updatedDemographics = { ...route.params.demographics };
     if (district?.name) {
       updatedDemographics.electoral_district = district.name;
@@ -169,7 +172,16 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
     if (district?.id) {
       updatedDemographics.electoral_district_id = district.id;
     }
-    navigation.navigate('Interests', { demographics: updatedDemographics });
+    
+    // Call completeOnboarding with both demographics and interests
+    const result = await completeOnboarding(
+      updatedDemographics,
+      route.params.interests
+    );
+    
+    if (!result.ok && result.error) {
+      setError(result.error);
+    }
   };
 
   return (

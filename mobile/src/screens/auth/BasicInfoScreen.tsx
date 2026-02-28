@@ -9,27 +9,16 @@ import GradientBackground from '../../components/GradientBackground';
 
 type BasicInfoProps = StackScreenProps<AuthStackParamList, 'BasicInfo'>;
 
-const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
+const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation, route }) => {
   const [age, setAge] = useState('');
   const [genderIdentity, setGenderIdentity] = useState('');
-  const [sexAssignedAtBirth, setSexAssignedAtBirth] = useState('');
-  const [ethnicity, setEthnicity] = useState('');
   const [indigenousStatus, setIndigenousStatus] = useState('');
-  const [sexualOrientation, setSexualOrientation] = useState('');
   const [citizenshipStatus, setCitizenshipStatus] = useState('');
-  const [placeOfBirth, setPlaceOfBirth] = useState('');
-  const [timeInCanada, setTimeInCanada] = useState('');
-  const [religiousAffiliation, setReligiousAffiliation] = useState('');
-  const [maritalStatus, setMaritalStatus] = useState('');
   const [familyStatus, setFamilyStatus] = useState('');
-  const [educationLevel, setEducationLevel] = useState('');
   const [incomeRange, setIncomeRange] = useState('');
   const [employmentStatus, setEmploymentStatus] = useState('');
-  const [occupationType, setOccupationType] = useState('');
-  const [industry, setIndustry] = useState('');
   const [disabilityStatus, setDisabilityStatus] = useState('');
   const [housingStatus, setHousingStatus] = useState('');
-  const [languageAtHome, setLanguageAtHome] = useState('');
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,35 +35,7 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
       label: 'Gender Identity',
       value: genderIdentity,
       setter: setGenderIdentity,
-      options: ['Woman', 'Man', 'Non-binary', 'Two-Spirit', 'Prefer to self-describe'],
-    },
-    {
-      key: 'sex_assigned_at_birth',
-      label: 'Sex Assigned at Birth',
-      value: sexAssignedAtBirth,
-      setter: setSexAssignedAtBirth,
-      options: ['Female', 'Male', 'Intersex'],
-    },
-    {
-      key: 'ethnicity_racial_identity',
-      label: 'Ethnicity / Racial Identity',
-      value: ethnicity,
-      setter: setEthnicity,
-      options: [
-        'Indigenous (First Nations - Status)',
-        'Indigenous (First Nations - Non-Status)',
-        'Metis',
-        'Inuit',
-        'Black',
-        'East Asian',
-        'South Asian',
-        'Southeast Asian',
-        'Middle Eastern or North African',
-        'Latino or Hispanic',
-        'White / Caucasian',
-        'Mixed ethnicity',
-        'Other (please specify)',
-      ],
+      options: ['Woman', 'Man', 'Non-binary', 'Two-Spirit', 'Transgender', 'Prefer to self-describe'],
     },
     {
       key: 'indigenous_status',
@@ -84,74 +45,19 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
       options: ['First Nations (Status)', 'First Nations (Non-Status)', 'Metis', 'Inuit'],
     },
     {
-      key: 'sexual_orientation',
-      label: 'Sexual Orientation',
-      value: sexualOrientation,
-      setter: setSexualOrientation,
-      options: [
-        'Heterosexual (Straight)',
-        'Gay',
-        'Lesbian',
-        'Bisexual',
-        'Pansexual',
-        'Asexual',
-        'Queer',
-        'Prefer to self-describe',
-      ],
-    },
-    {
       key: 'citizenship_status',
       label: 'Citizenship Status',
       value: citizenshipStatus,
       setter: setCitizenshipStatus,
       options: [
-        'Canadian Citizen',
+        'Canadian Citizen (Canadian born)',
+        'Canadian Citizen (Foreign born)',
         'Permanent Resident',
         'Temporary Foreign Worker',
         'International Student',
         'Refugee or Protected Person',
         'Other Immigration Status',
       ],
-    },
-    {
-      key: 'place_of_birth',
-      label: 'Place of Birth',
-      value: placeOfBirth,
-      setter: setPlaceOfBirth,
-      options: ['Born in Canada', 'Born outside Canada'],
-    },
-    {
-      key: 'time_in_canada',
-      label: 'Length of Time in Canada',
-      value: timeInCanada,
-      setter: setTimeInCanada,
-      options: ['Less than 1 year', '1-5 years', '6-10 years', '11 or more years', 'Not applicable'],
-    },
-    {
-      key: 'religious_affiliation',
-      label: 'Religious Affiliation',
-      value: religiousAffiliation,
-      setter: setReligiousAffiliation,
-      options: [
-        'No religion / Atheist',
-        'Agnostic',
-        'Christian (Catholic)',
-        'Christian (Protestant)',
-        'Muslim',
-        'Jewish',
-        'Hindu',
-        'Sikh',
-        'Buddhist',
-        'Indigenous Spirituality',
-        'Other (please specify)',
-      ],
-    },
-    {
-      key: 'marital_status',
-      label: 'Marital Status',
-      value: maritalStatus,
-      setter: setMaritalStatus,
-      options: ['Single', 'Married', 'Common-law', 'Divorced', 'Separated', 'Widowed'],
     },
     {
       key: 'family_status',
@@ -163,20 +69,6 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
         'Parent/guardian to child(ren) under 18',
         'Caregiver to adult family member',
         'Both child and adult caregiver (sandwich generation)',
-      ],
-    },
-    {
-      key: 'education_level',
-      label: 'Education Level',
-      value: educationLevel,
-      setter: setEducationLevel,
-      options: [
-        'Less than high school diploma',
-        'High school diploma or equivalent',
-        'Some college or university, no degree',
-        'College diploma or certificate',
-        "Bachelor's degree",
-        "Graduate or professional degree (Master's, PhD, etc.)",
       ],
     },
     {
@@ -201,56 +93,8 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
       value: employmentStatus,
       setter: setEmploymentStatus,
       options: [
-        'Employed full-time',
-        'Employed part-time',
-        'Self-employed',
-        'Unemployed, looking for work',
-        'Not in labour force (e.g. student, retired, caregiver)',
-      ],
-    },
-    {
-      key: 'occupation_type',
-      label: 'Occupation Type',
-      value: occupationType,
-      setter: setOccupationType,
-      options: [
-        'Management',
-        'Business, finance & administration',
-        'Natural and applied sciences',
-        'Health occupations',
-        'Education, law, and social services',
-        'Art, culture, recreation, sport',
-        'Sales and service',
-        'Trades, transport, and equipment operation',
-        'Natural resources and agriculture',
-        'Manufacturing and utilities',
-        'Student',
+        'Employed',
         'Unemployed',
-        'Other',
-      ],
-    },
-    {
-      key: 'industry',
-      label: 'Industry',
-      value: industry,
-      setter: setIndustry,
-      options: [
-        'Health care and social assistance',
-        'Educational services',
-        'Professional, scientific and technical services',
-        'Finance and insurance',
-        'Manufacturing',
-        'Construction',
-        'Retail trade',
-        'Public administration',
-        'Accommodation and food services',
-        'Transportation and warehousing',
-        'Information and cultural industries',
-        'Agriculture, forestry, fishing and hunting',
-        'Mining, quarrying, and oil & gas',
-        'Arts, entertainment and recreation',
-        'Other services (repair, personal services, etc.)',
-        'Student / Not in labour force',
       ],
     },
     {
@@ -279,19 +123,6 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
         'Transitional / Homeless',
       ],
     },
-    {
-      key: 'language_at_home',
-      label: 'Language(s) Spoken at Home / Mother Tongue',
-      value: languageAtHome,
-      setter: setLanguageAtHome,
-      options: [
-        'English',
-        'French',
-        'Both English and French',
-        'Indigenous language(s)',
-        'Other (please specify)',
-      ],
-    },
   ];
 
   return (
@@ -305,7 +136,7 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
 
       <Pressable style={styles.card} onPress={() => setOpenKey(null)}>
         <ScrollView contentContainerStyle={styles.cardContent}>
-          <Text style={styles.title}>Basic Information</Text>
+          <Text style={styles.title}>Personalization Features</Text>
           <Text style={styles.subtitle}>
             All fields are optional and will improve recommendations.
           </Text>
@@ -382,26 +213,18 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation }) => {
               const demographics = {
                 age,
                 gender_identity: genderIdentity,
-                sex_assigned_at_birth: sexAssignedAtBirth,
-                ethnicity_racial_identity: ethnicity,
                 indigenous_status: indigenousStatus,
-                sexual_orientation: sexualOrientation,
                 citizenship_status: citizenshipStatus,
-                place_of_birth: placeOfBirth,
-                time_in_canada: timeInCanada,
-                religious_affiliation: religiousAffiliation,
-                marital_status: maritalStatus,
                 family_status: familyStatus,
-                education_level: educationLevel,
                 "income_range_(annual,_before_tax)": incomeRange,
                 employment_status: employmentStatus,
-                occupation_type: occupationType,
-                industry,
                 disability_status: disabilityStatus,
                 housing_status: housingStatus,
-                language_at_home: languageAtHome,
               };
-              navigation.navigate('ElectoralDistrict', { demographics });
+              navigation.navigate('ElectoralDistrict', { 
+                demographics,
+                interests: route.params.interests 
+              });
             }}
           >
             <Text style={styles.primaryButtonText}>Continue</Text>

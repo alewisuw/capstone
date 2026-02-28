@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.billboard.app'
+    namespace 'com.anonymous.billboard'
     defaultConfig {
-        applicationId 'com.billboard.app'
+        applicationId 'com.anonymous.billboard'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

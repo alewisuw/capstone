@@ -6,12 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Modal,
 } from 'react-native';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
 import { theme } from '../../theme';
-import { useAuth } from '../../context/AuthContext';
 import AppLogo from '../../components/AppLogo';
 import { interestGroups } from '../../data/interestGroups';
 import { getTagColor } from '../../data/tagCategories';
@@ -19,12 +19,12 @@ import GradientBackground from '../../components/GradientBackground';
 
 type InterestsProps = StackScreenProps<AuthStackParamList, 'Interests'>;
 
-const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
-  const { completeOnboarding } = useAuth();
+const InterestsScreen: React.FC<InterestsProps> = ({ navigation }) => {
   const [search, setSearch] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
+  const [showPersonalizationModal, setShowPersonalizationModal] = useState(false);
 
   const filteredGroups = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -52,7 +52,7 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
     [selected]
   );
 
-  const handleComplete = async () => {
+  const handleContinue = () => {
     setError(null);
     
     // Validate that at least one interest is selected
@@ -61,10 +61,22 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
       return;
     }
     
-    const result = await completeOnboarding(route.params.demographics, selectedTags);
-    if (!result.ok && result.error) {
-      setError(result.error);
-    }
+    // Show modal asking about personalization
+    setShowPersonalizationModal(true);
+  };
+
+  const handlePersonalizationYes = () => {
+    setShowPersonalizationModal(false);
+    navigation.navigate('BasicInfo', { interests: selectedTags });
+  };
+
+  const handlePersonalizationNo = () => {
+    setShowPersonalizationModal(false);
+    // Skip demographics, go directly to ElectoralDistrict with empty demographics
+    navigation.navigate('ElectoralDistrict', { 
+      demographics: {},
+      interests: selectedTags 
+    });
   };
 
   return (
@@ -154,17 +166,51 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation, route }) => {
             styles.primaryButton,
             selectedTags.length === 0 && styles.primaryButtonDisabled
           ]} 
-          onPress={handleComplete}
+          onPress={handleContinue}
           disabled={selectedTags.length === 0}
         >
           <Text style={[
             styles.primaryButtonText,
             selectedTags.length === 0 && styles.primaryButtonTextDisabled
           ]}>
-            Complete
+            Continue
           </Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal
+        visible={showPersonalizationModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowPersonalizationModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Further Customize Your Billboard?</Text>
+            <Text style={styles.modalText}>
+              You can further refine your Billboard by adding personalization features. 
+              This will help us provide you with more tailored bill recommendations.{'\n\n'}
+              <Text style={styles.modalTextBold}>This is completely optional and can be added, edited or removed at any time later through your profile.</Text>
+            </Text>
+            
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonSecondary]}
+                onPress={handlePersonalizationNo}
+              >
+                <Text style={styles.modalButtonSecondaryText}>Skip</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonPrimary]}
+                onPress={handlePersonalizationYes}
+              >
+                <Text style={styles.modalButtonPrimaryText}>Yes, Customize</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -297,6 +343,72 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.textDark,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 15,
+    color: theme.colors.textMuted,
+    lineHeight: 22,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  modalTextBold: {
+    fontWeight: '700',
+    color: theme.colors.textDark,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalButtonPrimary: {
+    backgroundColor: theme.colors.black,
+  },
+  modalButtonSecondary: {
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+  },
+  modalButtonPrimaryText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  modalButtonSecondaryText: {
+    color: theme.colors.textDark,
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

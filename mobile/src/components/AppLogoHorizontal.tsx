@@ -54,7 +54,7 @@ type AppLogoHorizontalProps = {
 };
 
 const AppLogoHorizontal: React.FC<AppLogoHorizontalProps> = ({
-  text = 'Bill Board',
+  text = 'Billboard',
   textColor = '#ffffff',
   textSize = 32,
   logoSize = 44,

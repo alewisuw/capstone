@@ -1,4 +1,4 @@
-package com.billboard.app
+package com.anonymous.billboard
 
 import android.os.Build
 import android.os.Bundle

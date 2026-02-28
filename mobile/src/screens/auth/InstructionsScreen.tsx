@@ -20,11 +20,21 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
       </GradientBackground>
 
       <View style={styles.card}>
-        <Text style={styles.title}>How does Bill Board work?</Text>
+        <Text style={styles.title}>How does Billboard work?</Text>
 
         <View style={styles.step}>
           <View style={styles.stepBadge}>
             <Text style={styles.stepNumber}>1</Text>
+          </View>
+          <Text style={styles.stepText}>
+            Share your <Text style={styles.bold}>interests</Text> to personalize
+            your recommendations.
+          </Text>
+        </View>
+
+        <View style={styles.step}>
+          <View style={styles.stepBadge}>
+            <Text style={styles.stepNumber}>2</Text>
           </View>
           <Text style={styles.stepText}>
             Input <Text style={styles.bold}>Basic Demographic Information</Text> so we
@@ -34,7 +44,7 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
 
         <View style={styles.step}>
           <View style={styles.stepBadge}>
-            <Text style={styles.stepNumber}>2</Text>
+            <Text style={styles.stepNumber}>3</Text>
           </View>
           <Text style={styles.stepText}>
             Add your <Text style={styles.bold}>Electoral District</Text> to stay up to date
@@ -42,19 +52,9 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
           </Text>
         </View>
 
-        <View style={styles.step}>
-          <View style={styles.stepBadge}>
-            <Text style={styles.stepNumber}>3</Text>
-          </View>
-          <Text style={styles.stepText}>
-            Share any additional <Text style={styles.bold}>interests</Text> to personalize
-            your recommendations.
-          </Text>
-        </View>
-
         <TouchableOpacity
           style={styles.primaryButton}
-          onPress={() => navigation.navigate('BasicInfo')}
+          onPress={() => navigation.navigate('Interests')}
         >
           <Text style={styles.primaryButtonText}>Get Started</Text>
         </TouchableOpacity>

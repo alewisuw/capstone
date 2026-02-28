@@ -1,7 +1,9 @@
-module.exports = {
+export default {
   expo: {
     name: "BillBoard",
     slug: "billboard",
-    version: "1.0.0"
+    android: {
+      package: "com.anonymous.billboard"
+    }
   }
 };

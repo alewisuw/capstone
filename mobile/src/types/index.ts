@@ -73,9 +73,9 @@ export type AuthStackParamList = {
   SignUp: undefined;
   VerifyEmail: undefined;
   Instructions: undefined;
-  BasicInfo: undefined;
-  ElectoralDistrict: { demographics: Record<string, string> };
-  Interests: { demographics: Record<string, string> };
+  Interests: undefined;
+  BasicInfo: { interests: string[] };
+  ElectoralDistrict: { demographics: Record<string, string>; interests: string[] };
 };
 
 // Component Props Types
