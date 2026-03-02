@@ -22,13 +22,17 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
       <View style={styles.card}>
         <Text style={styles.title}>How does Billboard work?</Text>
 
+        <Text style={styles.introText}>
+          All optional inputs you share help tailor your Billboard with bills that best align with your interests.
+        </Text>
+
         <View style={styles.step}>
           <View style={styles.stepBadge}>
             <Text style={styles.stepNumber}>1</Text>
           </View>
           <Text style={styles.stepText}>
             Share your <Text style={styles.bold}>interests</Text> to personalize
-            your recommendations.
+            your bill recommendations.
           </Text>
         </View>
 
@@ -37,8 +41,8 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
             <Text style={styles.stepNumber}>2</Text>
           </View>
           <Text style={styles.stepText}>
-            Input <Text style={styles.bold}>Basic Demographic Information</Text> so we
-            can recommend bills that may directly impact you. (optional)
+            You will then be prompted to add optional <Text style={styles.bold}>personalization features </Text>
+             (like age, gender, income, housing) to further refine which bills you see.
           </Text>
         </View>
 
@@ -48,9 +52,14 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
           </View>
           <Text style={styles.stepText}>
             Add your <Text style={styles.bold}>Electoral District</Text> to stay up to date
-            on local bills. (optional)
+            on local and regional bills.
           </Text>
         </View>
+
+        <Text style={styles.privacyText}>
+          Billboard only uses your interests and personalization details to recommend the most relevant bills to you.
+          Your information is stored securely, and can be edited or removed at any time from the profile page.
+        </Text>
 
         <TouchableOpacity
           style={styles.primaryButton}
@@ -96,7 +105,13 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: theme.colors.textDark,
-    marginBottom: 20,
+    marginBottom: 12,
+  },
+  introText: {
+    marginBottom: 16,
+    color: theme.colors.textMuted,
+    fontSize: 13,
+    lineHeight: 18,
   },
   step: {
     flexDirection: 'row',
@@ -121,6 +136,19 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 14,
     lineHeight: 20,
+  },
+  privacyTitle: {
+    marginTop: 8,
+    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textDark,
+  },
+  privacyText: {
+    marginBottom: 8,
+    color: theme.colors.textMuted,
+    fontSize: 13,
+    lineHeight: 18,
   },
   bold: {
     fontWeight: '700',
