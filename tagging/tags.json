@@ -127,7 +127,80 @@
     "Arts and culture"
   ],
   "Labor and Employment": [
-    "Minimum wage"
+    "Minimum wage",
+    "Workers' rights",
+    "Workplace equity",
+    "Labour disputes",
+    "Employment Insurance reform"
+  ],
+  "Consumer Protection & Product Safety": [
+    "Product labelling",
+    "Toxic substances",
+    "Cosmetics regulation",
+    "Animal testing ban",
+    "Food safety",
+    "Consumer rights",
+    "Product recalls"
+  ],
+  "Taxation & Government Revenue": [
+    "GST/HST exemptions",
+    "Excise tax amendments",
+    "Income tax deductions",
+    "Tax credits",
+    "Tax fairness",
+    "Corporate taxation",
+    "International tax cooperation"
+  ],
+  "Workplace Safety": [
+    "Occupational disease registry",
+    "Workplace health and safety",
+    "Hazardous materials",
+    "Workplace accident reporting",
+    "Workplace menstrual products",
+    "Employer safety obligations"
+  ],
+  "Veterans & Military Service": [
+    "Veteran recognition",
+    "Military families",
+    "Defence medals",
+    "War remembrance",
+    "Veteran benefits",
+    "Cold War service",
+    "Peacekeeping veterans"
+  ],
+  "Electoral Boundaries & Administration": [
+    "Electoral district renaming",
+    "Redistricting",
+    "Electoral boundaries",
+    "Riding name changes",
+    "Representation order amendments"
+  ],
+  "Commemorative Days & National Recognition": [
+    "National awareness days",
+    "Memorial day designations",
+    "Historical commemoration",
+    "Community recognition days",
+    "Heritage month designations",
+    "Symbolic observances"
+  ],
+  "Agriculture, Fisheries & Food": [
+    "Fisheries management",
+    "Agricultural policy",
+    "Soil conservation",
+    "Food security",
+    "Marine resource management",
+    "Farm subsidies and support",
+    "Rural development"
+  ],
+  "Government Finance & Budget": [
+    "Budget implementation",
+    "Government appropriations",
+    "Competition regulation",
+    "Investment review",
+    "Financial administration",
+    "Pension regulation",
+    "Crown corporation governance",
+    "Bankruptcy and insolvency"
   ]
 
 }

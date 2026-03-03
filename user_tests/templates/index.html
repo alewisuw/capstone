@@ -537,11 +537,6 @@
             e.preventDefault();
             const errorDiv = document.getElementById('interestError');
 
-            if (interests.length === 0) {
-                errorDiv.textContent = 'Please add at least one interest';
-                return;
-            }
-
             // Collect demographics
             const demographics = {
                 age: document.getElementById('age_group').value,

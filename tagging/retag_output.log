@@ -1,0 +1,200 @@
+nohup: ignoring input
+Device set to use cpu
+Candidate labels (20): ['Civil Rights', 'Economics', 'Environment', 'Healthcare', 'Education', 'Technology and Science', 'Foreign Policy', 'Democracy & Governance', 'Housing & Infrastructure', 'Indigenous Affairs', 'Public Safety & Emergency Response', 'Transportation', 'Crime and Justice', 'Culture, Heritage, and Holidays', 'Labor and Employment', 'Consumer Protection & Product Safety', 'Taxation & Government Revenue', 'Workplace Safety', 'Veterans & Military Service', 'Electoral Boundaries & Administration']
+Starting re-tagging of low-confidence bills...
+Loading transformers pipeline (this may take a moment)...
+Connected to DB
+Total bills with tags: 5156
+Low-confidence bills to re-tag: 187
+  [1/187] bill_id=8595 | new_max=0.422 | top=Democracy & Governance | still low
+  [2/187] bill_id=6363 | new_max=0.691 | top=Environment | IMPROVED
+  [3/187] bill_id=7481 | new_max=0.704 | top=Taxation & Government Revenue | IMPROVED
+  [4/187] bill_id=2013 | new_max=0.403 | top=Democracy & Governance | still low
+  [5/187] bill_id=7888 | new_max=0.797 | top=Taxation & Government Revenue | IMPROVED
+  [6/187] bill_id=8623 | new_max=0.462 | top=Taxation & Government Revenue | still low
+  [7/187] bill_id=1958 | new_max=0.599 | top=Environment | IMPROVED
+  [8/187] bill_id=1997 | new_max=0.451 | top=Civil Rights | still low
+  [9/187] bill_id=2143 | new_max=0.480 | top=Transportation | still low
+  [10/187] bill_id=7295 | new_max=0.478 | top=Democracy & Governance | still low
+  [11/187] bill_id=8480 | new_max=0.772 | top=Taxation & Government Revenue | IMPROVED
+  [12/187] bill_id=1390 | new_max=0.821 | top=Labor and Employment | IMPROVED
+  [13/187] bill_id=1891 | new_max=0.346 | top=Democracy & Governance | still low
+  [14/187] bill_id=7269 | new_max=0.650 | top=Taxation & Government Revenue | IMPROVED
+  [15/187] bill_id=981 | new_max=0.471 | top=Foreign Policy | still low
+  [16/187] bill_id=1446 | new_max=0.532 | top=Environment | IMPROVED
+  [17/187] bill_id=7376 | new_max=0.703 | top=Environment | IMPROVED
+  [18/187] bill_id=1921 | new_max=0.704 | top=Taxation & Government Revenue | IMPROVED
+  [19/187] bill_id=7340 | new_max=0.687 | top=Environment | IMPROVED
+  [20/187] bill_id=7316 | new_max=0.492 | top=Democracy & Governance | still low
+  [21/187] bill_id=1604 | new_max=0.332 | top=Crime and Justice | still low
+  [22/187] bill_id=8481 | new_max=0.746 | top=Taxation & Government Revenue | IMPROVED
+  [23/187] bill_id=8734 | new_max=0.720 | top=Environment | IMPROVED
+  [24/187] bill_id=1064 | new_max=0.632 | top=Taxation & Government Revenue | IMPROVED
+  [25/187] bill_id=8477 | new_max=0.460 | top=Democracy & Governance | still low
+  [26/187] bill_id=1172 | new_max=0.516 | top=Crime and Justice | IMPROVED
+  [27/187] bill_id=1602 | new_max=0.701 | top=Taxation & Government Revenue | IMPROVED
+  [28/187] bill_id=1672 | new_max=0.430 | top=Environment | still low
+  [29/187] bill_id=1378 | new_max=0.776 | top=Taxation & Government Revenue | IMPROVED
+  [30/187] bill_id=1289 | new_max=0.814 | top=Transportation | IMPROVED
+  [31/187] bill_id=8569 | new_max=0.460 | top=Indigenous Affairs | still low
+  [32/187] bill_id=8458 | new_max=0.489 | top=Democracy & Governance | still low
+  [33/187] bill_id=7499 | new_max=0.479 | top=Healthcare | still low
+  [34/187] bill_id=6502 | new_max=0.310 | top=Healthcare | still low
+  [35/187] bill_id=8127 | new_max=0.702 | top=Taxation & Government Revenue | IMPROVED
+  [36/187] bill_id=7618 | new_max=0.465 | top=Crime and Justice | still low
+  [37/187] bill_id=7470 | new_max=0.521 | top=Environment | IMPROVED
+  [38/187] bill_id=1053 | new_max=0.408 | top=Democracy & Governance | still low
+  [39/187] bill_id=1130 | new_max=0.498 | top=Democracy & Governance | still low
+  [40/187] bill_id=1181 | new_max=0.425 | top=Healthcare | still low
+  [41/187] bill_id=8665 | new_max=0.425 | top=Culture, Heritage, and Holidays | still low
+  [42/187] bill_id=7232 | new_max=0.567 | top=Veterans & Military Service | IMPROVED
+  [43/187] bill_id=7290 | new_max=0.914 | top=Taxation & Government Revenue | IMPROVED
+  [44/187] bill_id=8392 | new_max=0.465 | top=Environment | still low
+  [45/187] bill_id=2693 | new_max=0.434 | top=Healthcare | still low
+  [46/187] bill_id=2773 | new_max=0.666 | top=Veterans & Military Service | IMPROVED
+  [47/187] bill_id=6515 | new_max=0.494 | top=Democracy & Governance | still low
+  [48/187] bill_id=2823 | new_max=0.550 | top=Crime and Justice | IMPROVED
+  [49/187] bill_id=6508 | new_max=0.412 | top=Democracy & Governance | still low
+  [50/187] bill_id=7417 | new_max=0.542 | top=Environment | IMPROVED
+  [51/187] bill_id=7253 | new_max=0.414 | top=Democracy & Governance | still low
+  [52/187] bill_id=8491 | new_max=0.669 | top=Workplace Safety | IMPROVED
+  [53/187] bill_id=7233 | new_max=0.656 | top=Environment | IMPROVED
+  [54/187] bill_id=7700 | new_max=0.502 | top=Labor and Employment | IMPROVED
+  [55/187] bill_id=8267 | new_max=0.617 | top=Labor and Employment | IMPROVED
+  [56/187] bill_id=8069 | new_max=0.434 | top=Culture, Heritage, and Holidays | still low
+  [57/187] bill_id=8064 | new_max=0.532 | top=Labor and Employment | IMPROVED
+  [58/187] bill_id=8041 | new_max=0.458 | top=Transportation | still low
+  [59/187] bill_id=8525 | new_max=0.672 | top=Environment | IMPROVED
+  [60/187] bill_id=2704 | new_max=0.855 | top=Labor and Employment | IMPROVED
+  [61/187] bill_id=8584 | new_max=0.729 | top=Environment | IMPROVED
+  [62/187] bill_id=8503 | new_max=0.491 | top=Democracy & Governance | still low
+  [63/187] bill_id=1256 | new_max=0.339 | top=Electoral Boundaries & Administration | still low
+  [64/187] bill_id=7585 | new_max=0.463 | top=Transportation | still low
+  [65/187] bill_id=2369 | new_max=0.425 | top=Foreign Policy | still low
+  [66/187] bill_id=2149 | new_max=0.515 | top=Environment | IMPROVED
+  [67/187] bill_id=2265 | new_max=0.465 | top=Taxation & Government Revenue | still low
+  [68/187] bill_id=2313 | new_max=0.494 | top=Democracy & Governance | still low
+  [69/187] bill_id=8506 | new_max=0.471 | top=Healthcare | still low
+  [70/187] bill_id=2318 | new_max=0.486 | top=Healthcare | still low
+  [71/187] bill_id=2316 | new_max=0.420 | top=Crime and Justice | still low
+  [72/187] bill_id=7298 | new_max=0.338 | top=Democracy & Governance | still low
+  [73/187] bill_id=7330 | new_max=0.728 | top=Labor and Employment | IMPROVED
+  [74/187] bill_id=2291 | new_max=0.444 | top=Housing & Infrastructure | still low
+  [75/187] bill_id=1180 | new_max=0.679 | top=Labor and Employment | IMPROVED
+  [76/187] bill_id=7653 | new_max=0.628 | top=Environment | IMPROVED
+  [77/187] bill_id=2215 | new_max=0.308 | top=Democracy & Governance | still low
+  [78/187] bill_id=1681 | new_max=0.492 | top=Economics | still low
+  [79/187] bill_id=8058 | new_max=0.499 | top=Democracy & Governance | still low
+  [80/187] bill_id=8197 | new_max=0.801 | top=Labor and Employment | IMPROVED
+  [81/187] bill_id=1324 | new_max=0.532 | top=Taxation & Government Revenue | IMPROVED
+  [82/187] bill_id=7798 | new_max=0.451 | top=Democracy & Governance | still low
+  [83/187] bill_id=1314 | new_max=0.474 | top=Democracy & Governance | still low
+  [84/187] bill_id=1708 | new_max=0.231 | top=Electoral Boundaries & Administration | still low
+  [85/187] bill_id=2541 | new_max=0.681 | top=Environment | IMPROVED
+  [86/187] bill_id=2798 | new_max=0.685 | top=Taxation & Government Revenue | IMPROVED
+  [87/187] bill_id=955 | new_max=0.440 | top=Public Safety & Emergency Response | still low
+  [88/187] bill_id=7729 | new_max=0.456 | top=Democracy & Governance | still low
+  [89/187] bill_id=2679 | new_max=0.503 | top=Transportation | IMPROVED
+  [90/187] bill_id=8548 | new_max=0.449 | top=Foreign Policy | still low
+  [91/187] bill_id=2144 | new_max=0.551 | top=Environment | IMPROVED
+  [92/187] bill_id=7462 | new_max=0.420 | top=Democracy & Governance | still low
+  [93/187] bill_id=7615 | new_max=0.498 | top=Healthcare | still low
+  [94/187] bill_id=7667 | new_max=0.436 | top=Crime and Justice | still low
+  [95/187] bill_id=7511 | new_max=0.622 | top=Taxation & Government Revenue | IMPROVED
+  [96/187] bill_id=7334 | new_max=0.575 | top=Environment | IMPROVED
+  [97/187] bill_id=8336 | new_max=0.583 | top=Environment | IMPROVED
+  [98/187] bill_id=8381 | new_max=0.596 | top=Environment | IMPROVED
+  [99/187] bill_id=8546 | new_max=0.510 | top=Crime and Justice | IMPROVED
+  [100/187] bill_id=8652 | new_max=0.474 | top=Environment | still low
+  [101/187] bill_id=8322 | new_max=0.490 | top=Economics | still low
+  [102/187] bill_id=8195 | new_max=0.535 | top=Environment | IMPROVED
+  [103/187] bill_id=2127 | new_max=0.495 | top=Healthcare | still low
+  [104/187] bill_id=8106 | new_max=0.482 | top=Economics | still low
+  [105/187] bill_id=8006 | new_max=0.669 | top=Environment | IMPROVED
+  [106/187] bill_id=2116 | new_max=0.434 | top=Environment | still low
+  [107/187] bill_id=2114 | new_max=0.484 | top=Healthcare | still low
+  [108/187] bill_id=7853 | new_max=0.439 | top=Crime and Justice | still low
+  [109/187] bill_id=6347 | new_max=0.726 | top=Environment | IMPROVED
+  [110/187] bill_id=7953 | new_max=0.684 | top=Transportation | IMPROVED
+  [111/187] bill_id=7609 | new_max=0.712 | top=Veterans & Military Service | IMPROVED
+  [112/187] bill_id=7773 | new_max=0.430 | top=Culture, Heritage, and Holidays | still low
+  [113/187] bill_id=7697 | new_max=0.659 | top=Environment | IMPROVED
+  [114/187] bill_id=8279 | new_max=0.588 | top=Labor and Employment | IMPROVED
+  [115/187] bill_id=1096 | new_max=0.421 | top=Environment | still low
+  [116/187] bill_id=6409 | new_max=0.466 | top=Democracy & Governance | still low
+  [117/187] bill_id=2096 | new_max=0.449 | top=Healthcare | still low
+  [118/187] bill_id=1357 | new_max=0.244 | top=Democracy & Governance | still low
+  [119/187] bill_id=2579 | new_max=0.791 | top=Taxation & Government Revenue | IMPROVED
+  [120/187] bill_id=6545 | new_max=0.319 | top=Foreign Policy | still low
+  [121/187] bill_id=2180 | new_max=0.339 | top=Civil Rights | still low
+  [122/187] bill_id=2767 | new_max=0.710 | top=Taxation & Government Revenue | IMPROVED
+  [123/187] bill_id=1599 | new_max=0.713 | top=Crime and Justice | IMPROVED
+  [124/187] bill_id=1533 | new_max=0.491 | top=Democracy & Governance | still low
+  [125/187] bill_id=1516 | new_max=0.690 | top=Labor and Employment | IMPROVED
+  [126/187] bill_id=1087 | new_max=0.784 | top=Taxation & Government Revenue | IMPROVED
+  [127/187] bill_id=8690 | new_max=0.476 | top=Culture, Heritage, and Holidays | still low
+  [128/187] bill_id=1764 | new_max=0.638 | top=Transportation | IMPROVED
+  [129/187] bill_id=1383 | new_max=0.105 | top=Democracy & Governance | still low
+  [130/187] bill_id=6539 | new_max=0.330 | top=Crime and Justice | still low
+  [131/187] bill_id=8668 | new_max=0.298 | top=Indigenous Affairs | still low
+  [132/187] bill_id=1725 | new_max=0.445 | top=Healthcare | still low
+  [133/187] bill_id=6403 | new_max=0.461 | top=Crime and Justice | still low
+  [134/187] bill_id=2139 | new_max=0.457 | top=Labor and Employment | still low
+  [135/187] bill_id=8588 | new_max=0.416 | top=Transportation | still low
+  [136/187] bill_id=6527 | new_max=0.459 | top=Environment | still low
+  [137/187] bill_id=2293 | new_max=0.313 | top=Technology and Science | still low
+  [138/187] bill_id=7262 | new_max=0.336 | top=Economics | still low
+  [139/187] bill_id=8484 | new_max=0.400 | top=Crime and Justice | still low
+  [140/187] bill_id=7703 | new_max=0.340 | top=Democracy & Governance | still low
+  [141/187] bill_id=8431 | new_max=0.393 | top=Democracy & Governance | still low
+  [142/187] bill_id=2200 | new_max=0.363 | top=Taxation & Government Revenue | still low
+  [143/187] bill_id=1797 | new_max=0.372 | top=Environment | still low
+  [144/187] bill_id=6433 | new_max=0.471 | top=Democracy & Governance | still low
+  [145/187] bill_id=1647 | new_max=0.368 | top=Democracy & Governance | still low
+  [146/187] bill_id=1280 | new_max=0.253 | top=Electoral Boundaries & Administration | still low
+  [147/187] bill_id=8689 | new_max=0.386 | top=Economics | still low
+  [148/187] bill_id=8776 | new_max=0.305 | top=Labor and Employment | still low
+  [149/187] bill_id=2681 | new_max=0.266 | top=Crime and Justice | still low
+  [150/187] bill_id=8253 | new_max=0.332 | top=Culture, Heritage, and Holidays | still low
+  [151/187] bill_id=8511 | new_max=0.341 | top=Environment | still low
+  [152/187] bill_id=1707 | new_max=0.517 | top=Electoral Boundaries & Administration | IMPROVED
+  [153/187] bill_id=7788 | new_max=0.408 | top=Transportation | still low
+  [154/187] bill_id=8651 | new_max=0.012 | top=Democracy & Governance | still low
+  [155/187] bill_id=1511 | new_max=0.678 | top=Veterans & Military Service | IMPROVED
+  [156/187] bill_id=1128 | new_max=0.186 | top=Environment | still low
+  [157/187] bill_id=1471 | new_max=0.086 | top=Electoral Boundaries & Administration | still low
+  [158/187] bill_id=1515 | new_max=0.495 | top=Labor and Employment | still low
+  [159/187] bill_id=7815 | new_max=0.234 | top=Democracy & Governance | still low
+  [160/187] bill_id=6543 | new_max=0.562 | top=Transportation | IMPROVED
+  [161/187] bill_id=2025 | new_max=0.561 | top=Environment | IMPROVED
+  [162/187] bill_id=1820 | new_max=0.167 | top=Electoral Boundaries & Administration | still low
+  [163/187] bill_id=1868 | new_max=0.660 | top=Labor and Employment | IMPROVED
+  [164/187] bill_id=2176 | new_max=0.395 | top=Democracy & Governance | still low
+  [165/187] bill_id=972 | new_max=0.256 | top=Labor and Employment | still low
+  [166/187] bill_id=1326 | new_max=0.633 | top=Crime and Justice | IMPROVED
+  [167/187] bill_id=8397 | new_max=0.114 | top=Veterans & Military Service | still low
+  [168/187] bill_id=8228 | new_max=0.472 | top=Labor and Employment | still low
+  [169/187] bill_id=7714 | new_max=0.198 | top=Crime and Justice | still low
+  [170/187] bill_id=1541 | new_max=0.393 | top=Democracy & Governance | still low
+  [171/187] bill_id=1805 | new_max=0.322 | top=Democracy & Governance | still low
+  [172/187] bill_id=7625 | new_max=0.379 | top=Democracy & Governance | still low
+  [173/187] bill_id=8538 | new_max=0.497 | top=Labor and Employment | still low
+  [174/187] bill_id=8398 | new_max=0.477 | top=Housing & Infrastructure | still low
+  [175/187] bill_id=1325 | new_max=0.621 | top=Taxation & Government Revenue | IMPROVED
+  [176/187] bill_id=1517 | new_max=0.390 | top=Labor and Employment | still low
+  [177/187] bill_id=1755 | new_max=0.623 | top=Labor and Employment | IMPROVED
+  [178/187] bill_id=6338 | new_max=0.366 | top=Foreign Policy | still low
+  [179/187] bill_id=7989 | new_max=0.328 | top=Electoral Boundaries & Administration | still low
+  [180/187] bill_id=8720 | new_max=0.262 | top=Indigenous Affairs | still low
+  [181/187] bill_id=8321 | new_max=0.398 | top=Foreign Policy | still low
+  [182/187] bill_id=1603 | new_max=0.324 | top=Democracy & Governance | still low
+  [183/187] bill_id=8164 | new_max=0.307 | top=Crime and Justice | still low
+  [184/187] bill_id=8545 | new_max=0.339 | top=Healthcare | still low
+  [185/187] bill_id=8728 | new_max=0.042 | top=Democracy & Governance | still low
+  [186/187] bill_id=8768 | new_max=0.304 | top=Healthcare | still low
+  [187/187] bill_id=8540 | new_max=0.231 | top=Environment | still low
+
+--- Summary ---
+Bills re-tagged: 187/187
+Bills improved above 0.5 threshold: 69/187
+Bills still low confidence: 118/187
