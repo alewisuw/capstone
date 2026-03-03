@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
+import { useFocusEffect } from '@react-navigation/native';
 import type { RootStackParamList } from '../types';
 import { getRecommendations, getMyRecommendations, getProfiles } from '../services/apiService';
 import BillCard from '../components/BillCard';
@@ -44,8 +45,9 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const { user, authToken } = useAuth();
+  const { user, authToken, profileVersion } = useAuth();
   const { isSaved, toggleSave } = useSaved();
+  const lastLoadedProfileVersionRef = useRef<number>(profileVersion);
 
   useEffect(() => {
     if (route.params?.username) {
@@ -58,7 +60,34 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       loadProfiles();
     }
     loadRecommendations();
+    lastLoadedProfileVersionRef.current = profileVersion;
   }, [username, user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user && authToken && profileVersion > lastLoadedProfileVersionRef.current) {
+        loadRecommendations();
+        lastLoadedProfileVersionRef.current = profileVersion;
+      }
+    }, [user, authToken, profileVersion])
+  );
+
+  useEffect(() => {
+    const parent = navigation.getParent();
+    if (!parent) return;
+    const unsubscribe = parent.addListener('tabPress', () => {
+      if (
+        navigation.isFocused() &&
+        user &&
+        authToken &&
+        profileVersion > lastLoadedProfileVersionRef.current
+      ) {
+        loadRecommendations();
+        lastLoadedProfileVersionRef.current = profileVersion;
+      }
+    });
+    return unsubscribe;
+  }, [navigation, user, authToken, profileVersion]);
 
   const loadProfiles = async (): Promise<void> => {
     try {

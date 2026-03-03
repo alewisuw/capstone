@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
@@ -58,8 +67,17 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
         <AppLogo width={90} height={90} />
       </GradientBackground>
 
-      <View style={styles.card}>
-        <Text style={styles.title}>Create your account</Text>
+      <KeyboardAvoidingView
+        style={styles.card}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 12 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={styles.cardContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.title}>Create your account</Text>
 
         <Text style={styles.label}>Username</Text>
         <TextInput
@@ -132,13 +150,14 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
           <Text style={styles.primaryButtonText}>Sign Up</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footer}>
-          Already have an account?{' '}
-          <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
-            Log In
+          <Text style={styles.footer}>
+            Already have an account?{' '}
+            <Text style={styles.link} onPress={() => navigation.navigate('Login')}>
+              Log In
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -169,8 +188,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    padding: theme.spacing.lg,
     marginTop: -12,
+  },
+  cardContent: {
+    padding: theme.spacing.lg,
+    paddingBottom: theme.spacing.xl + theme.spacing.lg,
   },
   title: {
     fontSize: 22,

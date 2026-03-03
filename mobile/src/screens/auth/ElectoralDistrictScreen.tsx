@@ -48,6 +48,8 @@ const DEFAULT_REGION: Region = {
   longitudeDelta: 50,
 };
 
+const toSearchable = (value: unknown): string => String(value ?? '').toLowerCase();
+
 const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation, route }) => {
   const { completeOnboarding } = useAuth();
   const [addressQuery, setAddressQuery] = useState('');
@@ -66,8 +68,8 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
     if (!term || districtOptions.length === 0) return [];
     return districtOptions
       .filter((district) => {
-        const name = (district.name || '').toLowerCase();
-        const externalId = (district.id || '').toLowerCase();
+        const name = toSearchable(district.name);
+        const externalId = toSearchable(district.id);
         return name.includes(term) || externalId.includes(term);
       })
       .slice(0, 6);
@@ -111,7 +113,7 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
       const mapPolys = updateMapFromShape(feature.geometry);
       setDistrict({
         name: feature.properties?.name || 'Unknown district',
-        id: feature.properties?.id || undefined,
+        id: feature.properties?.id != null ? String(feature.properties.id) : undefined,
         source: 'geo',
       });
       if (!mapPolys || mapPolys.length === 0) {
@@ -136,7 +138,7 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
     setError(null);
     setDistrict({
       name: boundary.name || 'Unknown district',
-      id: boundary.id || undefined,
+      id: boundary.id != null ? String(boundary.id) : undefined,
       source: 'manual',
     });
     setManualQuery(boundary.name || '');

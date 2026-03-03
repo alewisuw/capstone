@@ -18,6 +18,8 @@ type AuthContextValue = {
   pendingUsername: string | null;
   pendingEmail: string | null;
   authToken: string | null;
+  profileVersion: number;
+  markProfileUpdated: () => void;
   signIn: (
     username: string,
     password: string
@@ -50,6 +52,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [pendingPassword, setPendingPassword] = useState<string | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
+  const [profileVersion, setProfileVersion] = useState<number>(0);
+
+  const markProfileUpdated = () => {
+    setProfileVersion((prev) => prev + 1);
+  };
 
   const signIn = (username: string, password: string) => {
     const normalizedUsername = username.trim().toLowerCase();
@@ -192,6 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
           authToken
         );
+        markProfileUpdated();
       } catch (err) {
         console.error('Failed to save profile', err);
         setUser({ username: pendingUsername });
@@ -219,6 +227,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPendingEmail(null);
     setPendingPassword(null);
     setAuthToken(null);
+    setProfileVersion(0);
   };
 
   const value = useMemo(
@@ -227,13 +236,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       pendingUsername,
       pendingEmail,
       authToken,
+      profileVersion,
+      markProfileUpdated,
       signIn,
       signUp,
       confirmSignUp,
       completeOnboarding,
       signOut,
     }),
-    [user, pendingUsername, pendingEmail, authToken]
+    [user, pendingUsername, pendingEmail, authToken, profileVersion]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

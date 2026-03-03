@@ -9,4 +9,3 @@ env
 .gradle/
 .idea
 qdrant_storage
-# mobile/android/app/src/main/AndroidManifest.xml

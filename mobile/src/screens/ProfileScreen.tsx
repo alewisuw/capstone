@@ -188,7 +188,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
             {profile.demographics && Object.keys(profile.demographics).length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Demographics</Text>
+                <Text style={styles.sectionTitle}>Personalization Features</Text>
                 {Object.entries(profile.demographics).map(([key, value]) => (
                   value && value !== 'prefer_not_to_say' && key !== 'electoral_district_id' && (
                     <View key={key} style={styles.demographicRow}>

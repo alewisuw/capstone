@@ -67,6 +67,7 @@ react {
  * Set this to true in release builds to optimize the app using [R8](https://developer.android.com/topic/performance/app-optimization/enable-app-optimization).
  */
 def enableMinifyInReleaseBuilds = (findProperty('android.enableMinifyInReleaseBuilds') ?: false).toBoolean()
+def mapsApiKey = (findProperty("MAPS_API_KEY") ?: System.getenv("MAPS_API_KEY") ?: "").trim()
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -94,6 +95,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+        manifestPlaceholders = [MAPS_API_KEY: mapsApiKey]
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -129,6 +131,18 @@ android {
     }
     androidResources {
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
+    }
+}
+
+gradle.taskGraph.whenReady { graph ->
+    def isReleaseBuild = graph.allTasks.any { task ->
+        def taskName = task.name.toLowerCase()
+        taskName.contains("release") &&
+            !taskName.contains("clean") &&
+            (taskName.contains("assemble") || taskName.contains("bundle") || taskName.contains("package") || taskName.contains("install"))
+    }
+    if (isReleaseBuild && !mapsApiKey) {
+        throw new GradleException("Missing MAPS_API_KEY. Set ORG_GRADLE_PROJECT_MAPS_API_KEY or MAPS_API_KEY before running a release build.")
     }
 }
 

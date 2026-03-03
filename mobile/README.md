@@ -4,8 +4,8 @@ A React Native cross-platform mobile application (built with TypeScript) for dis
 
 ## Features
 
-- 🏠 **Home Screen**: Search for bill recommendations by username
-- 📋 **Recommendations**: View personalized bill recommendations
+- 🏠 **Home Screen**: View personalized bill recommendations
+- 📋 **Search Page**: Search for bills based off semantic search
 - 👤 **Profile**: View user profiles with interests and demographics
 - 📄 **Bill Details**: Detailed view of individual bills
 
@@ -52,7 +52,19 @@ npm start
 ### Option B: Dev Client (native build)
 Use this if you need native modules/plugins:
 ```bash
+MAPS_API_KEY="$(aws ssm get-parameter \
+  --name '/billBoard/MAPS_ANDROID_KEY' \
+  --with-decryption \
+  --query 'Parameter.Value' \
+  --output text)" \
 npx expo run:android
+```
+
+If you hit Android native/CMake clean issues, run this once and then run the command above again:
+```bash
+./android/gradlew -p android clean \
+  -x :app:externalNativeBuildCleanDebug \
+  -x :app:externalNativeBuildCleanRelease
 ```
 Then in another terminal:
 ```bash

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   StyleSheet,
@@ -8,8 +9,10 @@ import {
   Pressable,
   TextInput,
   Alert,
+  Linking,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import MapView, { Marker, Polygon, type Region } from 'react-native-maps';
 import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { RootStackParamList } from '../types';
@@ -20,6 +23,13 @@ import AppLogo from '../components/AppLogo';
 import { interestGroups } from '../data/interestGroups';
 import type { MyProfileRecord } from '../types';
 import GradientBackground from '../components/GradientBackground';
+import { geocodeAddress } from '../services/geoService';
+import {
+  findLocalDistrictByPoint,
+  getLocalDistrictFeature,
+  listLocalDistricts,
+  type LocalDistrictSummary,
+} from '../services/localDistricts';
 
 type EditProfileProps = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -39,13 +49,26 @@ const groupColors: Record<string, string> = {
   'Transportation & Mobility': '#047857',
 };
 
+type MapPolygon = {
+  id: string;
+  coordinates: { latitude: number; longitude: number }[];
+};
+
+const DEFAULT_REGION: Region = {
+  latitude: 56.1304,
+  longitude: -106.3468,
+  latitudeDelta: 40,
+  longitudeDelta: 50,
+};
+
 const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const { authToken, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'demographics' | 'interests'>('demographics');
+  const { authToken, user, markProfileUpdated } = useAuth();
+  const [activeTab, setActiveTab] = useState<'interests' | 'demographics' | 'electoralDistrict'>('interests');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingDemographics, setExistingDemographics] = useState<Record<string, string>>({});
 
   // Demographics state
   const [age, setAge] = useState('');
@@ -58,11 +81,20 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
   const [disabilityStatus, setDisabilityStatus] = useState('');
   const [housingStatus, setHousingStatus] = useState('');
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const [electoralDistrict, setElectoralDistrict] = useState('');
+  const [electoralDistrictId, setElectoralDistrictId] = useState('');
 
   // Interests state
   const [search, setSearch] = useState('');
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [addressQuery, setAddressQuery] = useState('');
+  const [manualDistrictQuery, setManualDistrictQuery] = useState('');
+  const [isDistrictSearching, setIsDistrictSearching] = useState(false);
+  const [districtPolygons, setDistrictPolygons] = useState<MapPolygon[]>([]);
+  const [districtMapRegion, setDistrictMapRegion] = useState<Region>(DEFAULT_REGION);
+  const [districtPoint, setDistrictPoint] = useState<{ latitude: number; longitude: number } | null>(null);
+  const districtOptions = useMemo(() => listLocalDistricts(), []);
 
   useEffect(() => {
     loadProfile();
@@ -81,6 +113,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
       
       // Load demographics
       const demos = profile.demographics || {};
+      setExistingDemographics({ ...demos });
       setAge(demos.age || '');
       setGenderIdentity(demos.gender_identity || '');
       setIndigenousStatus(demos.indigenous_status || '');
@@ -90,6 +123,9 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
       setEmploymentStatus(demos.employment_status || '');
       setDisabilityStatus(demos.disability_status || '');
       setHousingStatus(demos.housing_status || '');
+      setElectoralDistrict(demos.electoral_district || '');
+      setElectoralDistrictId(demos.electoral_district_id || '');
+      setManualDistrictQuery(demos.electoral_district || '');
 
       // Load interests
       const interests = profile.interests || [];
@@ -121,7 +157,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
     setError(null);
 
     try {
-      const demographics = {
+      const managedDemographics = {
         age,
         gender_identity: genderIdentity,
         indigenous_status: indigenousStatus,
@@ -131,23 +167,33 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
         employment_status: employmentStatus,
         disability_status: disabilityStatus,
         housing_status: housingStatus,
+        electoral_district: electoralDistrict,
+        electoral_district_id: electoralDistrictId,
       };
 
-      // Filter out empty values
-      const filteredDemographics = Object.fromEntries(
-        Object.entries(demographics).filter(([, value]) => value && value.trim().length > 0)
-      );
+      // Preserve existing keys (e.g., electoral district) and only overwrite managed fields.
+      const mergedDemographics: Record<string, string> = { ...existingDemographics };
+      Object.entries(managedDemographics).forEach(([key, value]) => {
+        const normalized = (value || '').trim();
+        if (normalized.length > 0) {
+          mergedDemographics[key] = value;
+        } else {
+          delete mergedDemographics[key];
+        }
+      });
 
       await putMyProfile(
         {
           username: user.username,
           email: '', // Will be preserved from existing profile
-          demographics: filteredDemographics,
+          demographics: mergedDemographics,
           interests: selectedTags,
           onboarded: true,
         },
         authToken
       );
+      markProfileUpdated();
+      setExistingDemographics(mergedDemographics);
 
       Alert.alert('Success', 'Profile updated successfully!', [
         { text: 'OK', onPress: () => navigation.goBack() },
@@ -275,6 +321,111 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
       .filter((group) => group.tags.length > 0);
   }, [search]);
 
+  const filteredDistrictOptions = useMemo(() => {
+    const term = manualDistrictQuery.trim().toLowerCase();
+    if (!term) return [];
+    return districtOptions
+      .filter((district) => {
+        const name = String(district.name || '').toLowerCase();
+        const id = String(district.id || '').toLowerCase();
+        return name.includes(term) || id.includes(term);
+      })
+      .slice(0, 6);
+  }, [districtOptions, manualDistrictQuery]);
+
+  const updateDistrictMapFromShape = (shape: unknown): MapPolygon[] => {
+    const mapPolygons = geojsonToPolygons(shape).filter((poly) => poly.coordinates.length >= 3);
+    setDistrictPolygons(mapPolygons);
+    const region = getRegionForPolygons(mapPolygons);
+    if (region) {
+      setDistrictMapRegion(region);
+    }
+    return mapPolygons;
+  };
+
+  const handleDistrictLookup = async () => {
+    setError(null);
+    const query = addressQuery.trim();
+    if (!query) {
+      setError('Enter a street address or postal code.');
+      return;
+    }
+    if (districtOptions.length === 0) {
+      setError('District boundary data is missing. Please install the data file first.');
+      return;
+    }
+    setIsDistrictSearching(true);
+    try {
+      const geo = await geocodeAddress(query);
+      const geoPoint = { latitude: geo.lat, longitude: geo.lng };
+      setDistrictPoint(geoPoint);
+      const match = findLocalDistrictByPoint(geo.lat, geo.lng);
+      if (!match) {
+        throw new Error('No district matched');
+      }
+      const feature = match.feature;
+      const mapPolys = updateDistrictMapFromShape(feature.geometry);
+      const nextName = feature.properties?.name || 'Unknown district';
+      const nextId = feature.properties?.id != null ? String(feature.properties.id) : '';
+      setElectoralDistrict(nextName);
+      setElectoralDistrictId(nextId);
+      setManualDistrictQuery(nextName);
+      if (!mapPolys || mapPolys.length === 0) {
+        setDistrictMapRegion({
+          latitude: geoPoint.latitude,
+          longitude: geoPoint.longitude,
+          latitudeDelta: 0.08,
+          longitudeDelta: 0.08,
+        });
+      }
+    } catch {
+      setError('Unable to locate a district from that location.');
+    } finally {
+      setIsDistrictSearching(false);
+    }
+  };
+
+  const handleSelectDistrictBoundary = (boundary: LocalDistrictSummary) => {
+    setError(null);
+    const nextName = boundary.name || '';
+    const nextId = boundary.id != null ? String(boundary.id) : '';
+    setElectoralDistrict(nextName);
+    setElectoralDistrictId(nextId);
+    setManualDistrictQuery(nextName);
+    try {
+      const feature = getLocalDistrictFeature(boundary.index);
+      if (feature) {
+        updateDistrictMapFromShape(feature.geometry);
+      }
+    } catch {
+      setError('District selected, but map could not be loaded.');
+    }
+  };
+
+  const handleUseTypedDistrict = () => {
+    const trimmed = manualDistrictQuery.trim();
+    if (!trimmed) {
+      setError('Enter the district name first.');
+      return;
+    }
+    setError(null);
+    setElectoralDistrict(trimmed);
+    setElectoralDistrictId('');
+    setDistrictPolygons([]);
+    setDistrictPoint(null);
+  };
+
+  const handleRemoveDistrict = () => {
+    setElectoralDistrict('');
+    setElectoralDistrictId('');
+    setManualDistrictQuery('');
+    setAddressQuery('');
+    setDistrictPolygons([]);
+    setDistrictPoint(null);
+    setDistrictMapRegion(DEFAULT_REGION);
+    setError(null);
+  };
+
   const toggleGroup = (title: string) => {
     setExpandedGroups((prev) => ({ ...prev, [title]: !prev[title] }));
   };
@@ -313,14 +464,6 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'demographics' && styles.tabActive]}
-          onPress={() => setActiveTab('demographics')}
-        >
-          <Text style={[styles.tabText, activeTab === 'demographics' && styles.tabTextActive]}>
-            Demographics
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={[styles.tab, activeTab === 'interests' && styles.tabActive]}
           onPress={() => setActiveTab('interests')}
         >
@@ -328,77 +471,28 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
             Interests
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'demographics' && styles.tabActive]}
+          onPress={() => setActiveTab('demographics')}
+        >
+          <Text style={[styles.tabText, activeTab === 'demographics' && styles.tabTextActive]}>
+            Further Personalization
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'electoralDistrict' && styles.tabActive]}
+          onPress={() => setActiveTab('electoralDistrict')}
+        >
+          <Text style={[styles.tabText, activeTab === 'electoralDistrict' && styles.tabTextActive]}>
+            Electoral District
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        {activeTab === 'demographics' ? (
-          <Pressable onPress={() => setOpenKey(null)}>
-            {demographicsFields.map((field) => {
-              const isOpen = openKey === field.key;
-              return (
-                <View key={field.key} style={styles.field}>
-                  <Text style={styles.label}>{field.label}</Text>
-                  <View style={styles.inputContainer}>
-                    <TouchableOpacity
-                      style={[styles.inputRow, field.value && styles.inputRowWithValue]}
-                      onPress={() => setOpenKey(isOpen ? null : field.key)}
-                    >
-                      <Text style={[styles.inputText, !field.value && styles.inputTextPlaceholder]}>
-                        {field.value || 'Select an option'}
-                      </Text>
-                      <Ionicons
-                        name={isOpen ? 'chevron-up' : 'chevron-down'}
-                        size={16}
-                        color="#9b9b9b"
-                      />
-                    </TouchableOpacity>
-                    {field.value ? (
-                      <TouchableOpacity
-                        style={styles.clearButton}
-                        onPress={() => {
-                          field.setter('');
-                          setOpenKey(null);
-                        }}
-                      >
-                        <Ionicons name="close-circle" size={20} color="#9b9b9b" />
-                      </TouchableOpacity>
-                    ) : null}
-                  </View>
-                  {isOpen ? (
-                    <View style={styles.dropdown}>
-                      {field.options.map((option) => {
-                        const isSelected = option === field.value;
-                        return (
-                          <TouchableOpacity
-                            key={option}
-                            style={[styles.optionRow, isSelected && styles.optionRowSelected]}
-                            onPress={() => {
-                              if (isSelected) {
-                                field.setter('');
-                              } else {
-                                field.setter(option);
-                              }
-                              setOpenKey(null);
-                            }}
-                          >
-                            <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
-                              {option}
-                            </Text>
-                            {isSelected ? (
-                              <Ionicons name="checkmark-circle" size={18} color={theme.colors.accent} />
-                            ) : null}
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  ) : null}
-                </View>
-              );
-            })}
-          </Pressable>
-        ) : (
+        {activeTab === 'interests' ? (
           <>
             <Text style={styles.sectionTitle}>Select Your Interests</Text>
             <Text style={styles.subtitle}>Tap to select or unselect your areas of interest.</Text>
@@ -470,6 +564,177 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
               })}
             </View>
           </>
+        ) : activeTab === 'demographics' ? (
+          <Pressable onPress={() => setOpenKey(null)}>
+            {demographicsFields.map((field) => {
+              const isOpen = openKey === field.key;
+              return (
+                <View key={field.key} style={styles.field}>
+                  <Text style={styles.label}>{field.label}</Text>
+                  <View style={styles.inputContainer}>
+                    <TouchableOpacity
+                      style={[styles.inputRow, field.value && styles.inputRowWithValue]}
+                      onPress={() => setOpenKey(isOpen ? null : field.key)}
+                    >
+                      <Text style={[styles.inputText, !field.value && styles.inputTextPlaceholder]}>
+                        {field.value || 'Select an option'}
+                      </Text>
+                      <Ionicons
+                        name={isOpen ? 'chevron-up' : 'chevron-down'}
+                        size={16}
+                        color="#9b9b9b"
+                      />
+                    </TouchableOpacity>
+                    {field.value ? (
+                      <TouchableOpacity
+                        style={styles.clearButton}
+                        onPress={() => {
+                          field.setter('');
+                          setOpenKey(null);
+                        }}
+                      >
+                        <Ionicons name="close-circle" size={20} color="#9b9b9b" />
+                      </TouchableOpacity>
+                    ) : null}
+                  </View>
+                  {isOpen ? (
+                    <View style={styles.dropdown}>
+                      {field.options.map((option) => {
+                        const isSelected = option === field.value;
+                        return (
+                          <TouchableOpacity
+                            key={option}
+                            style={[styles.optionRow, isSelected && styles.optionRowSelected]}
+                            onPress={() => {
+                              if (isSelected) {
+                                field.setter('');
+                              } else {
+                                field.setter(option);
+                              }
+                              setOpenKey(null);
+                            }}
+                          >
+                            <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
+                              {option}
+                            </Text>
+                            {isSelected ? (
+                              <Ionicons name="checkmark-circle" size={18} color={theme.colors.accent} />
+                            ) : null}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  ) : null}
+                </View>
+              );
+            })}
+          </Pressable>
+        ) : (
+          <View style={styles.districtCard}>
+            <Text style={styles.sectionTitle}>Manage Electoral District</Text>
+            <Text style={styles.subtitle}>
+              Search by address or postal code. We only store your district, not your location.
+            </Text>
+            {districtOptions.length === 0 ? (
+              <Text style={styles.noticeText}>
+                District boundary data is not installed. Run the boundary builder script to enable lookup.
+              </Text>
+            ) : null}
+
+            <View style={styles.section}>
+              <Text style={styles.label}>Address or postal code</Text>
+              <TextInput
+                style={styles.searchInputBox}
+                placeholder="e.g. 111 Wellington St, Ottawa OR K1A 0A9"
+                placeholderTextColor="#9b9b9b"
+                value={addressQuery}
+                onChangeText={setAddressQuery}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+              <TouchableOpacity
+                style={styles.primaryDistrictButton}
+                onPress={handleDistrictLookup}
+                disabled={isDistrictSearching}
+              >
+                {isDistrictSearching ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.primaryDistrictButtonText}>Search District</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.label}>Know your district already?</Text>
+              <TextInput
+                style={styles.searchInputBox}
+                placeholder="Type the district name"
+                placeholderTextColor="#9b9b9b"
+                value={manualDistrictQuery}
+                onChangeText={setManualDistrictQuery}
+                autoCapitalize="words"
+              />
+              {filteredDistrictOptions.length > 0 ? (
+                <View style={styles.matchList}>
+                  {filteredDistrictOptions.map((district) => (
+                    <TouchableOpacity
+                      key={`${district.id || district.name}-${district.index}`}
+                      style={styles.matchRow}
+                      onPress={() => handleSelectDistrictBoundary(district)}
+                    >
+                      <Text style={styles.matchText}>{district.name}</Text>
+                      {district.id ? <Text style={styles.matchSubtext}>#{district.id}</Text> : null}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              ) : null}
+
+              <TouchableOpacity style={styles.secondaryDistrictButton} onPress={handleUseTypedDistrict}>
+                <Text style={styles.secondaryDistrictButtonText}>Use Typed District Name</Text>
+              </TouchableOpacity>
+            </View>
+
+            {electoralDistrict ? (
+              <View style={styles.section}>
+                <Text style={styles.label}>Selected district</Text>
+                <View style={styles.selectedDistrictBox}>
+                  <Text style={styles.selectedDistrictName}>{electoralDistrict}</Text>
+                  {electoralDistrictId ? (
+                    <Text style={styles.selectedDistrictId}>#{electoralDistrictId}</Text>
+                  ) : null}
+                </View>
+              </View>
+            ) : null}
+
+            {districtPolygons.length > 0 ? (
+              <View style={styles.mapWrapper}>
+                <MapView style={styles.map} region={districtMapRegion}>
+                  {districtPolygons.map((poly) => (
+                    <Polygon
+                      key={poly.id}
+                      coordinates={poly.coordinates}
+                      strokeWidth={2}
+                      strokeColor={theme.colors.accent}
+                      fillColor={`${theme.colors.accent}33`}
+                    />
+                  ))}
+                  {districtPoint ? <Marker coordinate={districtPoint} /> : null}
+                </MapView>
+              </View>
+            ) : null}
+
+            <TouchableOpacity style={styles.removeActionButton} onPress={handleRemoveDistrict}>
+              <Text style={styles.removeActionButtonText}>Remove District</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.linkButton}
+              onPress={() => Linking.openURL('https://www.elections.ca/map_01.aspx?lang=e&section=res&w=0')}
+            >
+              <Text style={styles.linkText}>View official Elections Canada map</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         <TouchableOpacity
@@ -482,6 +747,83 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
       </ScrollView>
     </SafeAreaView>
   );
+};
+
+const geojsonToPolygons = (geojson: unknown): MapPolygon[] => {
+  if (!geojson || typeof geojson !== 'object') return [];
+  const anyGeo = geojson as { type?: string; geometry?: unknown; features?: unknown[] };
+  if (anyGeo.type === 'Feature' && anyGeo.geometry) {
+    return geometryToPolygons(anyGeo.geometry);
+  }
+  if (anyGeo.type === 'FeatureCollection' && Array.isArray(anyGeo.features)) {
+    const polygons: MapPolygon[] = [];
+    anyGeo.features.forEach((feature, index) => {
+      const geo = feature as { geometry?: unknown };
+      if (geo.geometry) {
+        polygons.push(...geometryToPolygons(geo.geometry, `feature-${index}`));
+      }
+    });
+    return polygons;
+  }
+  return geometryToPolygons(anyGeo);
+};
+
+const geometryToPolygons = (geometry: unknown, prefix = 'poly'): MapPolygon[] => {
+  if (!geometry || typeof geometry !== 'object') return [];
+  const geo = geometry as {
+    type?: string;
+    coordinates?: number[][] | number[][][] | number[][][][];
+  };
+  if (geo.type === 'Polygon' && Array.isArray(geo.coordinates)) {
+    const outerRing = geo.coordinates[0] || [];
+    return [
+      {
+        id: `${prefix}-0`,
+        coordinates: outerRing.map((coord) => ({
+          longitude: Number(coord[0]),
+          latitude: Number(coord[1]),
+        })),
+      },
+    ];
+  }
+  if (geo.type === 'MultiPolygon' && Array.isArray(geo.coordinates)) {
+    return geo.coordinates.map((polygon, index) => {
+      const outerRing = polygon[0] || [];
+      return {
+        id: `${prefix}-${index}`,
+        coordinates: outerRing.map((coord) => ({
+          longitude: Number(coord[0]),
+          latitude: Number(coord[1]),
+        })),
+      };
+    });
+  }
+  return [];
+};
+
+const getRegionForPolygons = (polygons: MapPolygon[]): Region | null => {
+  let minLat = Number.POSITIVE_INFINITY;
+  let maxLat = Number.NEGATIVE_INFINITY;
+  let minLng = Number.POSITIVE_INFINITY;
+  let maxLng = Number.NEGATIVE_INFINITY;
+
+  polygons.forEach((poly) => {
+    poly.coordinates.forEach((coord) => {
+      minLat = Math.min(minLat, coord.latitude);
+      maxLat = Math.max(maxLat, coord.latitude);
+      minLng = Math.min(minLng, coord.longitude);
+      maxLng = Math.max(maxLng, coord.longitude);
+    });
+  });
+
+  if (!Number.isFinite(minLat) || !Number.isFinite(minLng)) return null;
+
+  const latitude = (minLat + maxLat) / 2;
+  const longitude = (minLng + maxLng) / 2;
+  const latitudeDelta = Math.max(0.05, (maxLat - minLat) * 1.4);
+  const longitudeDelta = Math.max(0.05, (maxLng - minLng) * 1.4);
+
+  return { latitude, longitude, latitudeDelta, longitudeDelta };
 };
 
 const styles = StyleSheet.create({
@@ -522,7 +864,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    paddingVertical: 16,
+    paddingVertical: 14,
     alignItems: 'center',
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
@@ -531,9 +873,10 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.accent,
   },
   tabText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '600',
     color: theme.colors.textMuted,
+    textAlign: 'center',
   },
   tabTextActive: {
     color: theme.colors.accent,
@@ -708,6 +1051,132 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '700',
+  },
+  districtCard: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    borderRadius: 14,
+    padding: 16,
+  },
+  noticeText: {
+    marginBottom: 16,
+    color: theme.colors.accent,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  section: {
+    marginBottom: 18,
+  },
+  searchInputBox: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: theme.colors.textDark,
+    backgroundColor: '#fff',
+    marginBottom: 10,
+  },
+  primaryDistrictButton: {
+    marginTop: 2,
+    backgroundColor: theme.colors.black,
+    borderRadius: 999,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  primaryDistrictButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  matchList: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  matchRow: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderLight,
+  },
+  matchText: {
+    fontSize: 14,
+    color: theme.colors.textDark,
+    fontWeight: '600',
+  },
+  matchSubtext: {
+    marginTop: 2,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  secondaryDistrictButton: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  secondaryDistrictButtonText: {
+    color: theme.colors.textDark,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  removeActionButton: {
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+    borderRadius: 999,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  removeActionButtonText: {
+    color: theme.colors.accent,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  selectedDistrictBox: {
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: theme.colors.surfaceMuted,
+  },
+  selectedDistrictName: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textDark,
+  },
+  selectedDistrictId: {
+    marginTop: 4,
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+  mapWrapper: {
+    height: 220,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    marginBottom: 6,
+  },
+  map: {
+    flex: 1,
+  },
+  linkButton: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  linkText: {
+    color: theme.colors.accent,
+    fontSize: 13,
     fontWeight: '700',
   },
   errorText: {

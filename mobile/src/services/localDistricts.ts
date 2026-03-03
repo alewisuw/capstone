@@ -7,7 +7,7 @@ type Geometry = {
 
 type DistrictProperties = {
   name?: string;
-  id?: string;
+  id?: string | number;
   province?: string;
 };
 
@@ -33,7 +33,7 @@ const data = federalDistricts as DistrictCollection;
 export const listLocalDistricts = (): LocalDistrictSummary[] => {
   return (data.features || []).map((feature, index) => ({
     name: feature.properties?.name || 'Unknown district',
-    id: feature.properties?.id,
+    id: feature.properties?.id != null ? String(feature.properties.id) : undefined,
     index,
   }));
 };
