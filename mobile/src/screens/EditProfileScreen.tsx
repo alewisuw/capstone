@@ -23,6 +23,7 @@ import AppLogo from '../components/AppLogo';
 import { interestGroups } from '../data/interestGroups';
 import type { MyProfileRecord } from '../types';
 import GradientBackground from '../components/GradientBackground';
+import { getTagColor } from '../data/tagCategories';
 import { geocodeAddress } from '../services/geoService';
 import {
   findLocalDistrictByPoint,
@@ -32,22 +33,6 @@ import {
 } from '../services/localDistricts';
 
 type EditProfileProps = StackScreenProps<RootStackParamList, 'EditProfile'>;
-
-// Color mapping for each interest group
-const groupColors: Record<string, string> = {
-  'Social & Civil Rights': '#b91c1c',
-  'Economic Issues': '#1d4ed8',
-  'Environmental Policy': '#0f766e',
-  'Healthcare': '#9d174d',
-  'Education': '#6d28d9',
-  'Technology & Innovation': '#0f172a',
-  'Foreign Policy': '#a16207',
-  'Democracy & Governance': '#374151',
-  'Housing & Infrastructure': '#7c2d12',
-  'Indigenous Affairs': '#7f1d1d',
-  'Public Safety & Emergency Response': '#0b1324',
-  'Transportation & Mobility': '#047857',
-};
 
 type MapPolygon = {
   id: string;
@@ -347,7 +332,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
     setError(null);
     const query = addressQuery.trim();
     if (!query) {
-      setError('Enter a street address or postal code.');
+      setError('Enter an address, city or postal code.');
       return;
     }
     if (districtOptions.length === 0) {
@@ -528,7 +513,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
                       <View style={styles.tagWrap}>
                         {group.tags.map((tag) => {
                           const isSelected = !!selected[tag];
-                          const groupColor = groupColors[group.title] || theme.colors.accent;
+                          const groupColor = getTagColor(tag) || theme.colors.accent;
                           return (
                             <TouchableOpacity
                               key={tag}
@@ -633,7 +618,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
           <View style={styles.districtCard}>
             <Text style={styles.sectionTitle}>Manage Electoral District</Text>
             <Text style={styles.subtitle}>
-              Search by address or postal code. We only store your district, not your location.
+              Search by address, city or postal code. We only store your district, not your location.
             </Text>
             {districtOptions.length === 0 ? (
               <Text style={styles.noticeText}>
@@ -642,10 +627,10 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
             ) : null}
 
             <View style={styles.section}>
-              <Text style={styles.label}>Address or postal code</Text>
+              <Text style={styles.label}>Address, city or postal code</Text>
               <TextInput
                 style={styles.searchInputBox}
-                placeholder="e.g. 111 Wellington St, Ottawa OR K1A 0A9"
+                placeholder="e.g. 111 Wellington St, Ottawa or K1A 0A9"
                 placeholderTextColor="#9b9b9b"
                 value={addressQuery}
                 onChangeText={setAddressQuery}

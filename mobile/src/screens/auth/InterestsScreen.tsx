@@ -51,6 +51,7 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation }) => {
     () => Object.entries(selected).filter(([, value]) => value).map(([tag]) => tag),
     [selected]
   );
+  const hasSelectedInterests = selectedTags.length > 0;
 
   const handleContinue = () => {
     setError(null);
@@ -160,7 +161,7 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation }) => {
           onPress={handleContinue}
         >
           <Text style={styles.primaryButtonText}>
-            Continue
+            {hasSelectedInterests ? 'Continue' : 'Skip'}
           </Text>
         </TouchableOpacity>
       </ScrollView>

@@ -60,6 +60,7 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
   const [point, setPoint] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasDistrictSelection = !!district?.name?.trim();
 
   const districtOptions = useMemo(() => listLocalDistricts(), []);
 
@@ -91,7 +92,7 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
     setError(null);
     const query = addressQuery.trim();
     if (!query) {
-      setError('Enter a street address or postal code.');
+      setError('Enter an address, city or postal code.');
       return;
     }
     if (districtOptions.length === 0) {
@@ -156,15 +157,6 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
     }
   };
 
-  const handleUseManualEntry = () => {
-    const trimmed = manualQuery.trim();
-    if (!trimmed) {
-      setError('Enter the district name first.');
-      return;
-    }
-    setDistrict({ name: trimmed, source: 'manual' });
-  };
-
   const handleContinue = async () => {
     setError(null);
     const updatedDemographics = { ...route.params.demographics };
@@ -198,7 +190,7 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
       <ScrollView style={styles.card} contentContainerStyle={styles.cardContent}>
         <Text style={styles.title}>Find Your Electoral District</Text>
         <Text style={styles.subtitle}>
-          Search by address or postal code. We only store your district, not your location.
+          Search by address, city or postal code. We only store your district, not your location.
         </Text>
         {districtOptions.length === 0 ? (
           <Text style={styles.noticeText}>
@@ -207,10 +199,10 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
         ) : null}
 
         <View style={styles.section}>
-          <Text style={styles.label}>Address or postal code</Text>
+          <Text style={styles.label}>Address, city or postal code</Text>
           <TextInput
             style={styles.input}
-            placeholder="e.g. 111 Wellington St, Ottawa OR K1A 0A9"
+            placeholder="e.g. 111 Wellington St, Ottawa or K1A 0A9"
             placeholderTextColor="#9b9b9b"
             value={addressQuery}
             onChangeText={setAddressQuery}
@@ -254,9 +246,6 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
             </View>
           ) : null}
 
-          <TouchableOpacity style={styles.secondaryButton} onPress={handleUseManualEntry}>
-            <Text style={styles.secondaryButtonText}>Use Typed District Name</Text>
-          </TouchableOpacity>
         </View>
 
         {district ? (
@@ -265,6 +254,20 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
             <View style={styles.districtRow}>
               <Text style={styles.districtName}>{district.name}</Text>
               {district.id ? <Text style={styles.districtMeta}>#{district.id}</Text> : null}
+              <TouchableOpacity
+                style={styles.clearDistrictIconButton}
+                onPress={() => {
+                  setDistrict(null);
+                  setManualQuery('');
+                  setAddressQuery('');
+                  setPolygons([]);
+                  setPoint(null);
+                  setMapRegion(DEFAULT_REGION);
+                  setError(null);
+                }}
+              >
+                <Ionicons name="close-circle" size={22} color={theme.colors.accent} />
+              </TouchableOpacity>
             </View>
           </View>
         ) : null}
@@ -289,7 +292,7 @@ const ElectoralDistrictScreen: React.FC<ElectoralDistrictProps> = ({ navigation,
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleContinue}>
-          <Text style={styles.primaryButtonText}>Continue</Text>
+          <Text style={styles.primaryButtonText}>{hasDistrictSelection ? 'Continue' : 'Skip'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -485,19 +488,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  secondaryButton: {
-    marginTop: 10,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: theme.colors.borderLight,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: theme.colors.textDark,
-    fontSize: 14,
-    fontWeight: '600',
-  },
   inlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -536,6 +526,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     backgroundColor: theme.colors.surfaceMuted,
+    position: 'relative',
   },
   districtName: {
     fontSize: 15,
@@ -546,6 +537,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 12,
     color: theme.colors.textMuted,
+  },
+  clearDistrictIconButton: {
+    position: 'absolute',
+    right: 10,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    padding: 4,
   },
   mapWrapper: {
     height: 220,

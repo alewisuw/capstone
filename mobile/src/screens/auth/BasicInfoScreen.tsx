@@ -22,6 +22,17 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation, route }) => {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const hasDemographicSelections =
+    !!age ||
+    !!genderIdentity ||
+    !!indigenousStatus ||
+    !!citizenshipStatus ||
+    !!familyStatus ||
+    !!incomeRange ||
+    !!employmentStatus ||
+    !!disabilityStatus ||
+    !!housingStatus;
+
   const fields = [
     {
       key: 'age',
@@ -227,7 +238,7 @@ const BasicInfoScreen: React.FC<BasicInfoProps> = ({ navigation, route }) => {
               });
             }}
           >
-            <Text style={styles.primaryButtonText}>Continue</Text>
+            <Text style={styles.primaryButtonText}>{hasDemographicSelections ? 'Continue' : 'Skip'}</Text>
           </TouchableOpacity>
         </ScrollView>
       </Pressable>

@@ -1,173 +1,57 @@
 import { interestGroups } from './interestGroups';
 
 export const categoryColors: Record<string, string> = {
-  "Civil Rights": "#b91c1c",
-  "Economics": "#1d4ed8",
-  "Environmental Policy": "#0f766e",
-  "Healthcare": "#9d174d",
-  "Education": "#6d28d9",
-  "Technology, Science, and Innovation": "#0f172a",
-  "Foreign Policy": "#a16207",
-  "Democracy & Governance": "#374151",
-  "Housing & Infrastructure": "#7c2d12",
-  "Indigenous Affairs": "#7f1d1d",
-  "Public Safety & Emergency Response": "#0b1324",
-  "Transportation & Mobility": "#047857",
-  "Crime, Justice and Public Safety": "#1f2937",
-  "Culture, Heritage, and Holidays": "#c2410c",
-};
-
-const groupTitleToCategory: Record<string, string> = {
-  'social & civil rights': 'Civil Rights',
-  'economic issues': 'Economics',
-  'technology & innovation': 'Technology, Science, and Innovation',
-  'public safety & emergency response': 'Public Safety & Emergency Response',
-  'transportation & mobility': 'Transportation & Mobility',
-  'housing & infrastructure': 'Housing & Infrastructure',
-  'environmental policy': 'Environmental Policy',
-  'democracy & governance': 'Democracy & Governance',
-  'foreign policy': 'Foreign Policy',
-  'indigenous affairs': 'Indigenous Affairs',
-  'education': 'Education',
-  'healthcare': 'Healthcare',
-};
-
-const staticTagCategoryLookup: Record<string, string> = {
-  "racial justice and equity": "Civil Rights",
-  "gender equality": "Civil Rights",
-  "lgbtq+ rights": "Civil Rights",
-  "immigration policy": "Civil Rights",
-  "refugee support": "Civil Rights",
-  "criminal justice reform": "Civil Rights",
-  "freedom of speech": "Civil Rights",
-  "charter of rights and freedoms": "Civil Rights",
-  "labor rights": "Civil Rights",
-  "minimum wage": "Economics",
-  "corporate tax policy": "Economics",
-  "individual tax policy": "Economics",
-  "support for small businesses": "Economics",
-  "corporate regulation": "Economics",
-  "federal budget": "Economics",
-  "economic stimulus": "Economics",
-  "inflation response": "Economics",
-  "gig & platform work": "Economics",
-  "employment insurance": "Economics",
-  "anti-money laundering": "Economics",
-  "climate change": "Environmental Policy",
-  "sustainability": "Environmental Policy",
-  "renewable energy investment": "Environmental Policy",
-  "conservation": "Environmental Policy",
-  "environmental justice": "Environmental Policy",
-  "carbon pricing": "Environmental Policy",
-  "resource extraction regulation": "Environmental Policy",
-  "recycling": "Environmental Policy",
-  "water protection": "Environmental Policy",
-  "mental health funding": "Healthcare",
-  "reproductive rights": "Healthcare",
-  "pharmaceutical regulation": "Healthcare",
-  "healthcare system reform": "Healthcare",
-  "drug policy & controlled substances": "Healthcare",
-  "indigenous health": "Healthcare",
-  "maid (medical assistance in dying)": "Healthcare",
-  "health data & privacy": "Healthcare",
-  "vaccination policy": "Healthcare",
-  "student debt": "Education",
-  "access to education": "Education",
-  "curriculum reform": "Education",
-  "higher education funding and affordability": "Education",
-  "indigenous education": "Education",
-  "early childhood education": "Education",
-  "digital literacy": "Education",
-  "ai regulation": "Technology, Science, and Innovation",
-  "data privacy": "Technology, Science, and Innovation",
-  "cybersecurity": "Technology, Science, and Innovation",
-  "access to internet": "Technology, Science, and Innovation",
-  "content moderation": "Technology, Science, and Innovation",
-  "telecom regulation": "Technology, Science, and Innovation",
-  "intellectual property": "Technology, Science, and Innovation",
-  "military spending": "Foreign Policy",
-  "interventionism": "Foreign Policy",
-  "international aid and development": "Foreign Policy",
-  "trade agreements": "Foreign Policy",
-  "international organizations (un, nato, etc.)": "Foreign Policy",
-  "arms export control": "Foreign Policy",
-  "peacekeeping": "Foreign Policy",
-  "sanctions": "Foreign Policy",
-  "foreign interference": "Foreign Policy",
-  "voting rights": "Democracy & Governance",
-  "election security": "Democracy & Governance",
-  "gerrymandering and redistricting": "Democracy & Governance",
-  "campaign finance reform": "Democracy & Governance",
-  "national security oversight": "Democracy & Governance",
-  "affordable housing": "Housing & Infrastructure",
-  "homelessness": "Housing & Infrastructure",
-  "indigenous housing": "Housing & Infrastructure",
-  "public infrastructure": "Housing & Infrastructure",
-  "urban planning": "Housing & Infrastructure",
-  "green building & retrofitting": "Housing & Infrastructure",
-  "indigenous truth & reconciliation": "Indigenous Affairs",
-  "undrip (united nations declaration on the rights of indigenous peoples)": "Indigenous Affairs",
-  "land rights & treaties": "Indigenous Affairs",
-  "indigenous self-government": "Indigenous Affairs",
-  "indigenous languages": "Indigenous Affairs",
-  "mmiwg (missing and murdered indigenous women and girls)": "Indigenous Affairs",
-  "child welfare reform": "Indigenous Affairs",
-  "national security": "Public Safety & Emergency Response",
-  "emergency preparedness": "Public Safety & Emergency Response",
-  "disaster response": "Public Safety & Emergency Response",
-  "border security": "Public Safety & Emergency Response",
-  "counter-terrorism": "Public Safety & Emergency Response",
-  "human trafficking": "Public Safety & Emergency Response",
-  "public transit": "Transportation & Mobility",
-  "aviation safety": "Transportation & Mobility",
-  "rail regulation": "Transportation & Mobility",
-  "vehicle emissions": "Transportation & Mobility",
-  "autonomous vehicles": "Transportation & Mobility",
-  "supply chain": "Transportation & Mobility",
-  "transportation accessibility": "Transportation & Mobility",
-  "electric vehicles": "Transportation & Mobility",
-  "policing": "Crime, Justice and Public Safety",
-  "prison reform": "Crime, Justice and Public Safety",
-  "public safety": "Crime, Justice and Public Safety",
-  "gun control": "Crime, Justice and Public Safety",
-  "public holidays": "Culture, Heritage, and Holidays",
-  "indigenous heritage": "Culture, Heritage, and Holidays",
-  "arts and culture": "Culture, Heritage, and Holidays",
+  'Civil Rights': '#b91c1c',
+  'Economics': '#1d4ed8',
+  'Environment': '#0f766e',
+  'Healthcare': '#9d174d',
+  'Education': '#6d28d9',
+  'Technology and Science': '#0f172a',
+  'Foreign Policy': '#a16207',
+  'Democracy & Governance': '#374151',
+  'Housing & Infrastructure': '#7c2d12',
+  'Indigenous Affairs': '#7f1d1d',
+  'Public Safety & Emergency Response': '#0b1324',
+  'Transportation': '#047857',
+  'Crime and Justice': '#4b5563',
+  'Culture, Heritage, and Holidays': '#c2410c',
+  'Labor and Employment': '#0e7490',
+  'Consumer Protection & Product Safety': '#334155',
+  'Taxation & Government Revenue': '#7e22ce',
+  'Workplace Safety': '#065f46',
+  'Veterans & Military Service': '#78350f',
+  'Electoral Boundaries & Administration': '#1f2937',
+  'Commemorative Days & National Recognition': '#9a3412',
+  'Agriculture, Fisheries & Food': '#365314',
+  'Government Finance & Budget': '#1e40af',
 };
 
 export const normalizeTag = (tag: string): string => tag.trim().toLowerCase();
 
-const dynamicTagCategoryLookup: Record<string, string> = {};
+const tagCategoryLookup: Record<string, string> = {};
 interestGroups.forEach((group) => {
-  const normalizedTitle = normalizeTag(group.title);
-  const category =
-    groupTitleToCategory[normalizedTitle] ||
-    (categoryColors[group.title] ? group.title : null);
-  if (!category) {
-    return;
-  }
   group.tags.forEach((tag) => {
-    dynamicTagCategoryLookup[normalizeTag(tag)] = category;
+    const normalized = normalizeTag(tag);
+    if (!tagCategoryLookup[normalized]) {
+      tagCategoryLookup[normalized] = group.title;
+    }
   });
 });
 
-export const tagCategoryLookup: Record<string, string> = {
-  ...dynamicTagCategoryLookup,
-  ...staticTagCategoryLookup,
-};
-
 export const getTagCategory = (tag: string): string | null => {
   const normalized = normalizeTag(tag);
-  const directCategory = categoryColors[tag] ? tag : null;
-  if (directCategory) {
-    return directCategory;
+
+  if (categoryColors[tag]) {
+    return tag;
   }
+
   const categoryByName = Object.keys(categoryColors).find(
     (category) => normalizeTag(category) === normalized
   );
   if (categoryByName) {
     return categoryByName;
   }
+
   return tagCategoryLookup[normalized] || null;
 };
 
