@@ -90,6 +90,31 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
     }
   };
 
+  const renderBoldSegments = (text: string) => {
+    const parts: Array<string | JSX.Element> = [];
+    const regex = /\*\*(.+?)\*\*/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+      parts.push(
+        <Text key={`${match.index}-${match[1]}`} style={styles.summaryBold}>
+          {match[1]}
+        </Text>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts;
+  };
+
   const renderSummary = (summary: string) => {
     const lines = summary.split('\n');
     
@@ -100,7 +125,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
     );
 
     if (!hasBullets) {
-      return <Text style={styles.summary}>{summary}</Text>;
+      return <Text style={styles.summary}>{renderBoldSegments(summary)}</Text>;
     }
 
     return (
@@ -116,7 +141,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
               return (
                 <View key={index} style={styles.bulletRow}>
                   <View style={styles.bulletDot} />
-                  <Text style={styles.bulletText}>{content}</Text>
+                  <Text style={styles.bulletText}>{renderBoldSegments(content)}</Text>
                 </View>
               );
             }
@@ -125,7 +150,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
           if (trimmed) {
             return (
               <Text key={index} style={styles.summary}>
-                {trimmed}
+                {renderBoldSegments(trimmed)}
               </Text>
             );
           }
@@ -364,6 +389,10 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     lineHeight: 24,
     marginBottom: 8,
+  },
+  summaryBold: {
+    fontWeight: '700',
+    color: theme.colors.textDark,
   },
   bulletRow: {
     flexDirection: 'row',

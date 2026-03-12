@@ -60,7 +60,7 @@ export const getRecommendations = async (
     );
     return response.data;
   } catch (error) {
-    console.error('Error fetching recommendations:', error);
+    console.warn('Error fetching recommendations:', error);
     throw error;
   }
 };
@@ -112,7 +112,7 @@ export const getMyRecommendations = async (
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching recommendations:', error);
+    console.warn('Error fetching recommendations:', error);
     throw error;
   }
 };

@@ -17,7 +17,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import AppLogo from '../components/AppLogo';
 import type { MyProfileRecord } from '../types';
 import { theme } from '../theme';
-import { categoryColors, getTagCategory } from '../data/tagCategories';
+import InterestChips from '../components/InterestChips';
 import { useAuth } from '../context/AuthContext';
 import GradientBackground from '../components/GradientBackground';
 
@@ -117,13 +117,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     return String(value);
   };
 
-  const getInterestChipStyle = (interest: string) => {
-    const category = getTagCategory(interest);
-    const backgroundColor = category ? categoryColors[category] : theme.colors.surfaceMuted;
-    const textColor = category ? '#ffffff' : theme.colors.textDark;
-    return { backgroundColor, textColor };
-  };
-
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <GradientBackground
@@ -159,30 +152,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             {profile.interests && profile.interests.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Interests</Text>
-                <View style={styles.interestsContainer}>
-                  {profile.interests.map((interest, index) => {
-                    if (interest === 'nan') return null;
-                    const chipStyle = getInterestChipStyle(interest);
-                    return (
-                      <View
-                        key={index}
-                        style={[
-                          styles.interestChip,
-                          { backgroundColor: chipStyle.backgroundColor },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.interestText,
-                            { color: chipStyle.textColor },
-                          ]}
-                        >
-                          {formatValue(interest)}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
+                <InterestChips interests={profile.interests} labelTransform={formatValue} />
               </View>
             )}
 
@@ -312,21 +282,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textDark,
     marginBottom: 12,
-  },
-  interestsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  interestChip: {
-    paddingHorizontal: 12,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: 16,
-    borderWidth: 0,
-  },
-  interestText: {
-    fontSize: 14,
-    fontWeight: '500',
   },
   demographicRow: {
     flexDirection: 'row',

@@ -89,7 +89,7 @@ const getReadingNumber = (value: string) => {
   return null;
 };
 
-type StatusConfig = {
+export type StatusConfig = {
   icon: string;
   label: string;
   phaseLabel: string;
@@ -104,7 +104,7 @@ const getChamberColor = (normalizedStatus: string): string | null => {
   return null;
 };
 
-const getStatusConfig = (statusCode: string): StatusConfig => {
+export const getStatusConfig = (statusCode: string): StatusConfig => {
   const normalized = normalize(statusCode);
   const chamberColor = getChamberColor(normalized);
 

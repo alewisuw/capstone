@@ -13,6 +13,9 @@ import type { StackScreenProps } from '@react-navigation/stack';
 
 import HomeScreen from './src/screens/HomeScreen';
 import RecommendationsScreen from './src/screens/RecommendationsScreen';
+import LearnScreen from './src/screens/LearnScreen';
+import LearnDetailScreen from './src/screens/LearnDetailScreen';
+import LearnModuleDetailScreen from './src/screens/LearnModuleDetailScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import EditProfileScreen from './src/screens/EditProfileScreen';
 import BillDetailScreen from './src/screens/BillDetailScreen';
@@ -71,6 +74,28 @@ function RecommendationsStack() {
       <Stack.Screen 
         name="BillDetail" 
         component={BillDetailScreen}
+        options={{ headerShown: false }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function LearnStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="LearnMain"
+        component={LearnScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="LearnDetail"
+        component={LearnDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="LearnModuleDetail"
+        component={LearnModuleDetailScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>
@@ -145,6 +170,8 @@ function AppShell() {
             iconName = focused ? 'search' : 'search-outline';
           } else if (route.name === 'Recommendations') {
             iconName = focused ? 'document-text' : 'document-text-outline';
+          } else if (route.name === 'Learn') {
+            iconName = focused ? 'school' : 'school-outline';
           } else if (route.name === 'Saved') {
             iconName = focused ? 'bookmark' : 'bookmark-outline';
           } else if (route.name === 'Profile') {
@@ -169,6 +196,7 @@ function AppShell() {
       })}
     >
       <Tab.Screen name="Recommendations" component={RecommendationsStack} options={{ title: 'Home' }} />
+      <Tab.Screen name="Learn" component={LearnStack} />
       <Tab.Screen name="Home" component={HomeStack} options={{ title: 'Search' }} />
       <Tab.Screen name="Saved" component={SavedStack} options={{ title: 'Saved' }} />
       <Tab.Screen name="Profile" component={ProfileStack} />

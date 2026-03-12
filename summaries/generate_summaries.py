@@ -2,6 +2,7 @@ import json
 import boto3
 import psycopg2
 import requests
+import argparse
 from google.oauth2 import service_account
 import google.auth.transport.requests
 from sentence_transformers import SentenceTransformer
@@ -88,7 +89,7 @@ def summarize(text, token):
     result = response.json()
     return result["candidates"][0]["content"]["parts"][0]["text"]
 
-def main():
+def main(no_status_update=False):
     token = get_token()
 
     conn = psycopg2.connect(
@@ -113,10 +114,24 @@ def main():
             ) THEN
                 ALTER TABLE bills_billtext ADD COLUMN llm_summary TEXT;
             END IF;
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns
+                WHERE table_name='bills_billtext' AND column_name='is_new_bill'
+            ) THEN
+                ALTER TABLE bills_billtext ADD COLUMN is_new_bill SMALLINT;
+            END IF;
         END
         $$;
     """)
     conn.commit()
+
+    if not no_status_update:
+        cursor.execute("""
+            UPDATE bills_billtext
+            SET is_new_bill = 0
+            WHERE llm_summary IS NOT NULL
+        """)
+        conn.commit()
 
     cursor.execute("""
         SELECT bill_id, text_en FROM bills_billtext
@@ -138,11 +153,18 @@ def main():
                 "summary": summary
             })
 
-            cursor.execute("""
-                UPDATE bills_billtext
-                SET llm_summary = %s
-                WHERE bill_id = %s
-            """, (summary, bill_id))
+            if no_status_update:
+                cursor.execute("""
+                    UPDATE bills_billtext
+                    SET llm_summary = %s
+                    WHERE bill_id = %s
+                """, (summary, bill_id))
+            else:
+                cursor.execute("""
+                    UPDATE bills_billtext
+                    SET llm_summary = %s, is_new_bill = 1
+                    WHERE bill_id = %s
+                """, (summary, bill_id))
             conn.commit()
 
         except Exception as e:
@@ -155,5 +177,13 @@ def main():
     return {"status": "tested", "summarized_count": len(results)}
 
 if __name__ == "__main__":
-    response = main()
+    parser = argparse.ArgumentParser(description="Generate LLM summaries for bills.")
+    parser.add_argument(
+        "--no-status-update",
+        action="store_true",
+        help="Skip is_new_bill reset/set updates."
+    )
+    args = parser.parse_args()
+
+    response = main(no_status_update=args.no_status_update)
     print("Response:", response)

@@ -424,7 +424,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
       <SafeAreaView style={styles.container} edges={[]}>
         <GradientBackground style={[styles.header, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={24} color="#fff" />
+            <Ionicons name="arrow-back" size={18} color={theme.colors.accentDark} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Profile</Text>
         </GradientBackground>
@@ -439,7 +439,7 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container} edges={[]}>
       <GradientBackground style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#fff" />
+          <Ionicons name="arrow-back" size={18} color={theme.colors.accentDark} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Profile</Text>
         <View style={styles.topRightLogo}>
@@ -825,10 +825,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 16,
     top: 55,
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#fff',
+    zIndex: 2,
   },
   headerTitle: {
     fontSize: 28,

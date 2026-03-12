@@ -54,6 +54,9 @@ export interface HealthStatus {
 export type RootStackParamList = {
   HomeMain: undefined;
   RecommendationsMain: { username?: string };
+  LearnMain: undefined;
+  LearnDetail: { topic: 'billboard' | 'legislation' | 'governance' };
+  LearnModuleDetail: { topic: 'billboard' | 'legislation' | 'governance'; moduleId: string };
   SavedMain: undefined;
   ProfileMain: undefined;
   EditProfile: undefined;
@@ -63,6 +66,7 @@ export type RootStackParamList = {
 export type RootTabParamList = {
   Home: undefined;
   Recommendations: { username?: string };
+  Learn: undefined;
   Saved: undefined;
   Profile: undefined;
 };

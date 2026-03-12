@@ -78,7 +78,7 @@ const InterestsScreen: React.FC<InterestsProps> = ({ navigation }) => {
     <View style={styles.container}>
       <GradientBackground style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={20} color="#fff" />
+          <Ionicons name="arrow-back" size={18} color={theme.colors.accentDark} />
         </TouchableOpacity>
         <AppLogo width={90} height={90} />
       </GradientBackground>
@@ -222,7 +222,8 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    backgroundColor: '#fff',
+    zIndex: 2,
   },
   card: {
     flex: 1,

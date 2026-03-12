@@ -22,6 +22,7 @@ import type { BillRecommendation } from '../types';
 import { theme } from '../theme';
 import { useSaved } from '../context/SavedContext';
 import GradientBackground from '../components/GradientBackground';
+import SearchBar from '../components/SearchBar';
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
@@ -107,27 +108,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <AppLogo width={44} height={44} />
         </View>
 
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color={theme.colors.accent} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search by topic, issue, or phrase"
-            placeholderTextColor="#6b6b6b"
-            value={query}
-            onChangeText={setQuery}
-            onSubmitEditing={() => handleSearch()}
-            returnKeyType="search"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Pressable
-            style={({ pressed }) => [styles.searchIconButton, pressed && styles.buttonPressed]}
-            onPress={() => handleSearch()}
-            android_ripple={{ color: 'rgba(193,0,0,0.12)', borderless: true }}
-          >
-            <Ionicons name="arrow-forward" size={20} color={theme.colors.accent} />
-          </Pressable>
-        </View>
+        <SearchBar
+          value={query}
+          placeholder="Search by topic, issue, or phrase"
+          onChangeText={setQuery}
+          onSubmit={() => handleSearch()}
+          onActionPress={() => handleSearch()}
+        />
 
         {null}
       </GradientBackground>
@@ -228,27 +215,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255, 255, 255, 0.9)',
     marginBottom: 24,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginTop: theme.spacing.lg,
-    backgroundColor: theme.colors.surface,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-  },
-  searchInput: {
-    flex: 1,
-    color: theme.colors.textDark,
-    fontSize: 16,
-  },
-  searchIconButton: {
-    padding: theme.spacing.xs,
-    borderRadius: 10,
   },
   buttonPressed: {
     opacity: 0.8,
