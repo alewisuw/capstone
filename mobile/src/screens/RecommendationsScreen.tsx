@@ -45,7 +45,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   );
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<BillRecommendation[]>([]);
-  const [currentLimit, setCurrentLimit] = useState<number>(50);
+  const [nextOffset, setNextOffset] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +109,8 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
     }
   };
 
+  const pageSize = 50;
+
   const loadRecommendations = async (append: boolean = false): Promise<void> => {
     try {
       setError(null);
@@ -119,22 +121,22 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         setLoadingMore(true);
       }
 
-      const limit = 50;
+      const offset = append ? nextOffset : 0;
 
       if (user && authToken) {
-        const data = await getMyRecommendations(authToken, limit);
+        const data = await getMyRecommendations(authToken, pageSize, offset);
         const newRecommendations = data.recommendations || [];
         
         if (append) {
           const existingIds = new Set(recommendations.map(b => b.bill_id));
           const newBills = newRecommendations.filter(b => !existingIds.has(b.bill_id));
           setRecommendations([...recommendations, ...newBills]);
-          setCurrentLimit(limit);
-          setHasMore(false);
+          setNextOffset(offset + pageSize);
+          setHasMore(newRecommendations.length === pageSize);
         } else {
           setRecommendations(newRecommendations);
-          setCurrentLimit(limit);
-          setHasMore(false);
+          setNextOffset(pageSize);
+          setHasMore(newRecommendations.length === pageSize);
         }
         return;
       }
@@ -143,24 +145,25 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         return;
       }
       const normalized = (user?.username || username).trim().toLowerCase();
-      const data = await getRecommendations(normalized, limit);
+      const data = await getRecommendations(normalized, pageSize, offset);
       const newRecommendations = data.recommendations || [];
       
       if (append) {
         const existingIds = new Set(recommendations.map(b => b.bill_id));
         const newBills = newRecommendations.filter(b => !existingIds.has(b.bill_id));
           setRecommendations([...recommendations, ...newBills]);
-          setCurrentLimit(limit);
-          setHasMore(false);
+          setNextOffset(offset + pageSize);
+          setHasMore(newRecommendations.length === pageSize);
         } else {
           setRecommendations(newRecommendations);
-          setCurrentLimit(limit);
-          setHasMore(false);
+          setNextOffset(pageSize);
+          setHasMore(newRecommendations.length === pageSize);
         }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load recommendations');
       if (!append) {
         setRecommendations([]);
+        setNextOffset(0);
       }
     } finally {
       setLoading(false);
@@ -221,6 +224,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
 
   const onRefresh = (): void => {
     setRefreshing(true);
+    setNextOffset(0);
     loadRecommendations();
   };
 
@@ -255,7 +259,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       <GradientBackground
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
-        <Text style={styles.headerTitle}>Your BillBoard</Text>
+        <Text style={styles.headerTitle}>Recommendations</Text>
         <Text style={styles.headerSubtitle}>
           Personalized bills for {user?.username || username}
         </Text>

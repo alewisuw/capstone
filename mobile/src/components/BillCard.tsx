@@ -107,6 +107,13 @@ const BillCard: React.FC<BillCardProps> = ({
         ) : null}
         
         <View style={styles.footer}>
+          {bill.is_new_bill === 1 || bill.is_new_bill === true ? (
+            <View style={styles.newBadge}>
+              <Text style={styles.newBadgeText}>New</Text>
+            </View>
+          ) : (
+            <View />
+          )}
           <View style={styles.readMoreContainer}>
             <Text style={styles.readMoreText}>Read More</Text>
             <Ionicons name="arrow-forward" size={16} color={theme.colors.accent} />
@@ -209,8 +216,19 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
+  },
+  newBadge: {
+    backgroundColor: theme.colors.accent,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  newBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
   },
   readMoreContainer: {
     flexDirection: 'row',

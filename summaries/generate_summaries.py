@@ -7,7 +7,7 @@ from google.oauth2 import service_account
 import google.auth.transport.requests
 from sentence_transformers import SentenceTransformer
 
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 ssm = boto3.client('ssm', region_name='ca-central-1')
 
 PARAMETER_NAMES = [

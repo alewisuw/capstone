@@ -2,11 +2,11 @@ from app.services.embeddings import get_model
 from app.services.qdrant import search_vectors
 from app.services.db import get_bill_info
 
-def semantic_search(query: str, limit: int = 3):
+def semantic_search(query: str, limit: int = 20, offset: int = 0):
     model = get_model()
     vector = model.encode(query).tolist()
 
-    results = search_vectors(vector, limit)
+    results = search_vectors(vector, limit, offset)
 
     output = []
     for hit in results:
@@ -25,6 +25,7 @@ def semantic_search(query: str, limit: int = 3):
             "last_updated": info.get("last_updated"),
             "tags": info.get("tags"),
             "status_code": info.get("status_code"),
+            "is_new_bill": info.get("is_new_bill"),
         })
 
     return output

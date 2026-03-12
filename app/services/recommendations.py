@@ -28,6 +28,7 @@ def _build_recommendations(hits) -> List[BillRecommendation]:
                 last_updated=info.get("last_updated"),
                 tags=info.get("tags"),
                 status_code=info.get("status_code"),
+                is_new_bill=info.get("is_new_bill"),
             )
         )
         debug_ids.append(bill_id)
@@ -35,7 +36,7 @@ def _build_recommendations(hits) -> List[BillRecommendation]:
         print(f"[recommendations] bill_ids={debug_ids}")
     return output
 
-def _fused_search(interests: List[str], demographics: Dict, limit: int):
+def _fused_search(interests: List[str], demographics: Dict, limit: int, offset: int):
     fusion = get_fusion()
     qdrant = get_qdrant()
 
@@ -48,9 +49,10 @@ def _fused_search(interests: List[str], demographics: Dict, limit: int):
         collection_name=COLLECTION_NAME,
         query_vector=fused_vector.tolist(),
         limit=limit,
+        offset=offset,
         with_payload=True,
         with_vectors=False,
     )
 
-def recommend_bills(interests, demographics, limit):
-    return _build_recommendations(_fused_search(interests, demographics, limit))
+def recommend_bills(interests, demographics, limit, offset: int = 0):
+    return _build_recommendations(_fused_search(interests, demographics, limit, offset))

@@ -77,7 +77,11 @@ def put_my_profile(payload: UserProfileInput, user=Depends(_get_user)):
 
 
 @router.get("/me/recommendations", response_model=RecommendationResponse)
-def get_my_recommendations(limit: int = Query(10, ge=1, le=100), user=Depends(_get_user)):
+def get_my_recommendations(
+    limit: int = Query(20, ge=1, le=50),
+    offset: int = Query(0, ge=0),
+    user=Depends(_get_user),
+):
     item = get_profile(user["sub"])
     if not item:
         raise HTTPException(status_code=404, detail="Profile not found")
@@ -88,6 +92,7 @@ def get_my_recommendations(limit: int = Query(10, ge=1, le=100), user=Depends(_g
         interests=interests,
         demographics=item.get("demographics", {}),
         limit=limit,
+        offset=offset,
     )
     return RecommendationResponse(recommendations=recommendations)
 

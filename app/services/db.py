@@ -28,7 +28,7 @@ def get_bill_info(bill_id: int):
         conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code
+            SELECT bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code, bt.is_new_bill
             FROM bills_billtext bt
             JOIN bills_bill b ON bt.bill_id = b.id
             WHERE bt.bill_id = %s;
@@ -50,6 +50,7 @@ def get_bill_info(bill_id: int):
     status_date = row[5]
     tags = _extract_tag_labels(row[6])
     status_code = row[7]
+    is_new_bill = row[8]
     return {
         "summary": summary,
         "title": title,
@@ -58,6 +59,7 @@ def get_bill_info(bill_id: int):
         "last_updated": status_date.isoformat() if status_date else None,
         "tags": tags,
         "status_code": status_code,
+        "is_new_bill": is_new_bill,
     }
 
 def get_bills_info(bill_ids: List[int]) -> List[Dict]:
@@ -69,7 +71,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
         conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code
+            SELECT bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code, bt.is_new_bill
             FROM bills_billtext bt
             JOIN bills_bill b ON bt.bill_id = b.id
             WHERE bt.bill_id = ANY(%s);
@@ -93,7 +95,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
 
     info_map = {}
     for row in rows:
-        bill_id, llm_summary, summary_en, title, bill_number, session_id, status_date, llm_tags, status_code = row
+        bill_id, llm_summary, summary_en, title, bill_number, session_id, status_date, llm_tags, status_code, is_new_bill = row
         summary = llm_summary or summary_en or "[No summary found]"
         info_map[bill_id] = {
             "bill_id": bill_id,
@@ -104,6 +106,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
             "last_updated": status_date.isoformat() if status_date else None,
             "tags": _extract_tag_labels(llm_tags),
             "status_code": status_code,
+            "is_new_bill": is_new_bill,
         }
 
     output = []
@@ -119,6 +122,7 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
                 "last_updated": None,
                 "tags": None,
                 "status_code": None,
+                "is_new_bill": None,
             },
         ))
     return output

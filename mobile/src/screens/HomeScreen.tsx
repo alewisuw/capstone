@@ -55,7 +55,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     if (!append) {
       setCurrentSearchTerm(searchTerm.trim());
       setCurrentLimit(20);
-      setHasMore(false);
+      setHasMore(true);
       setResults([]);
     }
 
@@ -68,19 +68,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     
     try {
       const limit = 20;
-      const data = await searchBills(searchTerm.trim(), limit);
+      const nextOffset = append ? currentLimit : 0;
+      const data = await searchBills(searchTerm.trim(), limit, nextOffset);
       
       if (append) {
         // Append new results, avoiding duplicates
         const existingIds = new Set(results.map(b => b.bill_id));
         const newBills = data.filter(b => !existingIds.has(b.bill_id));
         setResults([...results, ...newBills]);
-        setCurrentLimit(limit);
-        setHasMore(false);
+        const nextTotal = currentLimit + newBills.length;
+        setCurrentLimit(nextTotal);
+        setHasMore(data.length === limit);
       } else {
         setResults(data || []);
-        setCurrentLimit(limit);
-        setHasMore(false);
+        setCurrentLimit(data.length);
+        setHasMore(data.length === limit);
       }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to search bills');

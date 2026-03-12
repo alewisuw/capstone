@@ -11,12 +11,13 @@ def get_qdrant() -> QdrantClient:
         port=settings["qdrant"]["port"],
     )
 
-def search_vectors(vector, limit: int):
+def search_vectors(vector, limit: int, offset: int = 0):
     client = get_qdrant()
     return client.search(
         collection_name=COLLECTION_NAME,
         query_vector=vector,
         limit=limit,
+        offset=offset,
         with_payload=True,
         with_vectors=False,
     )

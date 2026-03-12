@@ -11,6 +11,7 @@ class BillRecommendation(BaseModel):
     last_updated: Optional[str] = None
     tags: Optional[List[str]] = None
     status_code: Optional[str] = None
+    is_new_bill: Optional[int] = None
 
 class SavedBill(BaseModel):
     bill_id: int
@@ -21,6 +22,7 @@ class SavedBill(BaseModel):
     last_updated: Optional[str] = None
     tags: Optional[List[str]] = None
     status_code: Optional[str] = None
+    is_new_bill: Optional[int] = None
 
 class SaveBillRequest(BaseModel):
     bill_id: int
