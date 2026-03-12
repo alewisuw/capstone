@@ -26,7 +26,56 @@ export const categoryColors: Record<string, string> = {
   'Government Finance & Budget': '#1e40af',
 };
 
-export const normalizeTag = (tag: string): string => tag.trim().toLowerCase();
+export const normalizeTag = (tag: string): string =>
+  tag
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[(),.:/]/g, ' ')
+    .replace(/\s+/g, ' ');
+
+const categoryAliases: Record<string, string> = {
+  'social and civil rights': 'Civil Rights',
+  'economic issues': 'Economics',
+  'environmental policy': 'Environment',
+  'technology and innovation': 'Technology and Science',
+  'technology science and innovation': 'Technology and Science',
+  'transportation and mobility': 'Transportation',
+  'crime justice and public safety': 'Crime and Justice',
+};
+
+const legacyTagCategoryLookup: Record<string, string> = {
+  'human rights': 'Civil Rights',
+  'youth justice': 'Civil Rights',
+  'disability rights': 'Civil Rights',
+  'hate speech': 'Civil Rights',
+  'labor rights': 'Labor and Employment',
+  'income inequality': 'Economics',
+  'wealth redistribution': 'Economics',
+  'universal basic income ubi': 'Economics',
+  'employment standards': 'Labor and Employment',
+  'biodiversity': 'Environment',
+  'plastic waste': 'Environment',
+  'clean energy': 'Environment',
+  'universal healthcare': 'Healthcare',
+  'access to abortion': 'Healthcare',
+  'pharmaceutical pricing': 'Healthcare',
+  'online harms': 'Technology and Science',
+  'government investment in innovation': 'Technology and Science',
+  'digital governance': 'Technology and Science',
+  'research and development': 'Technology and Science',
+  'globalization': 'Foreign Policy',
+  'diplomacy': 'Foreign Policy',
+  'government transparency and accountability': 'Democracy & Governance',
+  'federalism and intergovernmental relations': 'Democracy & Governance',
+  'political financing': 'Democracy & Governance',
+  'public services': 'Democracy & Governance',
+  'parliamentary reform': 'Democracy & Governance',
+  'rural broadband': 'Housing & Infrastructure',
+  'crime': 'Crime and Justice',
+  'infrastructure resilience': 'Transportation',
+  'biking': 'Transportation',
+};
 
 const tagCategoryLookup: Record<string, string> = {};
 interestGroups.forEach((group) => {
@@ -41,18 +90,44 @@ interestGroups.forEach((group) => {
 export const getTagCategory = (tag: string): string | null => {
   const normalized = normalizeTag(tag);
 
-  if (categoryColors[tag]) {
-    return tag;
-  }
-
-  const categoryByName = Object.keys(categoryColors).find(
-    (category) => normalizeTag(category) === normalized
+  const exactCategoryName = Object.keys(categoryColors).find(
+    (category) => category === tag || normalizeTag(category) === normalized
   );
-  if (categoryByName) {
-    return categoryByName;
+  if (exactCategoryName) {
+    return exactCategoryName;
   }
 
-  return tagCategoryLookup[normalized] || null;
+  const aliasCategory = categoryAliases[normalized];
+  if (aliasCategory) {
+    return aliasCategory;
+  }
+
+  const directTagMatch = tagCategoryLookup[normalized];
+  if (directTagMatch) {
+    return directTagMatch;
+  }
+
+  const legacyTagMatch = legacyTagCategoryLookup[normalized];
+  if (legacyTagMatch) {
+    return legacyTagMatch;
+  }
+
+  // Fallback to approximate matching for minor punctuation/plural variations from backend labels.
+  const approxDynamic = Object.keys(tagCategoryLookup).find(
+    (known) => normalized.includes(known) || known.includes(normalized)
+  );
+  if (approxDynamic) {
+    return tagCategoryLookup[approxDynamic];
+  }
+
+  const approxLegacy = Object.keys(legacyTagCategoryLookup).find(
+    (known) => normalized.includes(known) || known.includes(normalized)
+  );
+  if (approxLegacy) {
+    return legacyTagCategoryLookup[approxLegacy];
+  }
+
+  return null;
 };
 
 export const getTagColor = (tag: string): string | null => {
