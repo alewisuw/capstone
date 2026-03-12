@@ -5,10 +5,16 @@ import type { ErrorMessageProps } from '../types';
 import { theme } from '../theme';
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, onRetry }) => {
+  const displayMessage = typeof message === 'string'
+    ? message
+    : message
+    ? JSON.stringify(message)
+    : 'Something went wrong';
+
   return (
     <View style={styles.container}>
       <Ionicons name="alert-circle-outline" size={48} color={theme.colors.accent} />
-      <Text style={styles.message}>{message || 'Something went wrong'}</Text>
+      <Text style={styles.message}>{displayMessage}</Text>
       {onRetry && (
         <TouchableOpacity onPress={onRetry}>
           <Text style={styles.retryText}>Tap to retry</Text>

@@ -14,7 +14,11 @@ import Ionicons from '../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import type { RootStackParamList } from '../types';
-import { getRecommendations, getMyRecommendations, getProfiles } from '../services/apiService';
+import {
+  getRecommendations,
+  getMyRecommendations,
+  getProfiles,
+} from '../services/apiService';
 import BillCard from '../components/BillCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
@@ -28,6 +32,9 @@ import GradientBackground from '../components/GradientBackground';
 
 type RecommendationsScreenProps = StackScreenProps<RootStackParamList, 'RecommendationsMain'>;
 
+type FilterKey = 'all' | 'in_progress' | 'assented' | 'new';
+type SortKey = 'relevance' | 'recent';
+
 const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ 
   navigation, 
   route 
@@ -38,13 +45,17 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
   );
   const [availableProfiles, setAvailableProfiles] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<BillRecommendation[]>([]);
-  const [currentLimit, setCurrentLimit] = useState<number>(10);
+  const [currentLimit, setCurrentLimit] = useState<number>(50);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [showUsernameInput, setShowUsernameInput] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
+  const [activeSort, setActiveSort] = useState<SortKey>('relevance');
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showSorts, setShowSorts] = useState<boolean>(false);
   const { user, authToken, profileVersion } = useAuth();
   const { isSaved, toggleSave } = useSaved();
   const lastLoadedProfileVersionRef = useRef<number>(profileVersion);
@@ -108,7 +119,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         setLoadingMore(true);
       }
 
-      const limit = append ? currentLimit + 10 : 10;
+      const limit = 50;
 
       if (user && authToken) {
         const data = await getMyRecommendations(authToken, limit);
@@ -119,11 +130,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
           const newBills = newRecommendations.filter(b => !existingIds.has(b.bill_id));
           setRecommendations([...recommendations, ...newBills]);
           setCurrentLimit(limit);
-          setHasMore(newBills.length > 0 && newRecommendations.length === limit);
+          setHasMore(false);
         } else {
           setRecommendations(newRecommendations);
           setCurrentLimit(limit);
-          setHasMore(newRecommendations.length === limit);
+          setHasMore(false);
         }
         return;
       }
@@ -138,14 +149,14 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       if (append) {
         const existingIds = new Set(recommendations.map(b => b.bill_id));
         const newBills = newRecommendations.filter(b => !existingIds.has(b.bill_id));
-        setRecommendations([...recommendations, ...newBills]);
-        setCurrentLimit(limit);
-        setHasMore(newBills.length > 0 && newRecommendations.length === limit);
-      } else {
-        setRecommendations(newRecommendations);
-        setCurrentLimit(limit);
-        setHasMore(newRecommendations.length === limit);
-      }
+          setRecommendations([...recommendations, ...newBills]);
+          setCurrentLimit(limit);
+          setHasMore(false);
+        } else {
+          setRecommendations(newRecommendations);
+          setCurrentLimit(limit);
+          setHasMore(false);
+        }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load recommendations');
       if (!append) {
@@ -163,6 +174,50 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       loadRecommendations(true);
     }
   }, [loadingMore, hasMore, refreshing]);
+
+  const isInProgress = (statusCode?: string | null): boolean => {
+    if (!statusCode) return false;
+    const normalized = statusCode.toLowerCase();
+    if (normalized === 'royalassentgiven') return false;
+    if (normalized === 'outsideorderprecedence') return false;
+    if (normalized === 'billdefeated' || normalized === 'willnotbeproceededwith') return false;
+    return true;
+  };
+
+  const isAssented = (statusCode?: string | null): boolean =>
+    statusCode?.toLowerCase() === 'royalassentgiven';
+
+  const isNewBill = (bill: BillRecommendation): boolean =>
+    bill.is_new_bill === 1 || bill.is_new_bill === true;
+
+  const applyFilters = (list: BillRecommendation[]): BillRecommendation[] => {
+    switch (activeFilter) {
+      case 'in_progress':
+        return list.filter((bill) => isInProgress(bill.status_code));
+      case 'assented':
+        return list.filter((bill) => isAssented(bill.status_code));
+      case 'new':
+        return list.filter((bill) => isNewBill(bill));
+      default:
+        return list;
+    }
+  };
+
+  const applySort = (list: BillRecommendation[]): BillRecommendation[] => {
+    if (activeSort === 'recent') {
+      return [...list].sort((a, b) => {
+        const aTime = a.last_updated ? new Date(a.last_updated).getTime() : 0;
+        const bTime = b.last_updated ? new Date(b.last_updated).getTime() : 0;
+        return bTime - aTime;
+      });
+    }
+    return list;
+  };
+
+  const filteredRecommendations = applySort(applyFilters(recommendations));
+  const hasActiveFilters = activeFilter !== 'all' || activeSort !== 'relevance';
+  const sortActive = showSorts;
+  const filterActive = showFilters;
 
   const onRefresh = (): void => {
     setRefreshing(true);
@@ -200,7 +255,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
       <GradientBackground
         style={[styles.header, { paddingTop: insets.top + 10 }]}
       >
-        <Text style={styles.headerTitle}>Recommendations</Text>
+        <Text style={styles.headerTitle}>Your BillBoard</Text>
         <Text style={styles.headerSubtitle}>
           Personalized bills for {user?.username || username}
         </Text>
@@ -255,7 +310,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         <ErrorMessage message={error} onRetry={() => loadRecommendations(false)} />
       ) : (
         <FlatList
-          data={recommendations}
+          data={filteredRecommendations}
           keyExtractor={(item) => item.bill_id.toString()}
           renderItem={({ item }) => (
             <BillCard
@@ -265,8 +320,8 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
               onToggleSave={toggleSave}
             />
           )}
-          ListHeaderComponent={
-            <>
+          ListHeaderComponent={() => (
+            <View>
               {availableProfiles.length > 0 && !user && (
                 <View style={styles.profileChips}>
                   <Text style={styles.profileChipsLabel}>Try another profile:</Text>
@@ -288,14 +343,118 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
                 </View>
               )}
               {recommendations.length > 0 && (
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>
-                    For You
-                  </Text>
+                <View>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>
+                      Your BillBoard
+                    </Text>
+                  </View>
+                  <View style={styles.controlRow}>
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.controlButton,
+                        sortActive && styles.controlButtonActive,
+                        pressed && styles.buttonPressed,
+                      ]}
+                      onPress={() => {
+                        setShowSorts((prev) => !prev);
+                        setShowFilters(false);
+                      }}
+                      android_ripple={{ color: 'rgba(193,0,0,0.10)' }}
+                    >
+                      <Ionicons name="swap-vertical" size={16} color={sortActive ? '#fff' : theme.colors.accent} />
+                      <Text style={[styles.controlText, sortActive && styles.controlTextActive]}>
+                        Sort
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      style={({ pressed }) => [
+                        styles.controlButton,
+                        filterActive && styles.controlButtonActive,
+                        pressed && styles.buttonPressed,
+                      ]}
+                      onPress={() => {
+                        setShowFilters((prev) => !prev);
+                        setShowSorts(false);
+                      }}
+                      android_ripple={{ color: 'rgba(193,0,0,0.10)' }}
+                    >
+                      <Text style={[styles.controlText, filterActive && styles.controlTextActive]}>
+                        Filter
+                      </Text>
+                      <Ionicons name="funnel-outline" size={16} color={filterActive ? '#fff' : theme.colors.accent} />
+                    </Pressable>
+                  </View>
+                  {showSorts ? (
+                    <View style={styles.optionRow}>
+                      {([
+                        { key: 'relevance', label: 'Relevant' },
+                        { key: 'recent', label: 'Recent' },
+                      ] as const).map((sort) => (
+                        <Pressable
+                          key={sort.key}
+                          style={({ pressed }) => [
+                            styles.optionChip,
+                            activeSort === sort.key && styles.optionChipActive,
+                            pressed && styles.buttonPressed,
+                          ]}
+                          onPress={() => setActiveSort(sort.key)}
+                          android_ripple={{ color: 'rgba(193,0,0,0.10)' }}
+                        >
+                          <Text
+                            style={[
+                              styles.optionChipText,
+                              activeSort === sort.key && styles.optionChipTextActive,
+                            ]}
+                          >
+                            {sort.label}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  ) : null}
+                  {showFilters ? (
+                    <View style={styles.optionRow}>
+                      {([
+                        { key: 'all', label: 'All' },
+                        { key: 'in_progress', label: 'In Progress' },
+                        { key: 'assented', label: 'In Law' },
+                        { key: 'new', label: 'New' },
+                      ] as const).map((filter) => (
+                        <Pressable
+                          key={filter.key}
+                          style={({ pressed }) => [
+                            styles.optionChip,
+                            activeFilter === filter.key && styles.optionChipActive,
+                            pressed && styles.buttonPressed,
+                          ]}
+                          onPress={() => setActiveFilter(filter.key)}
+                          android_ripple={{ color: 'rgba(193,0,0,0.10)' }}
+                        >
+                          <Text
+                            style={[
+                              styles.optionChipText,
+                              activeFilter === filter.key && styles.optionChipTextActive,
+                            ]}
+                          >
+                            {filter.label}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  ) : null}
+                  {hasActiveFilters && filteredRecommendations.length === 0 ? (
+                    <View style={styles.emptyStateSmall}>
+                      <Ionicons name="filter" size={28} color="#d1d5db" />
+                      <Text style={styles.emptyStateSmallText}>
+                        Try broadening filters to ensure more bills are found
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
               )}
-            </>
-          }
+            </View>
+          )}
           ListFooterComponent={
             loadingMore ? (
               <View style={styles.loadingMore}>
@@ -304,7 +463,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
             ) : null
           }
           ListEmptyComponent={
-            !loading ? (
+            !loading && !(recommendations.length > 0 && hasActiveFilters) ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyStateText}>
                   No recommendations available
@@ -403,6 +562,79 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingVertical: 16,
+  },
+  controlRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+  controlButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#fff',
+  },
+  controlButtonActive: {
+    backgroundColor: theme.colors.accent,
+  },
+  controlText: {
+    color: theme.colors.accent,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  controlTextActive: {
+    color: '#fff',
+  },
+  optionRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  optionChip: {
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#fff',
+  },
+  optionChipActive: {
+    backgroundColor: theme.colors.accent,
+    borderColor: theme.colors.accent,
+  },
+  optionChipText: {
+    color: theme.colors.accent,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  optionChipTextActive: {
+    color: '#fff',
+  },
+  emptyStateSmall: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    backgroundColor: theme.colors.surface,
+  },
+  emptyStateSmallText: {
+    color: theme.colors.textMuted,
+    fontSize: 13,
+    flex: 1,
   },
   loadingMore: {
     paddingVertical: theme.spacing.lg,

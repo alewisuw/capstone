@@ -49,7 +49,7 @@ export const getProfile = async (username: string): Promise<UserProfile> => {
 
 export const getRecommendations = async (
   username: string, 
-  limit: number = 5
+  limit: number = 50
 ): Promise<RecommendationResponse> => {
   try {
     const response = await api.get<RecommendationResponse>(
@@ -61,6 +61,24 @@ export const getRecommendations = async (
     return response.data;
   } catch (error) {
     console.warn('Error fetching recommendations:', error);
+    throw error;
+  }
+};
+
+export const getRecommendationsRecent = async (
+  username: string,
+  limit: number = 50
+): Promise<RecommendationResponse> => {
+  try {
+    const response = await api.get<RecommendationResponse>(
+      `/api/recommendations/${username}/recent`,
+      {
+        params: { limit },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.warn('Error fetching recommendations (recent):', error);
     throw error;
   }
 };
@@ -101,7 +119,7 @@ export const putMyProfile = async (
 
 export const getMyRecommendations = async (
   token: string,
-  limit: number = 5
+  limit: number = 50
 ): Promise<RecommendationResponse> => {
   try {
     const response = await api.get<RecommendationResponse>('/api/me/recommendations', {
@@ -113,6 +131,24 @@ export const getMyRecommendations = async (
     return response.data;
   } catch (error) {
     console.warn('Error fetching recommendations:', error);
+    throw error;
+  }
+};
+
+export const getMyRecommendationsRecent = async (
+  token: string,
+  limit: number = 50
+): Promise<RecommendationResponse> => {
+  try {
+    const response = await api.get<RecommendationResponse>('/api/me/recommendations/recent', {
+      params: { limit },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.warn('Error fetching recommendations (recent):', error);
     throw error;
   }
 };
@@ -189,7 +225,7 @@ export const deleteMyAccount = async (token: string): Promise<void> => {
 
 export const searchBills = async (
   query: string,
-  limit: number = 3
+  limit: number = 20
 ): Promise<BillRecommendation[]> => {
   try {
     const response = await api.get<BillRecommendation[]>('/api/search/', {

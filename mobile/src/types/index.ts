@@ -10,6 +10,7 @@ export interface BillRecommendation {
   parliament_session?: string | null;
   last_updated?: string | null;
   status_code?: string | null;
+  is_new_bill?: number | boolean | null;
 }
 
 export interface UserProfile {

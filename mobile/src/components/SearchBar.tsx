@@ -9,6 +9,7 @@ type SearchBarProps = {
   onChangeText?: (text: string) => void;
   onSubmit?: () => void;
   onActionPress?: () => void;
+  onClear?: () => void;
   editable?: boolean;
   disabled?: boolean;
 };
@@ -19,9 +20,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onChangeText,
   onSubmit,
   onActionPress,
+  onClear,
   editable = true,
   disabled = false,
 }) => {
+  const showClear = Boolean(onClear && value && value.length > 0);
   return (
     <View style={styles.searchContainer}>
       <Ionicons name="search" size={20} color={theme.colors.accent} />
@@ -38,6 +41,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
         editable={editable}
         pointerEvents={editable ? 'auto' : 'none'}
       />
+      {showClear ? (
+        <Pressable
+          style={({ pressed }) => [styles.clearButton, pressed && styles.buttonPressed]}
+          onPress={onClear}
+          android_ripple={{ color: 'rgba(193,0,0,0.12)', borderless: true }}
+        >
+          <Ionicons name="close-circle" size={18} color={theme.colors.accent} />
+        </Pressable>
+      ) : null}
       <Pressable
         style={({ pressed }) => [styles.searchIconButton, pressed && styles.buttonPressed]}
         onPress={onActionPress}
@@ -69,6 +81,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchIconButton: {
+    padding: theme.spacing.xs,
+    borderRadius: 10,
+  },
+  clearButton: {
     padding: theme.spacing.xs,
     borderRadius: 10,
   },
