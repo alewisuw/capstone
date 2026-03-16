@@ -1,6 +1,6 @@
 """
 Scrapes bills from the Open Parliament API (https://api.openparliament.ca/bills/)
-and upserts them into the bills_billtext_copy table.
+and upserts them into both the bills_billtext and bills_billtext_copy tables.
 
 Usage:
     python scraping/scraping.py                        # scrape all sessions
@@ -187,6 +187,8 @@ def get_or_create_bill(cur, detail: dict) -> int | None:
     # Ensure the session FK target exists
     ensure_session(cur, session_id)
 
+    status_date = introduced  # use introduced date as initial status_date
+
     cur.execute(
         """
         INSERT INTO bills_bill
@@ -194,12 +196,12 @@ def get_or_create_bill(cur, detail: dict) -> int | None:
              legisinfo_id, session_id, introduced, law,
              privatemember, status_code, institution,
              short_title_en, short_title_fr, text_docid,
-             added, library_summary_available)
+             added, library_summary_available, status_date)
         VALUES (%s, %s, %s, %s,
                 %s, %s, %s, %s,
                 %s, %s, %s,
                 %s, %s, %s,
-                %s, %s)
+                %s, %s, %s)
         RETURNING id
         """,
         (
@@ -207,7 +209,7 @@ def get_or_create_bill(cur, detail: dict) -> int | None:
             legisinfo_id, session_id, introduced, law,
             private_member, status_code, institution,
             short_en, short_fr, text_docid,
-            datetime.now(timezone.utc).date(), False,
+            datetime.now(timezone.utc).date(), False, status_date,
         ),
     )
     new_id = cur.fetchone()[0]
@@ -255,7 +257,52 @@ def upsert_billtext(
             """,
             (new_id, bill_id, doc_id, created, text_en, text_fr, summary_en),
         )
-        print(f"    ✚ Inserted billtext id={new_id}")
+        print(f"    ✚ Inserted billtext_copy id={new_id}")
+
+
+def upsert_billtext_main(
+    cur,
+    bill_id: int,
+    doc_id: int,
+    created: datetime,
+    text_en: str,
+    text_fr: str,
+    summary_en: str,
+):
+    """Insert or update a row in bills_billtext (main table) keyed on docid (unique)."""
+    cur.execute(
+        "SELECT id, bill_id FROM bills_billtext WHERE docid = %s",
+        (doc_id,),
+    )
+    existing = cur.fetchone()
+
+    if existing:
+        existing_id = existing[0]
+        cur.execute(
+            """
+            UPDATE bills_billtext
+               SET bill_id     = %s,
+                   text_en     = %s,
+                   text_fr     = %s,
+                   summary_en  = %s,
+                   created     = %s
+             WHERE id = %s
+            """,
+            (bill_id, text_en, text_fr, summary_en, created, existing_id),
+        )
+        print(f"    ↻ Updated billtext (main) id={existing_id}")
+    else:
+        cur.execute("SELECT COALESCE(MAX(id), 0) + 1 FROM bills_billtext")
+        new_id = cur.fetchone()[0]
+        cur.execute(
+            """
+            INSERT INTO bills_billtext
+                (id, bill_id, docid, created, text_en, text_fr, summary_en)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (new_id, bill_id, doc_id, created, text_en, text_fr, summary_en),
+        )
+        print(f"    ✚ Inserted billtext (main) id={new_id}")
 
 
 # ── main ─────────────────────────────────────────────────────────────────────
@@ -282,8 +329,15 @@ def main():
     conn.autocommit = False
     cur = conn.cursor()
 
-    # Sync the sequence to avoid duplicate key errors
-    cur.execute("SELECT setval('bills_bill_id_seq', (SELECT MAX(id) FROM bills_bill))")
+    # Sync sequences to avoid duplicate key errors
+    cur.execute("SELECT setval('bills_bill_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bills_bill))")
+    cur.execute("""
+        DO $$ BEGIN
+            IF EXISTS (SELECT 1 FROM pg_class WHERE relname = 'bills_billtext_id_seq') THEN
+                PERFORM setval('bills_billtext_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bills_billtext));
+            END IF;
+        END $$;
+    """)
     conn.commit()
 
     processed = 0
@@ -350,13 +404,19 @@ def main():
             skipped += 1
             continue
 
-        # ── skip if already present ──────────────────────────────────────
+        # ── skip if already present in both tables ────────────────────
         cur.execute(
             "SELECT 1 FROM bills_billtext_copy WHERE bill_id = %s AND docid = %s",
             (bill_id, doc_id),
         )
-        if cur.fetchone():
-            print(f"  ⏩ Already exists, skipping")
+        in_copy = cur.fetchone()
+        cur.execute(
+            "SELECT 1 FROM bills_billtext WHERE docid = %s",
+            (doc_id,),
+        )
+        in_main = cur.fetchone()
+        if in_copy and in_main:
+            print(f"  ⏩ Already exists in both tables, skipping")
             skipped += 1
             processed += 1
             continue
@@ -378,9 +438,10 @@ def main():
             else datetime.now(timezone.utc)
         )
 
-        # ── upsert ──────────────────────────────────────────────────────
+        # ── upsert into both tables ─────────────────────────────────────
         try:
             upsert_billtext(cur, bill_id, doc_id, created, text_en, text_fr, summary_en)
+            upsert_billtext_main(cur, bill_id, doc_id, created, text_en, text_fr, summary_en)
             conn.commit()
         except Exception as exc:
             print(f"  ⚠  DB error upserting {label}: {exc}")
