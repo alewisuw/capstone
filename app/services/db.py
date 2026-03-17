@@ -126,3 +126,121 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
             },
         ))
     return output
+
+
+def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[Dict]:
+    if not electoral_district_id:
+        return None
+
+    try:
+        district_id = int(electoral_district_id)
+    except (TypeError, ValueError):
+        return None
+
+    try:
+        conn = psycopg2.connect(**DB_CFG)
+        cur = conn.cursor()
+
+        # Resolve the requested district to known riding rows.
+        cur.execute(
+            """
+            SELECT id, name_en
+            FROM core_riding
+            WHERE id = %s OR edid = %s
+            ORDER BY current DESC, id DESC;
+            """,
+            (district_id, district_id),
+        )
+        ridings = cur.fetchall()
+        riding_ids = [row[0] for row in ridings]
+        district_name = ridings[0][1] if ridings else None
+        if not riding_ids:
+            cur.close()
+            conn.close()
+            return None
+
+        # Preferred path: use the recorded elected-member row for the vote.
+        cur.execute(
+            """
+            SELECT
+                mv.vote,
+                vq.date,
+                vq.result,
+                p.name,
+                party.short_name_en,
+                r.name_en
+            FROM bills_votequestion vq
+            JOIN bills_membervote mv ON mv.votequestion_id = vq.id
+            JOIN core_electedmember em ON em.id = mv.member_id
+            LEFT JOIN core_politician p ON p.id = COALESCE(mv.politician_id, em.politician_id)
+            LEFT JOIN core_party party ON party.id = em.party_id
+            LEFT JOIN core_riding r ON r.id = em.riding_id
+            WHERE vq.bill_id = %s
+              AND em.riding_id = ANY(%s)
+            ORDER BY vq.date DESC NULLS LAST, vq.id DESC
+            LIMIT 1;
+            """,
+            (bill_id, riding_ids),
+        )
+        row = cur.fetchone()
+
+        # Fallback path: match via politician and district membership at vote date.
+        if not row:
+            cur.execute(
+                """
+                SELECT
+                    mv.vote,
+                    vq.date,
+                    vq.result,
+                    p.name,
+                    party.short_name_en,
+                    r.name_en
+                FROM bills_votequestion vq
+                JOIN bills_membervote mv ON mv.votequestion_id = vq.id
+                JOIN core_electedmember em
+                  ON em.politician_id = mv.politician_id
+                 AND em.riding_id = ANY(%s)
+                 AND (em.start_date IS NULL OR em.start_date <= vq.date)
+                 AND (em.end_date IS NULL OR em.end_date >= vq.date)
+                LEFT JOIN core_politician p ON p.id = mv.politician_id
+                LEFT JOIN core_party party ON party.id = em.party_id
+                LEFT JOIN core_riding r ON r.id = em.riding_id
+                WHERE vq.bill_id = %s
+                ORDER BY vq.date DESC NULLS LAST, vq.id DESC
+                LIMIT 1;
+                """,
+                (riding_ids, bill_id),
+            )
+            row = cur.fetchone()
+
+        cur.close()
+        conn.close()
+    except Exception as exc:
+        print(f"[DB error] get_district_mp_vote failed for bill_id={bill_id}: {exc}")
+        return None
+
+    if not row:
+        return None
+
+    vote, vote_date, vote_result, mp_name, mp_party, district_name_from_vote = row
+    vote_normalized = (vote or "").strip().lower()
+    position = None
+    if vote_normalized in {"yea", "yes", "for"}:
+        position = "for"
+    elif vote_normalized in {"nay", "no", "against"}:
+        position = "against"
+    elif vote_normalized in {"paired", "abstain", "abstained"}:
+        position = "abstain"
+
+    return {
+        "bill_id": bill_id,
+        "electoral_district": district_name_from_vote or district_name,
+        "electoral_district_id": str(district_id),
+        "available": True,
+        "mp_name": mp_name,
+        "mp_party": mp_party,
+        "vote": vote,
+        "position": position,
+        "vote_date": vote_date.isoformat() if vote_date else None,
+        "vote_result": vote_result,
+    }

@@ -49,3 +49,16 @@ class UserProfileResponse(UserProfileInput):
 
 class RecommendationResponse(BaseModel):
     recommendations: List[BillRecommendation]
+
+
+class DistrictMpVote(BaseModel):
+    bill_id: int
+    electoral_district: Optional[str] = None
+    electoral_district_id: Optional[str] = None
+    available: bool = False
+    mp_name: Optional[str] = None
+    mp_party: Optional[str] = None
+    vote: Optional[str] = None
+    position: Optional[str] = None
+    vote_date: Optional[str] = None
+    vote_result: Optional[str] = None

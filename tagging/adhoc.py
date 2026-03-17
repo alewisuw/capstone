@@ -52,9 +52,11 @@ def main():
     print("connected to DB")
 
     # Duplicate the bills_billtext table
-    cursor.execute("SELECT * FROM bills_billtext_copy")
+    cursor.execute("""SELECT * FROM bills_membervote
+limit 1
+""")
     conn.commit()
-    print("Table duplicated successfully")
+    print(cursor.fetchall())
 
     cursor.close()
     conn.close()

@@ -6,6 +6,7 @@ import type {
   HealthStatus,
   BillRecommendation,
   MyProfileRecord,
+  DistrictMpVote,
 } from '../types';
 
 type UserProfilePayload = {
@@ -167,6 +168,23 @@ export const getMySaved = async (
     return response.data;
   } catch (error) {
     console.error('Error fetching saved bills:', error);
+    throw error;
+  }
+};
+
+export const getMyDistrictVote = async (
+  token: string,
+  bill_id: number
+): Promise<DistrictMpVote> => {
+  try {
+    const response = await api.get<DistrictMpVote>(`/api/me/bills/${bill_id}/district-vote`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching district vote:', error);
     throw error;
   }
 };

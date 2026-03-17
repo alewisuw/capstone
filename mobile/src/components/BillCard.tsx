@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   fullTitle: {
     flex: 1,
-    fontSize: 18,
+    fontSize: 18500,
     fontWeight: '600',
     color: theme.colors.textDark,
     lineHeight: 24,

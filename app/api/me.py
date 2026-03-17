@@ -9,10 +9,11 @@ from app.models.schemas import (
     UserProfileResponse,
     SavedBill,
     SaveBillRequest,
+    DistrictMpVote,
 )
 from app.services.auth import AuthError, verify_id_token, delete_cognito_user
 from app.services.dynamodb import get_profile, upsert_profile, delete_profile
-from app.services.db import get_bills_info
+from app.services.db import get_bills_info, get_district_mp_vote
 from app.services.recommendations import recommend_bills
 
 router = APIRouter()
@@ -103,6 +104,42 @@ def get_my_saved(user=Depends(_get_user)):
         raise HTTPException(status_code=404, detail="Profile not found")
     saved_ids = item.get("saved_bill_ids") or []
     return get_bills_info(saved_ids)
+
+
+@router.get("/me/bills/{bill_id}/district-vote", response_model=DistrictMpVote)
+def get_my_district_vote(bill_id: int, user=Depends(_get_user)):
+    item = get_profile(user["sub"])
+    if not item:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    district_id = item.get("electoral_district_id")
+    if district_id is None and isinstance(item.get("demographics"), dict):
+        district_id = item["demographics"].get("electoral_district_id")
+
+    district_name = item.get("electoral_district")
+    if district_name is None and isinstance(item.get("demographics"), dict):
+        district_name = item["demographics"].get("electoral_district")
+
+    if district_id is None:
+        return DistrictMpVote(
+            bill_id=bill_id,
+            electoral_district=district_name,
+            electoral_district_id=None,
+            available=False,
+        )
+
+    vote_info = get_district_mp_vote(bill_id, str(district_id))
+    if not vote_info:
+        return DistrictMpVote(
+            bill_id=bill_id,
+            electoral_district=district_name,
+            electoral_district_id=str(district_id),
+            available=False,
+        )
+
+    # Prefer the district name from profile if present.
+    vote_info["electoral_district"] = district_name or vote_info.get("electoral_district")
+    return DistrictMpVote(**vote_info)
 
 @router.post("/me/saved", response_model=list[int])
 def save_bill(payload: SaveBillRequest, user=Depends(_get_user)):

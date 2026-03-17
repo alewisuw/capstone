@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '../components/Icon';
@@ -18,6 +19,9 @@ import { useSaved } from '../context/SavedContext';
 import { getTagColor } from '../data/tagCategories';
 import BillStatusBadge from '../components/BillStatusBadge';
 import GradientBackground from '../components/GradientBackground';
+import { useAuth } from '../context/AuthContext';
+import { getMyDistrictVote } from '../services/apiService';
+import type { DistrictMpVote } from '../types';
 
 type BillDetailScreenProps = StackScreenProps<RootStackParamList, 'BillDetail'>;
 
@@ -25,7 +29,40 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
   const insets = useSafeAreaInsets();
   const { bill } = route.params;
   const { isSaved, toggleSave } = useSaved();
+  const { authToken } = useAuth();
+  const [districtVote, setDistrictVote] = useState<DistrictMpVote | null>(null);
+  const [districtVoteLoading, setDistrictVoteLoading] = useState<boolean>(false);
   const saved = isSaved(bill.bill_id);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadDistrictVote = async () => {
+      if (!authToken) {
+        setDistrictVote(null);
+        return;
+      }
+      setDistrictVoteLoading(true);
+      try {
+        const data = await getMyDistrictVote(authToken, bill.bill_id);
+        if (mounted) {
+          setDistrictVote(data);
+        }
+      } catch {
+        if (mounted) {
+          setDistrictVote(null);
+        }
+      } finally {
+        if (mounted) {
+          setDistrictVoteLoading(false);
+        }
+      }
+    };
+
+    loadDistrictVote();
+    return () => {
+      mounted = false;
+    };
+  }, [authToken, bill.bill_id]);
 
   // Get the bill URL - use provided URL or construct from bill_number and parliament_session
   const getBillUrl = (): string => {
@@ -161,6 +198,26 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
     );
   };
 
+  const voteToneStyle = () => {
+    if (districtVote?.position === 'for') return styles.votePillFor;
+    if (districtVote?.position === 'against') return styles.votePillAgainst;
+    return styles.votePillNeutral;
+  };
+
+  const voteToneTextStyle = () => {
+    if (districtVote?.position === 'for') return styles.votePillTextFor;
+    if (districtVote?.position === 'against') return styles.votePillTextAgainst;
+    return styles.votePillTextNeutral;
+  };
+
+  const voteLabel = () => {
+    if (districtVote?.position === 'for') return 'Voted For';
+    if (districtVote?.position === 'against') return 'Voted Against';
+    if (districtVote?.position === 'abstain') return 'Paired / Abstained';
+    if (districtVote?.vote) return districtVote.vote;
+    return 'No Recorded Vote';
+  };
+
   return (
     <SafeAreaView style={styles.container} edges={[]}>
       <ScrollView
@@ -237,6 +294,40 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
           <View style={styles.summarySection}>
             <Text style={styles.summaryLabel}>Summary</Text>
             {renderSummary(bill.summary)}
+          </View>
+
+          <View style={styles.voteSection}>
+            <Text style={styles.summaryLabel}>Your District MP Vote</Text>
+            {districtVoteLoading ? (
+              <View style={styles.voteLoadingRow}>
+                <ActivityIndicator size="small" color={theme.colors.accent} />
+                <Text style={styles.voteMetaText}>Loading vote record...</Text>
+              </View>
+            ) : !authToken ? (
+              <Text style={styles.voteMetaText}>
+                Sign in to see how your district MP voted on this bill.
+              </Text>
+            ) : districtVote?.available ? (
+              <View style={styles.voteCard}>
+                <View style={[styles.votePill, voteToneStyle()]}>
+                  <Text style={[styles.votePillText, voteToneTextStyle()]}>{voteLabel()}</Text>
+                </View>
+                <Text style={styles.voteMpName}>
+                  {districtVote.mp_name || 'Unknown MP'}
+                  {districtVote.mp_party ? ` (${districtVote.mp_party})` : ''}
+                </Text>
+                {districtVote.electoral_district ? (
+                  <Text style={styles.voteMetaText}>District: {districtVote.electoral_district}</Text>
+                ) : null}
+                {districtVote.vote_date ? (
+                  <Text style={styles.voteMetaText}>Vote date: {formatDate(districtVote.vote_date)}</Text>
+                ) : null}
+              </View>
+            ) : (
+              <Text style={styles.voteMetaText}>
+                No district vote record is available for this bill yet.
+              </Text>
+            )}
           </View>
 
           <View style={styles.infoSection}>
@@ -374,6 +465,60 @@ const styles = StyleSheet.create({
   },
   summarySection: {
     marginBottom: 24,
+  },
+  voteSection: {
+    marginBottom: 20,
+  },
+  voteLoadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  voteCard: {
+    backgroundColor: theme.colors.surfaceMuted,
+    borderRadius: 12,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    gap: 6,
+  },
+  votePill: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  votePillFor: {
+    backgroundColor: '#DCFCE7',
+  },
+  votePillAgainst: {
+    backgroundColor: '#FEE2E2',
+  },
+  votePillNeutral: {
+    backgroundColor: '#E5E7EB',
+  },
+  votePillText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  votePillTextFor: {
+    color: '#166534',
+  },
+  votePillTextAgainst: {
+    color: '#991B1B',
+  },
+  votePillTextNeutral: {
+    color: '#374151',
+  },
+  voteMpName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textDark,
+  },
+  voteMetaText: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    lineHeight: 20,
   },
   summaryLabel: {
     fontSize: 16,
