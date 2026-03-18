@@ -56,7 +56,7 @@ export interface DistrictMpVote {
   vote?: string | null;
   position?: 'for' | 'against' | 'abstain' | null;
   vote_date?: string | null;
-  vote_result?: string | null;
+  position?: string | null;
 }
 
 export interface HealthStatus {
