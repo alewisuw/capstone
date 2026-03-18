@@ -15,6 +15,8 @@ type UserProfilePayload = {
   interests: string[];
   demographics: Record<string, string>;
   onboarded: boolean;
+  electoral_district?: string;
+  electoral_district_id?: string;
 };
 
 

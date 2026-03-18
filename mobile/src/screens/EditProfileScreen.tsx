@@ -174,6 +174,8 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
           demographics: mergedDemographics,
           interests: selectedTags,
           onboarded: true,
+          electoral_district: mergedDemographics.electoral_district || '',
+          electoral_district_id: mergedDemographics.electoral_district_id || '',
         },
         authToken
       );
@@ -385,19 +387,6 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
     } catch {
       setError('District selected, but map could not be loaded.');
     }
-  };
-
-  const handleUseTypedDistrict = () => {
-    const trimmed = manualDistrictQuery.trim();
-    if (!trimmed) {
-      setError('Enter the district name first.');
-      return;
-    }
-    setError(null);
-    setElectoralDistrict(trimmed);
-    setElectoralDistrictId('');
-    setDistrictPolygons([]);
-    setDistrictPoint(null);
   };
 
   const handleRemoveDistrict = () => {
@@ -675,9 +664,6 @@ const EditProfileScreen: React.FC<EditProfileProps> = ({ navigation }) => {
                 </View>
               ) : null}
 
-              <TouchableOpacity style={styles.secondaryDistrictButton} onPress={handleUseTypedDistrict}>
-                <Text style={styles.secondaryDistrictButtonText}>Use Typed District Name</Text>
-              </TouchableOpacity>
             </View>
 
             {electoralDistrict ? (

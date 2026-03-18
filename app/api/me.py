@@ -54,14 +54,35 @@ def get_my_profile(user=Depends(_get_user)):
 def put_my_profile(payload: UserProfileInput, user=Depends(_get_user)):
     now = datetime.now(timezone.utc).isoformat()
     existing = get_profile(user["sub"])
-    electoral_district = payload.electoral_district or payload.demographics.get("electoral_district")
-    electoral_district_id = payload.electoral_district_id or payload.demographics.get("electoral_district_id")
+
+    demographics = dict(payload.demographics or {})
+
+    # Normalize district fields from payload and demographics so they are always
+    # persisted consistently for district-vote lookups.
+    electoral_district = payload.electoral_district or demographics.get("electoral_district")
+    electoral_district_id = payload.electoral_district_id or demographics.get("electoral_district_id")
+
+    if electoral_district is not None:
+        electoral_district = str(electoral_district).strip() or None
+    if electoral_district_id is not None:
+        electoral_district_id = str(electoral_district_id).strip() or None
+
+    if electoral_district:
+        demographics["electoral_district"] = electoral_district
+    else:
+        demographics.pop("electoral_district", None)
+
+    if electoral_district_id:
+        demographics["electoral_district_id"] = electoral_district_id
+    else:
+        demographics.pop("electoral_district_id", None)
+
     item = {
         "user_id": user["sub"],
         "username": payload.username,
         "email": user.get("email") or payload.email,
         "interests": payload.interests,
-        "demographics": payload.demographics,
+        "demographics": demographics,
         "onboarded": payload.onboarded,
         "updatedAt": now,
     }
@@ -121,25 +142,31 @@ def get_my_district_vote(bill_id: int, user=Depends(_get_user)):
         district_name = item["demographics"].get("electoral_district")
 
     if district_id is None:
-        return DistrictMpVote(
+        response = DistrictMpVote(
             bill_id=bill_id,
             electoral_district=district_name,
             electoral_district_id=None,
             available=False,
         )
+        print(f"[district-vote] response={response.model_dump()}")
+        return response
 
     vote_info = get_district_mp_vote(bill_id, str(district_id))
     if not vote_info:
-        return DistrictMpVote(
+        response = DistrictMpVote(
             bill_id=bill_id,
             electoral_district=district_name,
             electoral_district_id=str(district_id),
             available=False,
         )
+        print(f"[district-vote] response={response.model_dump()}")
+        return response
 
     # Prefer the district name from profile if present.
     vote_info["electoral_district"] = district_name or vote_info.get("electoral_district")
-    return DistrictMpVote(**vote_info)
+    response = DistrictMpVote(**vote_info)
+    print(f"[district-vote] response={response.model_dump()}")
+    return response
 
 @router.post("/me/saved", response_model=list[int])
 def save_bill(payload: SaveBillRequest, user=Depends(_get_user)):

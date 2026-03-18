@@ -189,6 +189,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         })
       );
       try {
+        const electoralDistrict = filteredDemographics.electoral_district;
+        const electoralDistrictId = filteredDemographics.electoral_district_id;
         await putMyProfile(
           {
             username: pendingUsername,
@@ -196,6 +198,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             demographics: filteredDemographics,
             interests,
             onboarded: true,
+            electoral_district: electoralDistrict,
+            electoral_district_id: electoralDistrictId,
           },
           authToken
         );
