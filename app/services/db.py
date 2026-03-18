@@ -225,11 +225,11 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
     vote, vote_date, vote_result, mp_name, mp_party, district_name_from_vote = row
     vote_normalized = (vote or "").strip().lower()
     position = None
-    if vote_normalized in {"yea", "yes", "for"}:
+    if vote_normalized in {"y", "yea", "yes", "for"}:
         position = "for"
-    elif vote_normalized in {"nay", "no", "against"}:
+    elif vote_normalized in {"n", "nay", "no", "against"}:
         position = "against"
-    elif vote_normalized in {"paired", "abstain", "abstained"}:
+    elif vote_normalized in {"a", "p", "paired", "abstain", "abstained"}:
         position = "abstain"
 
     return {
