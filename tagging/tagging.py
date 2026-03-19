@@ -64,8 +64,22 @@ def main():
     ADD COLUMN IF NOT EXISTS llm_tags JSON
     """)
 
-    cursor.execute("SELECT bill_id, llm_summary FROM bills_billtext WHERE llm_summary IS NOT NULL AND llm_tags IS NULL")
+    cursor.execute(
+        """
+        SELECT bill_id, llm_summary
+        FROM bills_billtext
+        WHERE llm_summary IS NOT NULL
+          AND llm_tags IS NOT NULL
+          AND (
+              SELECT key
+              FROM json_each_text(llm_tags)
+              ORDER BY value::float DESC
+              LIMIT 1
+          ) = 'Democracy & Governance'
+        """
+    )
     bills = cursor.fetchall()
+    print(len(bills))
 
     for bill_id, llm_summary in bills:
         if not llm_summary:

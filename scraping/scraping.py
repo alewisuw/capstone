@@ -269,7 +269,11 @@ def upsert_billtext_main(
     text_fr: str,
     summary_en: str,
 ):
-    """Insert or update a row in bills_billtext (main table) keyed on docid (unique)."""
+    """Insert or update a row in bills_billtext (main table).
+
+    First match by docid (canonical). If no docid match exists, fall back to
+    an exact text_en match to avoid duplicate bill text rows.
+    """
     cur.execute(
         "SELECT id, bill_id FROM bills_billtext WHERE docid = %s",
         (doc_id,),
@@ -282,16 +286,45 @@ def upsert_billtext_main(
             """
             UPDATE bills_billtext
                SET bill_id     = %s,
+                   docid       = %s,
                    text_en     = %s,
                    text_fr     = %s,
                    summary_en  = %s,
                    created     = %s
              WHERE id = %s
             """,
-            (bill_id, text_en, text_fr, summary_en, created, existing_id),
+            (bill_id, doc_id, text_en, text_fr, summary_en, created, existing_id),
         )
         print(f"    ↻ Updated billtext (main) id={existing_id}")
     else:
+        # If this exact bill text already exists under a different docid/bill,
+        # update that row instead of inserting a duplicate body of text.
+        dup_by_text = None
+        if text_en:
+            cur.execute(
+                "SELECT id FROM bills_billtext WHERE text_en = %s LIMIT 1",
+                (text_en,),
+            )
+            dup_by_text = cur.fetchone()
+
+        if dup_by_text:
+            existing_id = dup_by_text[0]
+            cur.execute(
+                """
+                UPDATE bills_billtext
+                   SET bill_id     = %s,
+                       docid       = %s,
+                       text_en     = %s,
+                       text_fr     = %s,
+                       summary_en  = %s,
+                       created     = %s
+                 WHERE id = %s
+                """,
+                (bill_id, doc_id, text_en, text_fr, summary_en, created, existing_id),
+            )
+            print(f"    ↻ Reused duplicate text row in main id={existing_id}")
+            return
+
         cur.execute("SELECT COALESCE(MAX(id), 0) + 1 FROM bills_billtext")
         new_id = cur.fetchone()[0]
         cur.execute(

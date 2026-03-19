@@ -52,45 +52,18 @@ def main():
     print("connected to DB")
 
     # Duplicate the bills_billtext table
-    cursor.execute("""SELECT
-                mv.vote,
-                vq.date,
-                vq.result,
-                p.name,
-                party.short_name_en,
-                r.name_en
-            FROM bills_votequestion vq
-            JOIN bills_membervote mv ON mv.votequestion_id = vq.id
-            JOIN core_electedmember em ON em.id = mv.member_id
-            LEFT JOIN core_politician p ON p.id = COALESCE(mv.politician_id, em.politician_id)
-            LEFT JOIN core_party party ON party.id = em.party_id
-            LEFT JOIN core_riding r ON r.id = em.riding_id
-            WHERE vq.bill_id = 1884
-            AND em.riding_id = 35104
-            ORDER BY vq.date DESC NULLS LAST, vq.id DESC
-            LIMIT 1;
+    cursor.execute("""SELECT * FROM bills_billtext
+where bill_id = 91;
 """)
     conn.commit()
-    row = cursor.fetchone()
-    print(row)
+    print(cursor.fetchall())
+
 
     cursor.close()
     conn.close()
 
 
-    vote, vote_date, vote_result, mp_name, mp_party, district_name_from_vote = row
-    vote_normalized = (vote or "").strip().lower()
-    print(vote_normalized)
-    position = None
-    if vote_normalized in {"y", "yea", "yes", "for"}:
-        position = "for"
-    elif vote_normalized in {"n", "nay", "no", "against"}:
-        position = "against"
-    elif vote_normalized in {"a", "p", "paired", "abstain", "abstained"}:
-        position = "abstain"
-
-    print(position)
-    print(vote_result)
+   
 
 if __name__ == "__main__":
     print("Starting tagging...")
