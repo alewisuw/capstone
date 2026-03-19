@@ -1,7 +1,21 @@
 import json
 import psycopg2
+import os
 from app.config.settings import DB_CFG
 from typing import List, Dict, Optional
+
+MP_HEADSHOT_BASE_URL = os.getenv("MP_HEADSHOT_BASE_URL", "https://openparliament.ca/media")
+
+
+def _build_media_url(path: Optional[str]) -> Optional[str]:
+    if not path:
+        return None
+    cleaned = str(path).strip().lstrip("/")
+    if not cleaned:
+        return None
+    base = MP_HEADSHOT_BASE_URL.rstrip("/")
+    return f"{base}/{cleaned}"
+
 
 def _extract_tag_labels(raw_tags, min_score: float = 0.3, max_tags: int = 2) -> Optional[List[str]]:
     if not raw_tags:
@@ -167,6 +181,8 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
                 vq.date,
                 vq.result,
                 p.name,
+                p.headshot_thumbnail,
+                p.headshot,
                 party.short_name_en,
                 r.name_en
             FROM bills_votequestion vq
@@ -193,6 +209,8 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
                     vq.date,
                     vq.result,
                     p.name,
+                    p.headshot_thumbnail,
+                    p.headshot,
                     party.short_name_en,
                     r.name_en
                 FROM bills_votequestion vq
@@ -222,7 +240,7 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
     if not row:
         return None
 
-    vote, vote_date, vote_result, mp_name, mp_party, district_name_from_vote = row
+    vote, vote_date, vote_result, mp_name, mp_headshot_thumbnail, mp_headshot, mp_party, district_name_from_vote = row
     vote_normalized = (vote or "").strip().lower()
     position = None
     if vote_normalized in {"y", "yea", "yes", "for"}:
@@ -238,6 +256,7 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
         "electoral_district_id": str(district_id),
         "available": True,
         "mp_name": mp_name,
+        "mp_headshot_url": _build_media_url(mp_headshot_thumbnail) or _build_media_url(mp_headshot),
         "mp_party": mp_party,
         "vote": vote,
         "position": position,

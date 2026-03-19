@@ -148,7 +148,7 @@ def get_my_district_vote(bill_id: int, user=Depends(_get_user)):
             electoral_district_id=None,
             available=False,
         )
-        print(f"[district-vote] response={response.model_dump()}")
+        # print(f"[district-vote] response={response.model_dump()}")
         return response
 
     vote_info = get_district_mp_vote(bill_id, str(district_id))
@@ -159,13 +159,13 @@ def get_my_district_vote(bill_id: int, user=Depends(_get_user)):
             electoral_district_id=str(district_id),
             available=False,
         )
-        print(f"[district-vote] response={response.model_dump()}")
+        # print(f"[district-vote] response={response.model_dump()}")
         return response
 
     # Prefer the district name from profile if present.
     vote_info["electoral_district"] = district_name or vote_info.get("electoral_district")
     response = DistrictMpVote(**vote_info)
-    print(f"[district-vote] response={response.model_dump()}")
+    # print(f"[district-vote] response={response.model_dump()}")
     return response
 
 @router.post("/me/saved", response_model=list[int])

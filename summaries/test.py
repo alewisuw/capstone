@@ -53,7 +53,7 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 cur.execute("""
-SELECT * from bills_membervote where id = 8217 limit 5
+SELECT * from core_politician where name_given = 'Taleeb' limit 50
 """)
 
 # Get column names from cursor description

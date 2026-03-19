@@ -52,9 +52,10 @@ export interface DistrictMpVote {
   electoral_district_id?: string | null;
   available: boolean;
   mp_name?: string | null;
+  mp_headshot_url?: string | null;
   mp_party?: string | null;
   vote?: string | null;
-  position?: 'for' | 'against' | 'abstain' | null;
+  vote_result?: string | null;
   vote_date?: string | null;
   position?: string | null;
 }

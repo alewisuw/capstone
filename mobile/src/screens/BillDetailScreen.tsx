@@ -8,6 +8,7 @@ import {
   Linking,
   Alert,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from '../components/Icon';
@@ -32,6 +33,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
   const { authToken } = useAuth();
   const [districtVote, setDistrictVote] = useState<DistrictMpVote | null>(null);
   const [districtVoteLoading, setDistrictVoteLoading] = useState<boolean>(false);
+  const [headshotLoadFailed, setHeadshotLoadFailed] = useState<boolean>(false);
   const saved = isSaved(bill.bill_id);
 
   useEffect(() => {
@@ -63,6 +65,10 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
       mounted = false;
     };
   }, [authToken, bill.bill_id]);
+
+  useEffect(() => {
+    setHeadshotLoadFailed(false);
+  }, [districtVote?.mp_headshot_url]);
 
   // Get the bill URL - use provided URL or construct from bill_number and parliament_session
   const getBillUrl = (): string => {
@@ -309,19 +315,37 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
               </Text>
             ) : districtVote?.available ? (
               <View style={styles.voteCard}>
-                <View style={[styles.votePill, voteToneStyle()]}>
-                  <Text style={[styles.votePillText, voteToneTextStyle()]}>{voteLabel()}</Text>
+                <View style={styles.voteCardRow}>
+                  {districtVote.mp_headshot_url && !headshotLoadFailed ? (
+                    <View style={styles.mpHeadshotFrame}>
+                      <Image
+                        source={{ uri: districtVote.mp_headshot_url }}
+                        style={styles.mpHeadshotImage}
+                        resizeMode="contain"
+                        onError={() => setHeadshotLoadFailed(true)}
+                      />
+                    </View>
+                  ) : (
+                    <View style={[styles.mpHeadshotFrame, styles.mpHeadshotFallback]}>
+                      <Ionicons name="person" size={18} color={theme.colors.textMuted} />
+                    </View>
+                  )}
+                  <View style={styles.voteCardContent}>
+                    <Text style={styles.voteMpName}>
+                      {districtVote.mp_name || 'Unknown MP'}
+                      {districtVote.mp_party ? ` (${districtVote.mp_party})` : ''}
+                    </Text>
+                    {districtVote.electoral_district ? (
+                      <Text style={styles.voteMetaText}>District: {districtVote.electoral_district}</Text>
+                    ) : null}
+                    <View style={[styles.votePill, voteToneStyle()]}>
+                      <Text style={[styles.votePillText, voteToneTextStyle()]}>{voteLabel()}</Text>
+                    </View>
+                    {districtVote.vote_date ? (
+                      <Text style={styles.voteMetaText}>Vote date: {formatDate(districtVote.vote_date)}</Text>
+                    ) : null}
+                  </View>
                 </View>
-                <Text style={styles.voteMpName}>
-                  {districtVote.mp_name || 'Unknown MP'}
-                  {districtVote.mp_party ? ` (${districtVote.mp_party})` : ''}
-                </Text>
-                {districtVote.electoral_district ? (
-                  <Text style={styles.voteMetaText}>District: {districtVote.electoral_district}</Text>
-                ) : null}
-                {districtVote.vote_date ? (
-                  <Text style={styles.voteMetaText}>Vote date: {formatDate(districtVote.vote_date)}</Text>
-                ) : null}
               </View>
             ) : (
               <Text style={styles.voteMetaText}>
@@ -480,7 +504,32 @@ const styles = StyleSheet.create({
     padding: 14,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
+  },
+  voteCardRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  voteCardContent: {
+    flex: 1,
     gap: 6,
+  },
+  mpHeadshotFrame: {
+    width: 76,
+    height: 100,
+    borderRadius: 16,
+    // overflow: 'hidden',
+  },
+  mpHeadshotImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  mpHeadshotFallback: {
+    backgroundColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   votePill: {
     alignSelf: 'flex-start',

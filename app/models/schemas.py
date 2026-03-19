@@ -57,6 +57,7 @@ class DistrictMpVote(BaseModel):
     electoral_district_id: Optional[str] = None
     available: bool = False
     mp_name: Optional[str] = None
+    mp_headshot_url: Optional[str] = None
     mp_party: Optional[str] = None
     vote: Optional[str] = None
     position: Optional[str] = None
