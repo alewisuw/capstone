@@ -90,6 +90,7 @@ def main():
         position = "abstain"
 
     print(position)
+    print(vote_result)
 
 if __name__ == "__main__":
     print("Starting tagging...")
