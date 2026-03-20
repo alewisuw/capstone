@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { StackScreenProps } from '@react-navigation/stack';
@@ -45,31 +45,32 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
         </View>
       </GradientBackground>
 
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-      >
-        {loading ? (
-          <BillCardSkeleton count={3} />
-        ) : savedBills.length > 0 ? (
-          savedBills.map((bill) => (
+      {loading ? (
+        <BillCardSkeleton count={3} />
+      ) : (
+        <FlatList
+          data={savedBills}
+          keyExtractor={(item) => item.bill_id.toString()}
+          renderItem={({ item }) => (
             <BillCard
-              key={bill.bill_id}
-              bill={bill}
-              onPress={() => navigation.navigate('BillDetail', { bill })}
-              isSaved={isSaved(bill.bill_id)}
+              bill={item}
+              onPress={() => navigation.navigate('BillDetail', { bill: item })}
+              isSaved={isSaved(item.bill_id)}
               onToggleSave={toggleSave}
             />
-          ))
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No saved bills yet</Text>
-            <Text style={styles.emptyText}>
-              Tap the bookmark icon on a bill to add it here.
-            </Text>
-          </View>
-        )}
-      </ScrollView>
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>No saved bills yet</Text>
+              <Text style={styles.emptyText}>
+                Tap the bookmark icon on a bill to add it here.
+              </Text>
+            </View>
+          }
+          style={styles.content}
+          contentContainerStyle={styles.contentContainer}
+        />
+      )}
     </SafeAreaView>
   );
 };

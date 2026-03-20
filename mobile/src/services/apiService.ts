@@ -96,10 +96,6 @@ export const getMyProfile = async (token: string): Promise<MyProfileRecord> => {
     });
     return response.data;
   } catch (error) {
-    const status = axios.isAxiosError(error) ? error.response?.status : undefined;
-    if (status !== 404) {
-      console.error('Error fetching profile:', error);
-    }
     throw error;
   }
 };

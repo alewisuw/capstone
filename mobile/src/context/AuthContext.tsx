@@ -130,7 +130,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             errCode === 'UsernameExistsException'
               ? 'Username already exists. Please choose another.'
               : errMessage;
-          console.error('Cognito signUp failed', err);
           resolve({ ok: false, error: message });
           return;
         }

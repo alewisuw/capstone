@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
@@ -44,53 +44,62 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         <AppLogo width={90} height={90} />
       </GradientBackground>
 
-      <View style={styles.card}>
-        <Text style={styles.title}>Log in to your account</Text>
-
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your username"
-          placeholderTextColor="#9b9b9b"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-        />
-
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your password"
-          placeholderTextColor="#9b9b9b"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TouchableOpacity
-          style={[styles.primaryButton, isSubmitting && styles.primaryButtonDisabled]}
-          onPress={handleLogin}
-          disabled={isSubmitting}
+      <KeyboardAvoidingView
+        style={styles.card}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.cardContent}
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
         >
-          {isSubmitting ? (
-            <View style={styles.loadingRow}>
-              <ActivityIndicator size="small" color="#fff" />
-              <Text style={styles.primaryButtonText}>Signing In...</Text>
-            </View>
-          ) : (
-            <Text style={styles.primaryButtonText}>Log In</Text>
-          )}
-        </TouchableOpacity>
+          <Text style={styles.title}>Log in to your account</Text>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your username"
+            placeholderTextColor="#9b9b9b"
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+          />
 
-        <Text style={styles.footer}>
-          Don't have an account?{' '}
-          <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
-            Sign Up
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your password"
+            placeholderTextColor="#9b9b9b"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={[styles.primaryButton, isSubmitting && styles.primaryButtonDisabled]}
+            onPress={handleLogin}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <View style={styles.loadingRow}>
+                <ActivityIndicator size="small" color="#fff" />
+                <Text style={styles.primaryButtonText}>Signing In...</Text>
+              </View>
+            ) : (
+              <Text style={styles.primaryButtonText}>Log In</Text>
+            )}
+          </TouchableOpacity>
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <Text style={styles.footer}>
+            Don't have an account?{' '}
+            <Text style={styles.link} onPress={() => navigation.navigate('SignUp')}>
+              Sign Up
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -122,8 +131,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    padding: theme.spacing.lg,
     marginTop: -12,
+  },
+  cardContent: {
+    padding: theme.spacing.lg,
   },
   title: {
     fontSize: 22,

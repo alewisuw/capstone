@@ -242,4 +242,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BillCard;
+export default React.memo(BillCard);

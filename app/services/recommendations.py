@@ -4,26 +4,36 @@ from typing import Dict, List
 
 from app.services.qdrant import get_qdrant, COLLECTION_NAME
 from app.services.embeddings import get_fusion
-from app.services.db import get_bill_info, get_recent_bills
+from app.services.db import get_bills_info, get_recent_bills
 from app.models.schemas import BillRecommendation
 
 def _build_recommendations(hits) -> List[BillRecommendation]:
-    output = []
-    debug_ids = []
+    scored = []
     for hit in hits:
         payload = hit.payload or {}
         bill_id = payload.get("bill_id")
-        if not bill_id:
-            continue
+        if bill_id:
+            scored.append((bill_id, float(hit.score)))
 
-        info = get_bill_info(bill_id)
+    if not scored:
+        return []
+
+    bill_ids = [bid for bid, _ in scored]
+    infos = get_bills_info(bill_ids)
+    info_map = {info["bill_id"]: info for info in infos}
+
+    output = []
+    for bill_id, score in scored:
+        info = info_map.get(bill_id)
+        if not info:
+            continue
         output.append(
             BillRecommendation(
                 bill_id=bill_id,
                 bill_number=info.get("bill_number"),
-                title=info["title"],
-                summary=info["summary"],
-                score=float(hit.score),
+                title=info.get("title", "[No title found]"),
+                summary=info.get("summary", "[No summary found]"),
+                score=score,
                 parliament_session=info.get("parliament_session"),
                 last_updated=info.get("last_updated"),
                 tags=info.get("tags"),
@@ -31,9 +41,7 @@ def _build_recommendations(hits) -> List[BillRecommendation]:
                 is_new_bill=info.get("is_new_bill"),
             )
         )
-        debug_ids.append(bill_id)
-    if debug_ids:
-        print(f"[recommendations] bill_ids={debug_ids}")
+    print(f"[recommendations] bill_ids={bill_ids}")
     return output
 
 def _fused_search(interests: List[str], demographics: Dict, limit: int, offset: int):

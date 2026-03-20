@@ -1,8 +1,19 @@
 import json
 import psycopg2
+import psycopg2.pool
 import os
 from app.config.settings import DB_CFG
 from typing import List, Dict, Optional
+
+_pool = psycopg2.pool.SimpleConnectionPool(1, 10, **DB_CFG)
+
+
+def _get_conn():
+    return _pool.getconn()
+
+
+def _put_conn(conn):
+    _pool.putconn(conn)
 
 MP_HEADSHOT_BASE_URL = os.getenv("MP_HEADSHOT_BASE_URL", "https://openparliament.ca/media")
 
@@ -38,8 +49,8 @@ def _extract_tag_labels(raw_tags, min_score: float = 0.3, max_tags: int = 2) -> 
     return labels or None
 
 def get_bill_info(bill_id: int):
+    conn = _get_conn()
     try:
-        conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
             SELECT bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code, bt.is_new_bill
@@ -49,10 +60,11 @@ def get_bill_info(bill_id: int):
         """, (bill_id,))
         row = cur.fetchone()
         cur.close()
-        conn.close()
     except Exception as exc:
         err = f"[DB error: {exc}]"
         return {"summary": err, "title": err}
+    finally:
+        _put_conn(conn)
 
     if not row:
         return {"summary": "[No summary found]", "title": "[No title found]"}
@@ -81,8 +93,8 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
         return []
 
     unique_ids = list(dict.fromkeys(int(bill_id) for bill_id in bill_ids))
+    conn = _get_conn()
     try:
-        conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
             SELECT bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en, b.number, b.session_id, b.status_date, bt.llm_tags, b.status_code, bt.is_new_bill
@@ -92,7 +104,6 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
         """, (unique_ids,))
         rows = cur.fetchall()
         cur.close()
-        conn.close()
     except Exception as exc:
         err = f"[DB error: {exc}]"
         return [
@@ -106,6 +117,8 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
             }
             for bill_id in unique_ids
         ]
+    finally:
+        _put_conn(conn)
 
     info_map = {}
     for row in rows:
@@ -143,8 +156,8 @@ def get_bills_info(bill_ids: List[int]) -> List[Dict]:
 
 
 def get_recent_bills(limit: int = 20, offset: int = 0) -> List[Dict]:
+    conn = _get_conn()
     try:
-        conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
             SELECT bill_id, llm_summary, summary_en, name_en,
@@ -164,10 +177,11 @@ def get_recent_bills(limit: int = 20, offset: int = 0) -> List[Dict]:
         """, (limit, offset))
         rows = cur.fetchall()
         cur.close()
-        conn.close()
     except Exception as exc:
         print(f"[DB error] get_recent_bills: {exc}")
         return []
+    finally:
+        _put_conn(conn)
 
     output = []
     for row in rows:
@@ -195,11 +209,10 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
     except (TypeError, ValueError):
         return None
 
+    conn = _get_conn()
     try:
-        conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
 
-        # Resolve the requested district to known riding rows.
         cur.execute(
             """
             SELECT id, name_en
@@ -214,10 +227,8 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
         district_name = ridings[0][1] if ridings else None
         if not riding_ids:
             cur.close()
-            conn.close()
             return None
 
-        # Preferred path: use the recorded elected-member row for the vote.
         cur.execute(
             """
             SELECT
@@ -244,7 +255,6 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
         )
         row = cur.fetchone()
 
-        # Fallback path: match via politician and district membership at vote date.
         if not row:
             cur.execute(
                 """
@@ -276,10 +286,11 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
             row = cur.fetchone()
 
         cur.close()
-        conn.close()
     except Exception as exc:
         print(f"[DB error] get_district_mp_vote failed for bill_id={bill_id}: {exc}")
         return None
+    finally:
+        _put_conn(conn)
 
     if not row:
         return None

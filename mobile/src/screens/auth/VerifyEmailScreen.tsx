@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Ionicons from '../../components/Icon';
 import type { StackScreenProps } from '@react-navigation/stack';
 import type { AuthStackParamList } from '../../types';
@@ -14,26 +14,33 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ navigation }) => {
   const { confirmSignUp, pendingEmail } = useAuth();
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleVerify = async () => {
+    if (isSubmitting) return;
     setError(null);
     if (!code.trim()) {
       setError('Enter the verification code.');
       return;
     }
-    const result = await confirmSignUp(code.trim());
-    if (!result.ok) {
-      setError(result.error || 'Verification failed. Please try again.');
-      return;
+    setIsSubmitting(true);
+    try {
+      const result = await confirmSignUp(code.trim());
+      if (!result.ok) {
+        setError(result.error || 'Verification failed. Please try again.');
+        return;
+      }
+      if (result.needsOnboarding === true) {
+        navigation.navigate('Instructions');
+        return;
+      }
+      if (result.needsOnboarding === false) {
+        return;
+      }
+      navigation.navigate('Login');
+    } finally {
+      setIsSubmitting(false);
     }
-    if (result.needsOnboarding === true) {
-      navigation.navigate('Instructions');
-      return;
-    }
-    if (result.needsOnboarding === false) {
-      return;
-    }
-    navigation.navigate('Login');
   };
 
   return (
@@ -48,28 +55,48 @@ const VerifyEmailScreen: React.FC<VerifyEmailProps> = ({ navigation }) => {
         </View>
       </GradientBackground>
 
-      <View style={styles.card}>
-        <Text style={styles.title}>Verify your email</Text>
-        <Text style={styles.subtitle}>
-          Enter the code sent to {pendingEmail || 'your email'}.
-        </Text>
+      <KeyboardAvoidingView
+        style={styles.card}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          contentContainerStyle={styles.cardContent}
+          keyboardShouldPersistTaps="handled"
+          bounces={false}
+        >
+          <Text style={styles.title}>Verify your email</Text>
+          <Text style={styles.subtitle}>
+            Enter the code sent to {pendingEmail || 'your email'}.
+          </Text>
 
-        <Text style={styles.label}>Verification Code</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter code"
-          placeholderTextColor="#9b9b9b"
-          value={code}
-          onChangeText={setCode}
-          keyboardType="number-pad"
-        />
+          <Text style={styles.label}>Verification Code</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter code"
+            placeholderTextColor="#9b9b9b"
+            value={code}
+            onChangeText={setCode}
+            keyboardType="number-pad"
+          />
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        <TouchableOpacity style={styles.primaryButton} onPress={handleVerify}>
-          <Text style={styles.primaryButtonText}>Verify Email</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={[styles.primaryButton, isSubmitting && styles.primaryButtonDisabled]}
+            onPress={handleVerify}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <View style={styles.loadingRow}>
+                <ActivityIndicator size="small" color="#fff" />
+                <Text style={styles.primaryButtonText}>Verifying...</Text>
+              </View>
+            ) : (
+              <Text style={styles.primaryButtonText}>Verify Email</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -106,8 +133,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    padding: 24,
     marginTop: -12,
+  },
+  cardContent: {
+    padding: 24,
   },
   title: {
     fontSize: 22,
@@ -149,6 +178,14 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 14,
     alignItems: 'center',
+  },
+  primaryButtonDisabled: {
+    opacity: 0.7,
+  },
+  loadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   primaryButtonText: {
     color: '#fff',

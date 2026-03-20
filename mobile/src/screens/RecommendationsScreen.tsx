@@ -324,7 +324,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
               onToggleSave={toggleSave}
             />
           )}
-          ListHeaderComponent={() => (
+          ListHeaderComponent={
             <View>
               {availableProfiles.length > 0 && !user && (
                 <View style={styles.profileChips}>
@@ -458,7 +458,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
                 </View>
               )}
             </View>
-          )}
+          }
           ListFooterComponent={
             loadingMore ? (
               <View style={styles.loadingMore}>

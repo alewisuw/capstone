@@ -33,7 +33,7 @@ export const SavedProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     void refreshSaved();
   }, [authToken, user, refreshSaved]);
 
-  const isSaved = (billId: number): boolean => savedIds.has(billId);
+  const isSaved = useCallback((billId: number): boolean => savedIds.has(billId), [savedIds]);
 
   const toggleSave = useCallback(async (bill: BillRecommendation): Promise<void> => {
     if (!authToken) {

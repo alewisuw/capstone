@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -7,7 +8,16 @@ from app.api import (
     me,
 )
 
-app = FastAPI(title="BillBoard API")
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    from app.services.embeddings import get_fusion
+    get_fusion()
+    print("[startup] SentenceTransformer model loaded")
+    yield
+
+
+app = FastAPI(title="BillBoard API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
