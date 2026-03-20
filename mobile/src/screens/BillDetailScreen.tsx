@@ -358,7 +358,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
             <View style={styles.infoRow}>
               <Ionicons name="information-circle" size={20} color={theme.colors.accentDark} />
               <Text style={styles.infoText}>
-                Bill uses AI generated summaries, make sure to refer to full bill below for most accurate information.
+                BillBoard uses AI generated summaries, make sure to refer to full bill below for most accurate information.
               </Text>
             </View>
           </View>
@@ -592,7 +592,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 10,
-    paddingLeft: 4,
   },
   bulletDot: {
     width: 7,
