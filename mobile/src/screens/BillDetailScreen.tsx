@@ -593,7 +593,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 10,
-    paddingLeft: 4,
   },
   bulletDot: {
     width: 7,
