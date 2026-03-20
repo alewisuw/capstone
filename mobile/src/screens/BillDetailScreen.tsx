@@ -178,9 +178,10 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
           const isBullet = /^[•\-\*▪▫◦‣⁃]\s/.test(trimmed) || /^[0-9]+[\.\)]\s/.test(trimmed);
           
           if (isBullet) {
-            const bulletMatch = trimmed.match(/^([•\-\*▪▫◦‣⁃]|[0-9]+[\.\)])\s(.+)/);
+            const bulletMatch = trimmed.match(/^([•*▪▫◦‣⁃-]|[0-9]+[.)])\s+(.+)/);
             if (bulletMatch) {
-              const [, bullet, content] = bulletMatch;
+              const [, , rawContent] = bulletMatch;
+              const content = rawContent.trimStart();
               return (
                 <View key={index} style={styles.bulletRow}>
                   <View style={styles.bulletDot} />
