@@ -147,12 +147,19 @@ def get_recent_bills(limit: int = 20, offset: int = 0) -> List[Dict]:
         conn = psycopg2.connect(**DB_CFG)
         cur = conn.cursor()
         cur.execute("""
-            SELECT bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en,
-                   b.number, b.session_id, b.status_date, bt.llm_tags,
-                   b.status_code, bt.is_new_bill
-            FROM bills_billtext bt
-            JOIN bills_bill b ON bt.bill_id = b.id
-            ORDER BY b.status_date DESC NULLS LAST
+            SELECT bill_id, llm_summary, summary_en, name_en,
+                   number, session_id, status_date, llm_tags,
+                   status_code, is_new_bill
+            FROM (
+                SELECT DISTINCT ON (bt.bill_id)
+                       bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en,
+                       b.number, b.session_id, b.status_date, bt.llm_tags,
+                       b.status_code, bt.is_new_bill
+                FROM bills_billtext bt
+                JOIN bills_bill b ON bt.bill_id = b.id
+                ORDER BY bt.bill_id, b.status_date DESC NULLS LAST
+            ) sub
+            ORDER BY status_date DESC NULLS LAST
             LIMIT %s OFFSET %s;
         """, (limit, offset))
         rows = cur.fetchall()
