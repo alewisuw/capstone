@@ -178,9 +178,10 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
           const isBullet = /^[•\-\*▪▫◦‣⁃]\s/.test(trimmed) || /^[0-9]+[\.\)]\s/.test(trimmed);
           
           if (isBullet) {
-            const bulletMatch = trimmed.match(/^([•\-\*▪▫◦‣⁃]|[0-9]+[\.\)])\s(.+)/);
+            const bulletMatch = trimmed.match(/^([•*▪▫◦‣⁃-]|[0-9]+[.)])\s+(.+)/);
             if (bulletMatch) {
-              const [, bullet, content] = bulletMatch;
+              const [, , rawContent] = bulletMatch;
+              const content = rawContent.trimStart();
               return (
                 <View key={index} style={styles.bulletRow}>
                   <View style={styles.bulletDot} />
@@ -358,7 +359,7 @@ const BillDetailScreen: React.FC<BillDetailScreenProps> = ({ route, navigation }
             <View style={styles.infoRow}>
               <Ionicons name="information-circle" size={20} color={theme.colors.accentDark} />
               <Text style={styles.infoText}>
-                Bill uses AI generated summaries, make sure to refer to full bill below for most accurate information.
+                BillBoard uses AI generated summaries, make sure to refer to full bill below for most accurate information.
               </Text>
             </View>
           </View>
