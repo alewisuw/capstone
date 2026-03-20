@@ -46,7 +46,16 @@ class EmbeddingFusion:
         interest_emb = self.create_interest_embedding(interests)
         demographic_emb = self.create_demographic_embedding(demographics)
 
-        return interest_emb * 0.8 + demographic_emb * 0.2
+        has_interests = bool(np.any(interest_emb))
+        has_demographics = bool(np.any(demographic_emb))
+
+        if has_interests and has_demographics:
+            return interest_emb * 0.8 + demographic_emb * 0.2
+        if has_interests:
+            return interest_emb
+        if has_demographics:
+            return demographic_emb
+        return None
     
     # fuse rankings after retrieving 2 lists
 

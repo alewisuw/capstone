@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from app.services.qdrant import get_qdrant, COLLECTION_NAME
 from app.services.embeddings import get_fusion
-from app.services.db import get_bill_info
+from app.services.db import get_bill_info, get_recent_bills
 from app.models.schemas import BillRecommendation
 
 def _build_recommendations(hits) -> List[BillRecommendation]:
@@ -45,6 +45,9 @@ def _fused_search(interests: List[str], demographics: Dict, limit: int, offset: 
         demographics=demographics,
     )
 
+    if fused_vector is None:
+        return None
+
     return qdrant.search(
         collection_name=COLLECTION_NAME,
         query_vector=fused_vector.tolist(),
@@ -55,4 +58,22 @@ def _fused_search(interests: List[str], demographics: Dict, limit: int, offset: 
     )
 
 def recommend_bills(interests, demographics, limit, offset: int = 0):
-    return _build_recommendations(_fused_search(interests, demographics, limit, offset))
+    hits = _fused_search(interests, demographics, limit, offset)
+    if hits is None:
+        rows = get_recent_bills(limit=limit, offset=offset)
+        return [
+            BillRecommendation(
+                bill_id=r["bill_id"],
+                bill_number=r.get("bill_number"),
+                title=r["title"],
+                summary=r["summary"],
+                score=0.0,
+                parliament_session=r.get("parliament_session"),
+                last_updated=r.get("last_updated"),
+                tags=r.get("tags"),
+                status_code=r.get("status_code"),
+                is_new_bill=r.get("is_new_bill"),
+            )
+            for r in rows
+        ]
+    return _build_recommendations(hits)

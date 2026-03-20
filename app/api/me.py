@@ -108,8 +108,6 @@ def get_my_recommendations(
     if not item:
         raise HTTPException(status_code=404, detail="Profile not found")
     interests = item.get("interests", [])
-    if not interests:
-        raise HTTPException(status_code=400, detail="No interests found in profile")
     recommendations = recommend_bills(
         interests=interests,
         demographics=item.get("demographics", {}),
