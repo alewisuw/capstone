@@ -89,7 +89,7 @@ def summarize(text, token):
     result = response.json()
     return result["candidates"][0]["content"]["parts"][0]["text"]
 
-def main(no_status_update=False):
+def main(no_old_status_clear=False):
     token = get_token()
 
     conn = psycopg2.connect(
@@ -125,7 +125,7 @@ def main(no_status_update=False):
     """)
     conn.commit()
 
-    if not no_status_update:
+    if not no_old_status_clear:
         cursor.execute("""
             UPDATE bills_billtext
             SET is_new_bill = 0
@@ -153,14 +153,7 @@ def main(no_status_update=False):
                 "summary": summary
             })
 
-            if no_status_update:
-                cursor.execute("""
-                    UPDATE bills_billtext
-                    SET llm_summary = %s
-                    WHERE bill_id = %s
-                """, (summary, bill_id))
-            else:
-                cursor.execute("""
+            cursor.execute("""
                     UPDATE bills_billtext
                     SET llm_summary = %s, is_new_bill = 1
                     WHERE bill_id = %s
@@ -179,11 +172,11 @@ def main(no_status_update=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate LLM summaries for bills.")
     parser.add_argument(
-        "--no-status-update",
+        "--no-old-status-clear",
         action="store_true",
-        help="Skip is_new_bill reset/set updates."
+        help="Skip clearing old is_new_bill values; newly summarized bills are still marked as new."
     )
     args = parser.parse_args()
 
-    response = main(no_status_update=args.no_status_update)
+    response = main(no_old_status_clear=args.no_old_status_clear)
     print("Response:", response)

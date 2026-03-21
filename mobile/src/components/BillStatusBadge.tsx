@@ -106,6 +106,7 @@ const getChamberColor = (normalizedStatus: string): string | null => {
 
 export const getStatusConfig = (statusCode: string): StatusConfig => {
   const normalized = normalize(statusCode);
+  const normalizedNoSpaces = normalized.replace(/\s+/g, '');
   const chamberColor = getChamberColor(normalized);
 
   if (normalized === 'royalassentgiven') {
@@ -139,6 +140,26 @@ export const getStatusConfig = (statusCode: string): StatusConfig => {
       phaseLabel: 'Hold',
       description: 'This bill is not currently prioritized for debate.',
       color: STAGE_COLORS.pending,
+    };
+  }
+
+  if (normalizedNoSpaces === 'senatebillwaitinghouse') {
+    return {
+      icon: timerSvg(CHAMBER_COLORS.house),
+      label: 'Senate Bill Waiting For House',
+      phaseLabel: 'Hold',
+      description: 'This bill has completed Senate stages and is waiting for House of Commons consideration.',
+      color: CHAMBER_COLORS.house,
+    };
+  }
+
+    if (normalizedNoSpaces === 'housebillwaitingsenate') {
+    return {
+      icon: timerSvg(CHAMBER_COLORS.senate),
+      label: 'House Bill Waiting For Senate',
+      phaseLabel: 'Hold',
+      description: 'This bill has completed House of Commons stages and is waiting for Senate consideration.',
+      color: CHAMBER_COLORS.senate,
     };
   }
 
