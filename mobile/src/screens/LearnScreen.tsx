@@ -16,7 +16,7 @@ import GradientBackground from '../components/GradientBackground';
 
 const startHereModules = [
   {
-    title: 'How does Bill Board Work?',
+    title: 'How does BillBoard Work?',
     topics: '4 Topics',
     description: 'Learn how recommendations, search, saved bills, and profile preferences work together.',
   },
@@ -47,7 +47,7 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.headerTitle}>Learn</Text>
         <Text style={styles.headerSubtitle}>
-          Your guide to Bill Board, Parliament, and the legislative process
+          Your guide to BillBoard, Parliament, and the legislative process
         </Text>
         <View style={[styles.topRightLogo, { top: insets.top + 10 }]}
         >
@@ -62,7 +62,7 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ navigation }) => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Start Here</Text>
           <Text style={styles.sectionSubtitle}>
-            Quick modules to help you navigate Bill Board
+            Quick modules to help you navigate BillBoard
           </Text>
         </View>
 
@@ -75,7 +75,7 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ navigation }) => {
             ]}
             android_ripple={{ color: 'rgba(255,255,255,0.08)' }}
             onPress={() => {
-              if (module.title === 'How does Bill Board Work?') {
+              if (module.title === 'How Does BillBoard Work?') {
                 navigation.navigate('LearnDetail', { topic: 'billboard' });
               } else if (module.title === 'Understanding Canadian Legislation') {
                 navigation.navigate('LearnDetail', { topic: 'legislation' });
@@ -111,7 +111,7 @@ const LearnScreen: React.FC<LearnScreenProps> = ({ navigation }) => {
             ]}
             android_ripple={{ color: 'rgba(255,255,255,0.08)' }}
             onPress={() => {
-              if (module.title === 'How does Bill Board Work?') {
+              if (module.title === 'How Does BillBoard Work?') {
                 navigation.navigate('LearnDetail', { topic: 'billboard' });
               } else if (module.title === 'Understanding Canadian Legislation') {
                 navigation.navigate('LearnDetail', { topic: 'legislation' });

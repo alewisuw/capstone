@@ -17,7 +17,7 @@ export type LearnTopic = {
 export const learnTopics: Record<LearnTopicKey, LearnTopic> = {
   billboard: {
     key: 'billboard',
-    title: 'How does Bill Board Work?',
+    title: 'How Does BillBoard Work?',
     subtitle: 'A quick tour of the main features and how personalization works.',
     modules: [
       {
@@ -43,7 +43,7 @@ export const learnTopics: Record<LearnTopicKey, LearnTopic> = {
       },
       {
         id: 'search',
-        title: 'Search by Topic or Issue',
+        title: 'Search by Topic, Title, or Issue',
         summary: 'Find bills by keywords, themes, or specific policy areas.',
         details: [
           'Search by topic, policy area, or bill number.',

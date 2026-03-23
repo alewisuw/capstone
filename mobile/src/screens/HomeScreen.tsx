@@ -25,7 +25,7 @@ import SearchBar from '../components/SearchBar';
 
 type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
-type FilterKey = 'all' | 'in_progress' | 'assented' | 'new';
+type FilterKey = 'all' | 'in_progress' | 'assented' | 'new' | 'current_session';
 type SortKey = 'relevance' | 'recent';
 type SearchMode = 'semantic' | 'title';
 
@@ -126,6 +126,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         return list.filter((bill) => isAssented(bill.status_code));
       case 'new':
         return list.filter((bill) => isNewBill(bill));
+      case 'current_session':
+        return list.filter((bill) => bill.parliament_session === '45-1');
       default:
         return list;
     }
@@ -306,6 +308,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <View style={styles.optionRow}>
                   {([
                     { key: 'all', label: 'All' },
+                    { key: 'current_session', label: 'Current Session' },
                     { key: 'in_progress', label: 'In Progress' },
                     { key: 'assented', label: 'In Law' },
                     { key: 'new', label: 'New' },

@@ -32,7 +32,7 @@ import GradientBackground from '../components/GradientBackground';
 
 type RecommendationsScreenProps = StackScreenProps<RootStackParamList, 'RecommendationsMain'>;
 
-type FilterKey = 'all' | 'in_progress' | 'assented' | 'new';
+type FilterKey = 'all' | 'in_progress' | 'assented' | 'new' | 'current_session';
 type SortKey = 'relevance' | 'recent';
 
 const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ 
@@ -201,6 +201,8 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
         return list.filter((bill) => isAssented(bill.status_code));
       case 'new':
         return list.filter((bill) => isNewBill(bill));
+      case 'current_session':
+        return list.filter((bill) => bill.parliament_session === '45-1');
       default:
         return list;
     }
@@ -421,6 +423,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({
                     <View style={styles.optionRow}>
                       {([
                         { key: 'all', label: 'All' },
+                        { key: 'current_session', label: 'Current Session' },
                         { key: 'in_progress', label: 'In Progress' },
                         { key: 'assented', label: 'In Law' },
                         { key: 'new', label: 'New' },

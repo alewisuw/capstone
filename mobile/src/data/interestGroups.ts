@@ -199,7 +199,7 @@ export const interestGroups: InterestGroup[] = [
     tags: [
       "GST/HST exemptions",
       "Excise tax amendments",
-      "Income tax deductions",
+      "Income tax",
       "Tax credits",
       "Tax fairness",
       "Corporate taxation",

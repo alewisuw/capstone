@@ -20,7 +20,7 @@ const InstructionsScreen: React.FC<InstructionsProps> = ({ navigation }) => {
       </GradientBackground>
 
       <View style={styles.card}>
-        <Text style={styles.title}>How does Billboard work?</Text>
+        <Text style={styles.title}>How Does Billboard work?</Text>
 
         <Text style={styles.introText}>
           All optional inputs you share help tailor your Billboard with bills that best align with your interests.
