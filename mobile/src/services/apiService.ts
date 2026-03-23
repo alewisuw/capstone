@@ -244,11 +244,12 @@ export const deleteMyAccount = async (token: string): Promise<void> => {
 export const searchBills = async (
   query: string,
   limit: number = 20,
-  offset: number = 0
+  offset: number = 0,
+  mode: 'semantic' | 'title' = 'semantic'
 ): Promise<BillRecommendation[]> => {
   try {
     const response = await api.get<BillRecommendation[]>('/api/search/', {
-      params: { q: query, limit, offset },
+      params: { q: query, limit, offset, mode },
     });
     return response.data;
   } catch (error) {

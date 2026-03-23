@@ -200,6 +200,53 @@ def get_recent_bills(limit: int = 20, offset: int = 0) -> List[Dict]:
     return output
 
 
+def search_bills_by_title(query: str, limit: int = 20, offset: int = 0) -> List[Dict]:
+    conn = _get_conn()
+    try:
+        cur = conn.cursor()
+        pattern = f"%{query}%"
+        cur.execute("""
+            SELECT bill_id, llm_summary, summary_en, name_en,
+                   number, session_id, status_date, llm_tags,
+                   status_code, is_new_bill
+            FROM (
+                SELECT DISTINCT ON (b.status_date, b.name_en)
+                       bt.bill_id, bt.llm_summary, bt.summary_en, b.name_en,
+                       b.number, b.session_id, b.status_date, bt.llm_tags,
+                       b.status_code, bt.is_new_bill
+                FROM bills_billtext bt
+                JOIN bills_bill b ON bt.bill_id = b.id
+                WHERE b.name_en ILIKE %s OR b.number ILIKE %s
+                ORDER BY b.status_date DESC NULLS LAST, b.name_en, bt.bill_id
+            ) sub
+            ORDER BY status_date DESC NULLS LAST
+            LIMIT %s OFFSET %s;
+        """, (pattern, pattern, limit, offset))
+        rows = cur.fetchall()
+        cur.close()
+    except Exception as exc:
+        print(f"[DB error] search_bills_by_title: {exc}")
+        return []
+    finally:
+        _put_conn(conn)
+
+    output = []
+    for row in rows:
+        bill_id, llm_summary, summary_en, title, bill_number, session_id, status_date, llm_tags, status_code, is_new_bill = row
+        output.append({
+            "bill_id": bill_id,
+            "summary": llm_summary or summary_en or "[No summary found]",
+            "title": title or "[No title found]",
+            "bill_number": bill_number,
+            "parliament_session": session_id,
+            "last_updated": status_date.isoformat() if status_date else None,
+            "tags": _extract_tag_labels(llm_tags),
+            "status_code": status_code,
+            "is_new_bill": is_new_bill,
+        })
+    return output
+
+
 def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[Dict]:
     if not electoral_district_id:
         return None

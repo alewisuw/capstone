@@ -328,7 +328,10 @@ const LearnModuleDetailScreen: React.FC<LearnModuleDetailProps> = ({ route, navi
                   <Text style={[styles.stageTitle, { color: getStatusConfig(stage.statusCode).color }]}>
                     {stage.title}
                   </Text>
-                  <Text style={styles.stageDescription}>{stage.description}</Text>
+                  <View style={styles.stageBulletRow}>
+                    <View style={styles.stageBulletDot} />
+                    <Text style={styles.stageDescription}>{stage.description}</Text>
+                  </View>
                 </View>
               </View>
             ))}

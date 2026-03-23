@@ -1,6 +1,6 @@
 from app.services.embeddings import get_model
 from app.services.qdrant import search_vectors
-from app.services.db import get_bill_info
+from app.services.db import get_bill_info, search_bills_by_title
 
 def semantic_search(query: str, limit: int = 20, offset: int = 0):
     model = get_model()
@@ -29,3 +29,7 @@ def semantic_search(query: str, limit: int = 20, offset: int = 0):
         })
 
     return output
+
+
+def title_search(query: str, limit: int = 20, offset: int = 0):
+    return search_bills_by_title(query, limit, offset)

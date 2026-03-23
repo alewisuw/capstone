@@ -27,6 +27,7 @@ type HomeScreenProps = StackScreenProps<RootStackParamList, 'HomeMain'>;
 
 type FilterKey = 'all' | 'in_progress' | 'assented' | 'new';
 type SortKey = 'relevance' | 'recent';
+type SearchMode = 'semantic' | 'title';
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -43,6 +44,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [activeSort, setActiveSort] = useState<SortKey>('relevance');
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [showSorts, setShowSorts] = useState<boolean>(false);
+  const [searchMode, setSearchMode] = useState<SearchMode>('semantic');
 
   const handleSearch = async (term?: string | null, append: boolean = false): Promise<void> => {
     const searchTerm = term || query;
@@ -69,7 +71,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     try {
       const limit = 20;
       const nextOffset = append ? currentLimit : 0;
-      const data = await searchBills(searchTerm.trim(), limit, nextOffset);
+      const data = await searchBills(searchTerm.trim(), limit, nextOffset, searchMode);
       
       if (append) {
         // Append new results, avoiding duplicates
@@ -99,7 +101,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     if (!loadingMore && hasMore && currentSearchTerm) {
       handleSearch(currentSearchTerm, true);
     }
-  }, [loadingMore, hasMore, currentSearchTerm]);
+  }, [loadingMore, hasMore, currentSearchTerm, searchMode]);
 
   const isInProgress = (statusCode?: string | null): boolean => {
     if (!statusCode) return false;
@@ -162,7 +164,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         <SearchBar
           value={query}
-          placeholder="Search by topic, issue, or phrase"
+          placeholder={searchMode === 'semantic' ? 'Search by topic, issue, or phrase' : 'Search by bill title or number'}
           onChangeText={setQuery}
           onSubmit={() => handleSearch()}
           onActionPress={() => handleSearch()}
@@ -175,7 +177,41 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           }}
         />
 
-        {null}
+        <View style={styles.searchModeRow}>
+          {([
+            { key: 'semantic', label: 'Topic Search' },
+            { key: 'title', label: 'Title Search' },
+          ] as const).map((mode) => (
+            <Pressable
+              key={mode.key}
+              style={({ pressed }) => [
+                styles.searchModeChip,
+                searchMode === mode.key && styles.searchModeChipActive,
+                pressed && styles.buttonPressed,
+              ]}
+              onPress={() => {
+                if (searchMode !== mode.key) {
+                  setSearchMode(mode.key);
+                  setResults([]);
+                  setCurrentSearchTerm('');
+                  setHasMore(true);
+                }
+              }}
+            >
+              <Ionicons
+                name={mode.key === 'semantic' ? 'sparkles' : 'text'}
+                size={14}
+                color={searchMode === mode.key ? '#fff' : 'rgba(255,255,255,0.8)'}
+              />
+              <Text style={[
+                styles.searchModeChipText,
+                searchMode === mode.key && styles.searchModeChipTextActive,
+              ]}>
+                {mode.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       </GradientBackground>
 
       {loading && results.length === 0 ? (
@@ -467,6 +503,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     paddingHorizontal: 16,
+    marginTop: 16,
     marginBottom: 12,
   },
   sectionTitle: {
@@ -516,6 +553,34 @@ const styles = StyleSheet.create({
   suggestionChipText: {
     color: theme.colors.accent,
     fontWeight: '600',
+  },
+  searchModeRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+  },
+  searchModeChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.5)',
+    backgroundColor: 'transparent',
+  },
+  searchModeChipActive: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderColor: '#fff',
+  },
+  searchModeChipText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  searchModeChipTextActive: {
+    color: '#fff',
   },
 });
 

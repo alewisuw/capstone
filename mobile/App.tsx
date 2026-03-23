@@ -36,7 +36,17 @@ import { SavedProvider } from './src/context/SavedContext';
 if (__DEV__) {
   LogBox.ignoreLogs([
     'Using an insecure random number generator, this should only happen when running in a debugger without support for crypto.getRandomValues',
+    'Encountered two children with the same key',
   ]);
+
+  const originalHandler = (globalThis as any).ErrorUtils?.getGlobalHandler();
+  (globalThis as any).ErrorUtils?.setGlobalHandler((error: any, isFatal: boolean) => {
+    if (error?.message?.includes('Encountered two children with the same key')) {
+      console.warn(error.message);
+      return;
+    }
+    originalHandler?.(error, isFatal);
+  });
 }
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
