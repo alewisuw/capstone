@@ -264,7 +264,7 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
             """
             SELECT id, name_en
             FROM core_riding
-            WHERE id = %s OR edid = %s
+            WHERE edid = %s OR id = %s
             ORDER BY current DESC, id DESC;
             """,
             (district_id, district_id),

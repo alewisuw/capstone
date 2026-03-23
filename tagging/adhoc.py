@@ -49,12 +49,34 @@ def main():
     # Connect to db
     conn = psycopg2.connect(**PG_CONFIG)
     cursor = conn.cursor()
-    print("connected to DB")
 
-    # Duplicate the bills_billtext table
-    cursor.execute("""SELECT * FROM bills_billtext
-where bill_id = 91;
-""")
+    cursor.execute("""SELECT
+                mv.vote,
+                vq.date,
+                vq.result,
+                p.name,
+                p.headshot_thumbnail,
+                p.headshot,
+                party.short_name_en,
+                r.name_en
+            FROM bills_votequestion vq
+            JOIN bills_membervote mv ON mv.votequestion_id = vq.id
+            JOIN core_electedmember em ON em.id = mv.member_id
+            LEFT JOIN core_politician p ON p.id = COALESCE(mv.politician_id, em.politician_id)
+            LEFT JOIN core_party party ON party.id = em.party_id
+            LEFT JOIN core_riding r ON r.id = em.riding_id
+            WHERE vq.bill_id = 96
+                AND em.riding_id = 70346
+
+            ORDER BY vq.date DESC NULLS LAST, vq.id DESC
+            LIMIT 1
+;
+""")    
+    # cursor.execute("""SELECT * from bills_bill
+    #     WHERE id = 96
+
+    # ;
+    # """)
     conn.commit()
     print(cursor.fetchall())
 
@@ -66,5 +88,4 @@ where bill_id = 91;
    
 
 if __name__ == "__main__":
-    print("Starting tagging...")
     main()   
