@@ -66,7 +66,7 @@ def main():
             LEFT JOIN core_party party ON party.id = em.party_id
             LEFT JOIN core_riding r ON r.id = em.riding_id
             WHERE vq.bill_id = 96
-                AND em.riding_id = 70346
+                AND em.riding_id = 35018
 
             ORDER BY vq.date DESC NULLS LAST, vq.id DESC
             LIMIT 1

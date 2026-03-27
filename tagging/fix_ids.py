@@ -32,7 +32,7 @@ PG_CONFIG = {
 # ── Paths ──────────────────────────────────────────────────────────────────────
 
 INPUT_PATH  = os.path.join(os.path.dirname(__file__), '../mobile/src/data/federalDistricts2023.json')
-OUTPUT_PATH = os.path.join(os.path.dirname(__file__), '../mobile/src/data/federalDistricts2023_fixed.json')
+OUTPUT_PATH = os.path.join(os.path.dirname(__file__), '../mobile/src/data/federalDistricts2023.json')
 
 # ── Name normalisation (strips accents, punctuation, case) ────────────────────
 

@@ -265,7 +265,7 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
             SELECT id, name_en
             FROM core_riding
             WHERE edid = %s OR id = %s
-            ORDER BY current DESC, id DESC;
+            ORDER BY edid DESC, current DESC NULLS LAST;
             """,
             (district_id, district_id),
         )
@@ -295,10 +295,11 @@ def get_district_mp_vote(bill_id: int, electoral_district_id: str) -> Optional[D
             LEFT JOIN core_riding r ON r.id = em.riding_id
             WHERE vq.bill_id = %s
               AND em.riding_id = ANY(%s)
-            ORDER BY vq.date DESC NULLS LAST, vq.id DESC
+            ORDER BY ARRAY_POSITION(%s, em.riding_id) DESC, 
+            vq.date DESC NULLS LAST, vq.id DESC
             LIMIT 1;
             """,
-            (bill_id, riding_ids),
+            (bill_id, riding_ids, riding_ids),
         )
         row = cur.fetchone()
 
